@@ -32,7 +32,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy matplotlib scipy sympy pandas
+          pip install numpy matplotlib scipy sympy pandas jupyter pyyaml
 
       - name: Render all book variants
         run: |
