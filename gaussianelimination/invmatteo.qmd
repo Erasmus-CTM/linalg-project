@@ -1,0 +1,10 @@
+::: {#thm-corekv} 
+\index{Invertible matrix theorem}
+The following are equivalent for an $n\times n$-matrix $A$: 
+
+1. $A$ is row equivalent with $I_n$. 
+2. $A\mathbf{x}=\mathbf{0}$ has $\mathbf{x}=\mathbf{0}$ as the only solution. 
+3. $A\mathbf{x}=\mathbf{b}$ has a unique solution for all right hand sides $\mathbf{b}$. 
+4. $A$ can be written as the product of elementary matrices. 
+
+:::

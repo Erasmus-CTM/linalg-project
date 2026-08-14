@@ -1,0 +1,8 @@
+::::: {.content-visible when-format="html"}
+Verify the result with your own python code:
+```{pyodide-python}
+import numpy as np
+
+
+```
+:::::

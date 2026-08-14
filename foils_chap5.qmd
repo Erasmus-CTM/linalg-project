@@ -1,0 +1,70 @@
+---
+title: "Foils for Chapter 5 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+
+# Linear independence and bases
+
+---
+
+## Basic definitions
+Let $\{\mathbf{a}_i\}_{i=1}^n$ be vectors in $\mathbb{R}^m$, and $c_1,c_2,...,c_n$ be scalars.
+
+- $c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n$ is called a *linear combination* of $\{\mathbf{a}_i\}_{i=1}^n$. 
+- The *Span* of $\{\mathbf{a}_i\}_{i=1}^n$, written $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$, 
+is the collection of av all linear combinations of $\{\mathbf{a}_i\}_{i=1}^n$. We say that the $\mathbf{a}_i$ 
+*span* $\mathbb{R}^m$ if 
+$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)=\mathbb{R}^m$.
+- We also say that they are *linearly independent*
+if every $\mathbf{b}\in \text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ can be written as a linear combination of 
+the $\mathbf{a}_i$ in a unique way.
+
+
+---
+
+::: {#prp-linindequivalence}
+The following are equivalent:
+
+1. $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent
+2. $c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = \mathbf{0}$ always implies that $c_1=c_2=\cdots=c_n=0$.
+
+:::
+
+A relation as in 2. is also called a *linear dependence relation*\index{Linear!dependence relation}. 
+In other words, if $\mathbf{c}=(c_1,...,c_n)$, then $A\mathbf{c}=\mathbf{0}$ is a linear dependence relation between the columns of $A$.
+
+---
+
+
+{{< include bases/invmatteo.qmd >}}
+
+--- 
+
+## Subspaces
+
+A set $U\subseteq\mathbb{R}^m$ so that
+
+1. if $\mathbf{u}_1,\mathbf{u}_2\in U$, then also $\mathbf{u}_1+\mathbf{u}_2\in U$
+2. if $\mathbf{u}\in U$, then also $c\mathbf{u}\in U$ for all scalars $c$.
+
+Examples of subspaces:
+
+- $\text{Span}(\mathbf{a}_1,...,\mathbf{a}_n$: Span of the vectors $\{\mathbf{a}_i\}_{i=1}^n$.
+- $\text{Col} A$: The column space of $A$.
+- $\text{Row} A$: The row space of $A$.
+- $\text{Nul} A$: The null space of $A$
+- $A^{\perp}$: The orthogonal complement of the set $A$.
+
+---
+
+## Coordinate mappings and change of coordinates {#sec-coordmappings}

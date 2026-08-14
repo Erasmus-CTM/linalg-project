@@ -1,0 +1,361 @@
+# Project: Jacobi's method for finding eigenvalues
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+
+We will study the *Jacobi method*, which can be used to find all eigenvectors and eigenvalues of a symmetric matrix numerically. 
+It does so by constructing orthogonal matrices $P_1,P_2,...$, and successively applying similarity transformations
+\begin{eqnarray*}
+  A_1 &=& A \\
+  A_2 &=& P_1^TA_1P_1 \\
+  A_3 &=& P_2^TA_2P_2 \\
+  \vdots & & \vdots \\
+  A_{k+1} &=& P_k^TA_kP_k
+\end{eqnarray*}
+
+::: {#exr-1}
+Set $B=P^TAP$ with $A$ symmetric and $P$ orthogonal. Show that $B$ is symmetric.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Wew compute 
+$$B^T=(P^TAP)^T=P^TA^T(P^T)^T=P^TAP=B,$$
+so that $B$ also is symmetric. 
+:::::::
+:::::
+:::
+
+
+  
+::: {#exr-2}
+Show that the matrices $A_1,A_2,A_3,...$ all have the same eigenvalues. 
+Show also that, if $\mathbf{v}$ is an eigenvector of $A_k$, then $(P_k)^T\textbf{v}$ is an eigenvector for $A_{k+1}$
+and that, if $\mathbf{v}$ is an eigenvector of $A$, then $(P_1\cdots P_k)^T\textbf{v}$ is an eigenvector of $A_{k+1}$.  
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If $\textbf{v}$ is an eigenvector for $A_k$ with eigenvalue $\lambda$, then the last equation above gives
+$$A_{k+1}(P_k)^T\textbf{v}=(P_k)^TA_k\textbf{v}=\lambda (P_k)^T\textbf{v},$$
+so that $(P_k)^T\textbf{v}$ is an eigenvector for $A_{k+1}$, also with eigenvalue $\lambda$. Since $A_k$ and $A_{k+1}$ have the 
+same eigenvalues, all of the $A_k$ have the same eigenvalues. 
+If $\textbf{v}$ is an eigenvector of $A_1=A$, then in particular $(P_1)^T\textbf{v}$ will be an eigenvector of $A_2$. 
+By repeating this procedure $(P_2)^T(P_1)^T\textbf{v}$ will be an eigenvector for $A_3$, and more generally 
+$$
+  (P_k)^T\cdots(P_1)^T\textbf{v} = (P_1\cdots P_k)^T\textbf{v}
+$$
+will be an eigenvector for $A_{k+1}$.
+:::::::
+:::::
+:::
+
+Thus, if $P$ is a matrix consisting of orthonormal eigenvectors for $A$ (so that $A=PDP^T$), 
+$(P_1\cdots P_k)^TP$ is a matrix consisting of orthonormal eigenvectors of $A_{k+1}$. 
+It follows that $A_{k+1}=(P_1\cdots P_k)^TPDP^T(P_1\cdots P_k)$, so that 
+$$A=PDP^T=(P_1\cdots P_k)A_{k+1}(P_1\cdots P_k)^T$$ {#eq-off-to-zero}
+The idea is now to choose the $P_i$ so that the matrices $A_i$ get closer to zero outside the diagonal. 
+We will later see that we can achieve this. 
+
+::: {#exr-3}
+One can show that the eigenvalues of a matrix can be written as a continuous function of the matrix entries. 
+Assume that the off-diagonal entries of $A_{k+1}$ in @eq-off-to-zero all converge to $0$. 
+Explain that the diagonal entries of $A_{k+1}$ converge to the eigenvalues of $A$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Set $A_k=D_k+E_k$, where $D_k$ is the diagonal part of $A_k$, and $E_k$ its off-diagonal part. Since $E_k\to 0$. 
+we have that $(P_1\cdots P_k)D_{k+1}(P_1\cdots P_k)^T\to A$. 
+By continuity of the eigenvalues it follows that the diagonal elements in $D_k$ converge to the eigenvalues of $A$. 
+:::::::
+:::::
+:::
+
+We will not go into similar arguments for the convergence of $P_1\cdots P_k$ to a matrix with eigenvectors as columns.
+
+After each transformation $A_{k+1} = P_k^TA_kP_k$ we will therefore compute
+$$\text{off}(A) = \sqrt{\sum_{i\neq j}^n a_{ij}^2},$$
+and if this value is less than a given tolerance, $A$ is considered 'diagonal enough', and the algorithm terminates. 
+
+
+
+
+
+
+
+
+
+
+The matrices $P_k$ will have the following form
+$$
+P_k =
+\begin{pmatrix}
+  1      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 0 \\
+  0      & 1      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cos\theta  & \cdots       & \sin\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & -\sin\theta & \cdots       & \cos\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  0      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 1
+\end{pmatrix}
+$$ {#eq-s_matrisen}
+where $(P_k)_{rr} = (P_k)_{ss} = \cos\theta$, $(P_k)_{rs} = -(P_k)_{sr} = \sin\theta$, $(P_k)_{ii} = 1$ (for $i\neq r,s$) and $0$ else. 
+
+::: {#exr-4}
+Show that the matrices $P_k$ defined by @eq-s_matrisen are orthogonal, so that
+$$
+(P_k)^{-1} = (P_k)^T =
+\begin{pmatrix}
+  1      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 0 \\
+  0      & 1      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cos\theta  & \cdots       & -\sin\theta & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \sin\theta  & \cdots       & \cos\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  0      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 1
+\end{pmatrix}
+$$ {#eq-s_matrisen2}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $C$ be the product of the matrices given by @eq-s_matrisen and @eq-s_matrisen2. 
+Since the rows/columns coincide with the rows/columns of the identity matrix, outside row/column $r$ and $s$, 
+it is clear that $c_{kl}=I_{kl}$
+when $k\neq r,s$, $l\neq r,s$ ($I$ is the identity matrix). 
+If $k\neq r,s$ we also see that $c_{kr}=c_{rk}=c_{ks}=c_{sk}=0$, since columns $r,s$ are the only ones which have elements in row $r$ and $s$. 
+Further we see that 
+\begin{eqnarray*}
+  c_{rs} &=& -\cos\theta\sin\theta + \sin\theta\cos\theta = 0\\
+  c_{sr} &=& -\sin\theta\cos\theta + \cos\theta\sin\theta = 0\\
+  c_{rr} &=& \cos\theta\cos\theta + \sin\theta\sin\theta = 1\\
+  c_{ss} &=& (-\sin\theta)(-\sin\theta) + \cos\theta\cos\theta = 1.
+\end{eqnarray*}
+It is therefore clear that $C=I$, so that the two matrices are inverses of one-another. 
+:::::::
+:::::
+:::
+
+
+::: {#exr-5}
+Why is $P_k$ often called a rotation matrix?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If $n=2$ we know that the matrix $P$ corresponds to a rotation with angle $\theta$ in the plane. 
+These more general matrices therefore have inherited the name rotation matrices, since they can be viewed as a rotation when we limit ourselves 
+to the plane spanned by two variables $x_r$ and $x_s$, while all other variables are kept fixed. 
+:::::::
+:::::
+:::
+
+::: {#exr-6}
+Write a function \texttt{P\_k} which takes the position $(r,s)$, the angle $\theta$, and the dimension $n$ as arguments, and returns the matrix @eq-s_matrisen.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used
+```{python}
+{{< include P_k.py >}}
+```
+:::::::
+:::::
+:::
+
+
+::: {#exr-7}
+Write a function which takes a real $n\times n$-matrix $A$ as input, and returns $\text{off}(A)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used
+```{python}
+{{< include off.py >}}
+```
+:::::::
+:::::
+:::
+
+::: {#exr-8}
+Write a function \texttt{offabsmaks} which takes a real $n\times n$-matrix as input, 
+and returns the position $(r,s)$ of the element outside the diagonal with biggest absolute value.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+There are several ways to do this. One way is to use the \texttt{max}-function as follows:
+```{python}
+{{< include offabsmaks.py >}}
+```
+:::::::
+:::::
+:::
+
+
+::: {#exr-9}
+The quantity $\sqrt{\sum_{i,j} a_{ij}^2}$ is called the *Frobenius norm* of $A$, and is written $\|A\|_F$. 
+Show that, if $P$ is orthogonal and $B=PA$, $A$ and $B$ have the same Frobenius norm. We say that the Frobenius norm is *invariant* under orthogonal transformations. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $(PA)_{:,i}=PA_{:,i}$, it is enough to show this invariance when $A$ and $B$ are column vectors. Since the Frobenius norm equals the euclidean norm for column vectors we get
+$$
+| P\mathbf{a}|^2 = (P\mathbf{a})^TP\mathbf{a}=\mathbf{a}^TP^TP\mathbf{a}=\mathbf{a}^T\mathbf{a} =|\mathbf{a}|^2.
+$$
+
+:::::::
+:::::
+:::
+
+
+::: {#exr-10}
+Show that 
+$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^1-2a_{rs}^2.$$ {#eq-newrel}
+by restricting $B=P^TAP$ to row/columns $r$ and $s$, 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Using that $A$ and $B$ have the same Frobenius norm, we get that 
+$$a_{rr}^2 + a_{rs}^2 + a_{sr}^2 + a_{ss}^2 = b_{rr}^2 + b_{rs}^2 + b_{sr}^2 + b_{ss}^2.$$
+Using that $A$ and $B$ are symmetric this can be written as in @eq-newrel.
+:::::::
+:::::
+:::
+
+If $i,j$ are both different from $r$ and $s$, we have that $b_{ij}=a_{ij}$. We also need to compute $b_{rs}$. 
+
+::: {#exr-11}
+Show that
+\begin{equation}
+  b_{rs} = b_{sr} = \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta-\sin^2\theta)a_{rs}.
+\end{equation}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $P$ has nonzero elements only in position $r$ and $s$ in row/column $r$ and $s$, it is clear that
+\begin{eqnarray*}
+  b_{rs} &=& (P^T)_{rr}a_{rr}P_{rs} + (P^T)_{rr}a_{rs}P_{ss} + (P^T)_{rs}a_{sr}P_{rs} + (P^T)_{rs}a_{ss}P_{ss} \\
+         &=& \cos\theta a_{rr}\sin\theta + \cos\theta a_{rs}\cos\theta -\sin\theta a_{sr}\sin\theta - \sin\theta a_{ss}\cos\theta \\
+         &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + \cos^2\theta a_{rs} - \sin^2\theta a_{sr} \\
+         &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta - \sin^2\theta)a_{sr},
+\end{eqnarray*}
+where we have used that $A$ is symmetric in the last equality.
+:::::::
+:::::
+:::
+
+
+
+From the first point above it follows that $\sum_{i\neq r,s} a_{ii}^2 = \sum_{i\neq r,s} b_{ii}^2$. 
+Adding $a_{rr}^2+a_{ss}^2+b_{rr}^2+b_{ss}^2$ to both sides gives
+$$\sum_{i=1}^n a_{ii}^2 + b_{rr}^2 + b_{ss}^2 = \sum_{i=1}^n b_{ii}^2 + a_{rr}^2 + a_{ss}^2,$$
+which can be written as
+$$\|A\|_F^2 - \text{off}(A)^2 + b_{rr}^2 + b_{ss}^2 = \|B\|_F^2 - \text{off}(B)^2 + a_{rr}^2 + a_{ss}^2.$$
+Since $\|A\|_F=\|B\|_F$ this can be written as
+$$
+\text{off}(B)^2 = \text{off}(A)^2 + a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2 = \text{off}(A)^2 + 2b_{rs}^1 - 2a_{rs}^2,$$ {#eq-newthis}
+where we used @eq-newrel. Thus, the off-diagonal contribution $\text{off}(B)$ only changes due to the $(r,s)$ and $(s,r)$ components,
+
+
+::: {#exr-12}
+
+Explain that $r,s,\theta$ will give a $B$ with smallest possible $\text{off}(B)$ when 
+$r,s$ are chosen so that $|a_{rs}|$ becomes biggest possible, and $b_{rs}=0$, i.e., when
+$$\sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta-\sin^2\theta)a_{rs} = 0$$ {#eq-losdenne0}
+The new value for $\text{off}(B)$ is then $\text{off}(B)^2 = \text{off}(A)^2 - 2a_{rs}^2$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+It is clear from @eq-newthis that $\text{off}(B)$ is smallest when $|a_{rs}|$ is biggest possible, and when $b_{rs}=0$. 
+For the latter @eq-losdenne0 must hold.   
+:::::::
+:::::
+:::
+
+Note that @los-denne0 also can be written as
+$$\tan(2\theta)=\frac{2a_{rs}}{a_{ss}-a_{rr}}.$$ {#eq-losdenne}
+
+
+::: {#exr-13}
+Show that when $r,s,\theta$ are chosen as above, we have that
+$$\text{off}(B)^2 = \left(1- \frac{2}{n(n-1)}\right)\text{off}(A)^2.$$
+Explain from this why $\text{off}(B)$ converges to $0$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since there are $n(n-1)$ off-diagonal entries, each of which are less than $|a_{rs}|$ in absolute value, 
+we have that $\text{off}(A)^2 \leq n(n-1)a_{rs}^2$. From this it follows that 
+$-2a_{rs}^2\leq - \frac{2}{n(n-1)}\text{off}(A)^2$, so that 
+$$
+\text{off}(B)^2 = \text{off}(A)^2 - 2a_{rs}^2 \leq \text{off}(A)^2 - \frac{2}{n(n-1)}\text{off}(A)^2
+= \left(1- \frac{2}{n(n-1)}\right)\text{off}(A)^2.
+$$
+Since $\left| 1- \frac{2}{n(n-1)}\right|\leq 1$ it follows that $\text{off}(B)$ converges to zero. 
+:::::::
+:::::
+:::
+
+
+::: {#exr-14}
+Study the following code.
+```{python}
+{{< include eig_jacobi.py >}}
+```
+Explain all parts of this code, and which exercise over that are used. What will the code print?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The code returns an approximation to the eigenvalues and the eigenvectors of a matrix with help of Jacobi's method. 
+Inside the loop $r,s$ are first found as the off-diagonal entry with largest absolute value, $\theta$ is found from @eq-losdenne, 
+and the matrix $P_k$ is computed. 
+The variable `A` is updated to $A_2$, $A_3$, and so on, 
+while the variable `P` is updated to $P_1$, $P_1P_2$, $P_1P_2P_3$, and so on.
+The code stops when $\text{off}(A_k)$ gets smaller than the given tolerance. 
+:::::::
+:::::
+:::
+
+
+
+
+To test this we create a random $6\times 6$ matrix $A$. $A+A^T$ is then a symmetric matrix:
+```{python}
+A = np.random.rand(6,6)
+A = A+A.T
+```
+Our method gives the following approximation to the eigenvalues:
+```{python}
+D, P = eig_jacobi(A)
+np.diag(D)
+```
+We first verify that the columns in $P$ are eigenvectors. This is the same as testing that 
+$PDP^T$ is an orthogonal diagonalisation of $A$:
+```{python}
+A - P @ D @ P.T
+```
+It is seen that $A-PDP^T$ is not exactly zero, but very close to zero. This is due to roundoff errors on the computer. 
+We then test that we get the same eigenvalues as returned by `np.linalg.eig`:
+```{python}
+D, P = np.linalg.eig(A)
+D
+```
+We see that `eig_jacobi` and `np.linalg.eig` give approximately the same values, 
+but they are listed in a different order. On a computer we have no control over 
+the order eigenvalues are listed - the algorithm decides this along the way.
+
+The matrix $A$ may be very large, and the function $P_k$ allocates a matrix of the same size. 
+
+::: {#-exr-15}
+Write a function which implements the transformation $A\to AP_k$ and avoids this problem
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following function implements multiplication with $P_k$ to the right, and avoids this problem simply by 
+re-computing only the two columns $r$ and $s$ (these are the only two columns in $A$ and $AP_k$ which differ):
+```{python}
+{{< include mult_Pk_right.py >}}
+```
+:::::::
+:::::
+:::

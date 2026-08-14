@@ -1,0 +1,492 @@
+# Orthogonally diagonalisable matrices. Condition numbers.
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+When solving the system $A\mathbf{x}=\mathbf{b}$ on a computer, the matrix $A$ and the right hand side $\mathbf{b}$ will typically be subject to measurement- and round-off errors.
+The computer will therefore actually be served a problem on the form
+$$(A+E)\mathbf{y}=\mathbf{b}+\mathbf{e},$$
+where $E$/$\mathbf{e}$ is a matrix/vector with small components, and which represent a deviation from the actual coefficient matrix/right hand side. 
+In this chapter we will assume for simplicity that there is no round-off errors in the coefficient matrix, so that $E=0$. 
+We will ask ourselves the following question: How does the error $\mathbf{e}$ in the right hand side propagate to the solution of the system? 
+Are there any cases where even a small error $\mathbf{e}$ will propagate to a large error between the solutions $\mathbf{x}$ and $\mathbf{y}$? 
+Such behaviour is clearly not desirable, since it would make us vulnerable to small errors. 
+
+To illustrate that such a behaviour actually is possible, set
+$$A=\frac{1}{2}\begin{pmatrix}1+\epsilon & 1-\epsilon \\ 1-\epsilon & 1+\epsilon\end{pmatrix},$$
+where $\epsilon$ is a number we will experiment with.
+Consider the system $A\mathbf{x}=\mathbf{b}$, where $\mathbf{b}=\begin{pmatrix}1 \\ 1\end{pmatrix}$. It is easy to show that the exact solution is 
+$\mathbf{x}= \begin{pmatrix}1 \\ 1 \end{pmatrix}$ for all $\epsilon$. 
+If there is a small error $\mathbf{e}$, we would expect the solution of $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ to be near $\mathbf{x}=(1,1)$, regardless of what $\epsilon$ is.
+Let us check this with $\mathbf{e}=10^{-3}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$. 
+In @exr-kontrollsjekk you are asked to check that $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ has solution
+$$\mathbf{y}=\begin{pmatrix} 1 \\ 1 \end{pmatrix} + 10^{-3}\epsilon^{-1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}.$$
+Something unexpected occurs here: When $\epsilon\to 0$ we get very large solutions $\mathbf{y}$, which get further and further away from $\mathbf{x}$. 
+What goes wrong here? The explanation we shall give is that $A$ has a high *condition number* when $\epsilon\to 0$. 
+Put differently, when $\epsilon\to 0$ the matrix $A$ will be close to the matrix $\frac{1}{2}\begin{pmatrix}1 & 1 \\ 1 & 1\end{pmatrix}$, which is not invertible. 
+This is problematic since a system with a non-invertible matrix does not have a unique solution in general.
+
+The behaviour above is best explained if we restrict ourselves to symmetric matrices. 
+In the next section we will explain that all such matrices are what we call orthogonally diagonalisable, and this property will help us in our analysis. 
+
+## Orthogonally diagonalisable matrices
+In the factorisation of a diagonalisable matrix, one has the term $P^{-1}$. If $P$ also is orthogonal (i.e., $P$ is real and $P^{-1}=P^T$) we have that 
+$$A=PDP^T.$$
+Real matrices which can be written in this way are called *orthogonally diagonalisable*\index{Orthogonally diagonalisable}. Such matrices must be symmetric since
+$$
+A^T=(PDP^T)^T=PD^TP^T=PDP^T=A.
+$$
+Since $D=P^TAP$ and $A$ and $P$ are real, $D$ is also real.
+
+When $P^{-1}=P^T$, the outer form of matrix multiplication gives
+$$
+PDP^T = \sum_{k=1}^n \lambda_k P_{:k}(P_{:k})^T
+$$
+Since the columns in $P$ have length $1$, this says that $A$ can be written as a (weighted) sum of  
+projection matrices (see @exm-projeksjonmatr). 
+
+
+
+
+The *spectral theorem* says that, the other way, alle real symmetric matrices are orthogonally diagonalisable. 
+To prove this is more difficult. First we prove the following.
+
+::: {#prp-}
+A real, symmetric $n\times n$-matrix $A$ has only real eigenvalues, and all eigenvectors can be written on real form. 
+:::
+
+::: {.proof}
+Let $\mathbf{x},\mathbf{y}\in\mathbb{R}^n$. 
+With the definition of the complex scalar product we get
+\begin{align*}
+(A\mathbf{x})\cdot \mathbf{y} &= (A\mathbf{x})^T \overline{\mathbf{y}} = \mathbf{x}^T A^T \overline{\mathbf{y}}\\
+\mathbf{x}\cdot (A\mathbf{y}) &= \mathbf{x}^T \overline{(A\mathbf{y})} = \mathbf{x}^T \overline{A} \overline{\mathbf{y}} = \mathbf{x}^T A \overline{\mathbf{y}}.
+\end{align*}
+Since $A=A^T$ we have equality here for all $\mathbf{x},\mathbf{y}$, i.e.,  
+$$
+(A\mathbf{x})\cdot \mathbf{y} = \mathbf{x}\cdot (A\mathbf{y}).
+$$ {#eq-innsettingher}
+If here $\mathbf{x}=\mathbf{y}$ and $A\mathbf{x}=\lambda \mathbf{x}$ with $\mathbf{x}\neq\mathbf{0}$, substitution in 
+@eq-innsettingher gives that
+$$\lambda|\mathbf{x}|^2=\overline{\lambda}|\mathbf{x}|^2.$$
+These two are equal if and only if $\lambda=\overline{\lambda}$, so that $\lambda$ is real.
+Row reduction of $A-\lambda I$ now gives us that all eigenvectors can be written on real form.
+:::
+
+We now need the following result, which is the one most difficult to prove
+
+::: {#thm-}
+A real, symmetric $n\times n$-matrix can be written on the form 
+$$A=PRP^T,$$
+with $P$ orthogonal, and $R$ upper triangular. 
+:::
+
+The factorisation $A=PRP^T$ with $P$ orthogonal and $R$ upper triangular is also called a *Schur-factorisation*\index{Factorisation!Schur}.
+The theorem holds more generally, but we will only need the result for symmetric matrices.
+
+::: {.proof}
+For $n=1$ this is obvious (choose $P=1$).\index{Block matrix!in proof of the spectral theorem} 
+Suppose now we have shown that all $(n-1)\times(n-1)$-matrices have a Schur-factorisation. Let $\mathbf{x}_1$ be an eigenvector for $A$ corresponding to eigenvalue $\lambda_1$. 
+Let $\mathbf{x}_1$ have length $1$. We can assume that both $\mathbf{x}_1$ and $\lambda_1$ are real since $A$ is symmetric. 
+Extend $\mathbf{x}_1$ to an orthonormal basis $\{\mathbf{x}_1,\mathbf{x}_2,...,\mathbf{x}_n\}$ for $\mathbb{R}^n$ (see @prp-underromortbasis), and set 
+$$P_1=\begin{pmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \cdots & \mathbf{x}_n \end{pmatrix}.$$
+$P_1$ is orthogonal. We have that
+$$
+P_1^TAP_1\mathbf{e}_1=P_1^TA\mathbf{x}_1=\lambda_1P_1^T\mathbf{x}_1=\lambda_1\mathbf{e}_1,
+$$
+so that $P_1^TAP_1=\left(\begin{array}{c|c} \lambda_1 & \mathbf{a} \\ \hline \mathbf{0} & M \end{array}\right)$, 
+where $\mathbf{a}$ is a row vector with $n-1$ components, and $M$ is an $(n-1)\times(n-1)$ matrix. We then have that 
+$$A = P_1 \left(\begin{array}{c|c} \lambda_1 & \mathbf{a} \\ \hline \mathbf{0} & M \end{array}\right) P_1^T.$$
+The matrix $M$ is symmetric since $A$ is, and by induction it is assumed to have a Schur factorisation $M=P_0R_0P_0^T$, 
+where $P_0$ is orthogonal and $R_0$ upper triangular. If we insert this we get 
+\begin{align*}
+A &= P_1 \left(\begin{array}{c|c} \lambda_1 & \mathbf{a} \\ \hline \mathbf{0} & P_0R_0P_0^T \end{array}\right) P_1^T \\
+&= P_1 \left(\begin{array}{c|c} 1 & \mathbf{0} \\ \hline \mathbf{0} & P_0 \end{array}\right)   \left(\begin{array}{c|c} \lambda_1 & \mathbf{a}P_0 \\ \hline \mathbf{0} & R_0 \end{array}\right)   \left(\begin{array}{c|c} 1 & 0 \\ \hline \mathbf{0} & P_0^T \end{array}\right) P_1^T \\
+&= P_1 \left(\begin{array}{c|c} 1 & \mathbf{0} \\ \hline \mathbf{0} & P_0 \end{array}\right)   \left(\begin{array}{c|c} \lambda_1 & \mathbf{a}P_0 \\ \hline \mathbf{0} & R_0 \end{array}\right)   \left( P_1 \left(\begin{array}{c|c} 1 & \mathbf{0} \\ \hline \mathbf{0} & P_0 \end{array}\right) \right)^T.
+\end{align*}
+Since $P_1 \left(\begin{array}{c|c} 1 & \mathbf{0} \\ \hline \mathbf{0} & P_0 \end{array}\right)$ is orthogonal (this is an exercise) 
+and $\left(\begin{array}{c|c} \lambda_1 & \mathbf{a}P_0 \\ \hline \mathbf{0} & R_0 \end{array}\right)$ 
+is upper triangular, this is a Schur factorisation of $A$.
+:::
+
+If $A=PRP^T$ is symmetric we have that $PRP^T=PR^TP^T$, so that $R=R^T$. But an upper triangular matrix which is symmetric must be diagonal, so that the Schur-factorisation in fact is an orthogonal diagonalisation. Real, symmetric matrices 
+are also orthogonally diagonalisable, and since we started by saying that orthogonally diagonalisable matrices are symmetric, we have shown the following.
+
+::: {#thm- name='The spectral theorem'} 
+\index{The spectral theorem}
+A real $n\times n$-matrix is orthogonally diagonalisable if and only if it is symmetric.
+:::
+
+Let us summarise some other things as well. 
+We know that, if $A=PDP^T$, then column $i$ in $P$ is an eigenvector for $A$ corresponding to $\lambda_i$. Since the columns is $P$ are orthonormal, it follows that the eigenspaces are orthogonal, and that the dimension of the eigenspace 
+equals the multiplicity of the eigenvalue. 
+
+::: {#thm-}
+A real symmetric $n\times n$-matrix
+
+1. has $n$ real eigenvalues,
+2. has mutually orthogonal eigenspaces,
+3. has dimension of the eigenspace corresponding to $\lambda$ equal to the multiplicity of $\lambda$ as root in the characteristic equation.
+
+:::
+
+We will have use for the following result. 
+
+::: {#lem-ineqspectral}
+Suppose that $A$ is real, symmetric, and invertible, and let
+$$|\lambda_1|\geq|\lambda_2|\geq\cdots\geq|\lambda_n|>0$$
+be the eigenvalues of $A$ listed by descending absolute value. Then we have that 
+$$
+|\lambda_n||\mathbf{x}|\leq|A\mathbf{x}|\leq |\lambda_1||\mathbf{x}|
+$$ {#eq-ineqhere}
+for all $\mathbf{x}$. 
+:::
+
+
+
+Since symmetric matrices are orthogonally diagonalisable we can write $A=PDP^T$, where $P$ is orthogonal. We have that
+$$
+|A\mathbf{x}|^2 = | PDP^T\mathbf{x} |^2 =  \mathbf{x}^T PDP^T PDP^T\mathbf{x} = (P^T\mathbf{x})^TD^2P^T\mathbf{x} = \mathbf{u}^TD^2\mathbf{u},
+$$
+where we put $\mathbf{u}=P^T\mathbf{x}$. We then get
+\begin{align*}
+\mathbf{u}^TD^2\mathbf{u} &= \sum_{i=1}^n \lambda_i^2u_i^2 \leq \lambda_1^2 \sum_{i=1} u_i^2 = \lambda_1^2|\mathbf{u}|^2= \lambda_1^2|\mathbf{x}|^2 \\
+\mathbf{u}^TD^2\mathbf{u} &= \sum_{i=1}^n \lambda_i^2u_i^2 \geq \lambda_n^2 \sum_{i=1} u_i^2 = \lambda_n^2|\mathbf{u}|^2= \lambda_n^2|\mathbf{x}|^2,
+\end{align*}
+where we used that $|\mathbf{u}|^2=\mathbf{x}^TPP^T\mathbf{x}=\mathbf{x}^T\mathbf{x}=|\mathbf{x}|^2$. 
+By taking square roots it follows that $|\lambda_n||\mathbf{x}|\leq|A\mathbf{x}|\leq |\lambda_1||\mathbf{x}|$.
+
+
+
+
+
+
+
+## Relative and absolute error
+The discussion we started this chapter with had to do with the error we get when solving systems. It is therefore important to be precise with the concept of error. 
+When talking about the error between two quantities it is natural to use the concept of relative error:
+
+::: {#def-}
+Suppose $a$ and $b$ are numbers. $\left|\frac{b-a}{a}\right|$ is called the *relative error* between \index{Error!relative} $a$ and $b$.
+If $\mathbf{a}$ and $\mathbf{b}$ more generally are vectors, we define the relative error between these as $\frac{|\mathbf{b}-\mathbf{a}|}{|\mathbf{a}|}$.
+:::
+
+Relative error says more about the size ratio between $a$ and $b$ that what the *absolute error*\index{Error!absolute} $|b-a|$ does, since it does not change if we scale the numbers:
+Since $\left|\frac{cb-ca}{ca}\right|=\left|\frac{b-a}{a}\right|$ for any $c\neq0$, the relative error between $a$ and $b$ equals the relative error between $ca$ and $cb$. 
+The same can not be said for the absolute error. 
+Relative error also says something about how many decimals the numbers $a$ and $b$ have in common: If the relative error is about $10^{-k}$, this means that approximately the 
+$k$ first decimal digits in $a$ and $b$ agree.
+
+For the systems $A\mathbf{x}=\mathbf{b}$ and $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ above there are two different relative errors:
+
+1. The relative error between the right hand sides of the system: $| (\mathbf{b}+\mathbf{e}) - \mathbf{b}|/|\mathbf{b}| = |\mathbf{e}|/|\mathbf{b}|$.
+2. The relative error between the solutions: $|\mathbf{y}-\mathbf{x}|/|\mathbf{x}|$.
+
+The ration 
+$$
+\frac{  |\mathbf{y}-\mathbf{x}|/|\mathbf{x}| }{ |\mathbf{e}|/|\mathbf{b}| }  
+$$ {#eq-forholdrelerr}
+between these say how much the relative error between the right hand sides will propagate to the solutions. 
+If @eq-forholdrelerr is about $10^{-n}$, this means that approximately $n$ decimal digits in precision can be lost when solving the perturbed system.
+
+In the example above the relative error in 1. equals $|\mathbf{e}|/|\mathbf{b}|=10^{-3}$. For the relative error in 2. we firtst obtain 
+$$
+\mathbf{y}-\mathbf{x}= \begin{pmatrix} 1 + 10^{-3}\epsilon^{-1} \\ 1 - 10^{-3}\epsilon^{-1} \end{pmatrix} - \begin{pmatrix} 1 \\ 1 \end{pmatrix}
+=10^{-3}\epsilon^{-1} \begin{pmatrix} 1 \\ -1 \end{pmatrix},
+$$
+and then $|\mathbf{y}-\mathbf{x}|/|\mathbf{x}|=10^{-3}\epsilon^{-1}$. The ''Propagation factor'' @eq-forholdrelerr is thus $\epsilon^{-1}$.
+Since this number is large when $\epsilon$ is small, the relative error in the right hand side of the system gets largely magnified when we compare the solutions. 
+
+
+## Definition of condition numbers
+In this section we will deduce a result which says how large the propagation factor @eq-forholdrelerr can be. We will show the following.
+
+::: {#prp-kondisjon-symmetrisk}
+Suppose that $A$ is symmetric and invertible, and let
+$$|\lambda_1|\geq|\lambda_2|\geq\cdots\geq|\lambda_n|>0$$
+be the eigenvalues of $A$, listed by descending absolute value. Then we have that 
+$$
+\left|\frac{\lambda_n}{\lambda_1}\right| \frac{|\mathbf{e}|}{|\mathbf{b}|} \leq \frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}  \leq \left|\frac{\lambda_1}{\lambda_n}\right|  \frac{|\mathbf{e}|}{|\mathbf{b}|}
+$$ {#eq-condnumberineq}
+Further we have that
+
+1. equality in the right inequality when $\mathbf{e}$ is an eigenvector for $\lambda_n$, and $\mathbf{b}$ for $\lambda_1$, 
+2. equality in the left inequality when $\mathbf{e}$ is an eigenvector for $\lambda_1$, and $\mathbf{b}$ for $\lambda_n$.
+
+:::
+
+If we define the *condition number*\index{Condition number} of $A$ as $K(A)=|\lambda_1/\lambda_n|$ then @eq-condnumberineq can be written
+$$
+\frac{1}{K(A)} \frac{|\mathbf{e}|}{|\mathbf{b}|} \leq \frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}  \leq K(A) \frac{|\mathbf{e}|}{|\mathbf{b}|}
+$$ {#eq-condnumberineq2}
+In @exr-kontrollsjekk you found that the eigenvalues of $A$ are $\epsilon<1$ and $1$, so that the condition number is $K(A)=\epsilon^{-1}$. Note that
+
+1. the right inequality says that the relative error in the right hand side propagates maximally with a factor $K(A)$ to the solutions,
+2. the left inequality can be rewritten as $\frac{|\mathbf{e}|}{|\mathbf{b}|} \leq K(A)\frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}$. On this form it says that the relative error in $\mathbf{x}$ 
+propagates maximally with a factor $K(A)$ under the matrix multiplication $\mathbf{b}=A\mathbf{x}$.
+
+
+::: {.proof} 
+of @prp-kondisjon-symmetrisk. 
+We first get that $A(\mathbf{y}-\mathbf{x})=\mathbf{e}$, so that $\mathbf{y}-\mathbf{x}= A^{-1}\mathbf{e}$. If we apply @lem-ineqspectral on this, and on $A\mathbf{x}=\mathbf{b}$ we get that 
+\begin{align*}
+|\lambda_n||\mathbf{x}| & \leq |\mathbf{b}| \leq |\lambda_1||\mathbf{x}| &     \frac{1}{|\lambda_1|}|\mathbf{e}| &\leq |\mathbf{y}-\mathbf{x}| \leq |\mathbf{e}| \frac{1}{|\lambda_n|}
+\end{align*}
+Here we used that $A^{-1}$ also is a symmetric matrix, with eigenvalues $1/\lambda_n,...,1/\lambda_1$, listed by descending absolute value, see @exr-symminveig.
+If we combine these we get that
+\begin{align*}
+\left|\frac{\lambda_n}{\lambda_1}\right| \frac{|\mathbf{e}|}{|\mathbf{b}|}        \leq \frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|} \leq     \left| \frac{\lambda_1}{\lambda_n} \right|  \frac{|\mathbf{e}|}{|\mathbf{b}|}
+\end{align*}
+Further, there is equality in the right inequality when $\mathbf{e}$ is an eigenvector for $\lambda_n$, and $\mathbf{b}$ is an eigenvector for $\lambda_1$, 
+and equality in the left inequality when $\mathbf{e}$ is an eigenvector for $\lambda_1$, and $\mathbf{b}$ is an eigenvector for $\lambda_n$.
+:::
+
+The last part of @prp-kondisjon-symmetrisk says that we can have equality in both inequalities by choosing concrete vectors/perturbations. 
+We have already considered the choice ini 1.. The choice in 2. corresponds to changing the right hand side to $\mathbf{b}=(1,-1)$ 
+(the eigenvector for the smallest eigenvalue), and the error to $\mathbf{e}=10^{-3}(1,1)$ (the eigenvector for the largest eigenvalue). 
+With 
+\begin{align*}
+\mathbf{x} &=  \epsilon^{-1}\begin{pmatrix} 1\\-1\end{pmatrix} &
+\mathbf{y} &=\epsilon^{-1}\begin{pmatrix} 1\\-1\end{pmatrix} + 10^{-3}\begin{pmatrix} 1\\1 \end{pmatrix}.
+\end{align*}
+we now get
+\begin{align*}
+A\mathbf{x}&= \epsilon^{-1}A\mathbf{v}_2 = \mathbf{v}_2=\mathbf{b} \\
+A\mathbf{y}&= \epsilon^{-1}A\mathbf{v}_2 + 10^{-3}A\mathbf{v}_1 = \mathbf{v}_2 + 10^{-3}\mathbf{v}_1 = \mathbf{b} + \mathbf{e}.
+\end{align*}
+This gives
+\begin{align*}
+|\mathbf{y} - \mathbf{x}|/|\mathbf{x}|&=10^{-3}\sqrt{2}/(\epsilon^{-1}\sqrt{2})=10^{-3}\epsilon \\
+|\mathbf{e}|/|\mathbf{b}|&=10^{-3}\sqrt{2}/\sqrt{2}=10^{-3}. 
+\end{align*}
+The propagation factor in @eq-forholdrelerr thus becomes $\epsilon$, which gives equality in the left inequality. 
+This choice thus gives maximal propagation of relative error under the matrix multiplication $\mathbf{b}=A\mathbf{x}$. 
+
+The example above can seem trivial, since $A$ is near a non-invertible matrix when $\epsilon$ is small. 
+The Hilbert matrix from @exm-hilbert is another example of a matrix with high condition number. 
+This is not quite as obvious, and here one also gets matrices of all sizes 
+The code below plots condition numbers for $n\times n$ Hilbert matrices, for different values of $n$.
+
+```{python}
+#| label: fig-cond
+#| fig-cap: "Condition numbers of $n\\times n$ Hilbert matrices, for different values of $n$"
+nvals = np.arange(1,21)
+ch = np.zeros(20)
+for k in nvals:
+    ch[k-1] = np.linalg.cond(hilbert(k))
+plt.semilogy(nvals,ch)
+```
+
+Here we used the command `cond(A)` \index{python!np.linalg.cond}, which returns the condition number of a matrix.
+We have $n$ along the $x$-axis. The plot is logarithmic (see @exr-semilog when it comes to the command `semilogy`), so that 
+we along the $y$-axis have the number of digits we lose.
+We see that Hilbert matrices lose about one digit in precision every time we increase $n$.
+They are thus difficult to use numerically, even for small matrices and small perturbations. 
+
+Condition numbers can be defined more generally for all matrices, not just for the symmetric ones. 
+We will not consider the more general definition, however. 
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+```
+:::
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-}
+Find an orthogonal diagonalisation of the matrix $A=\begin{pmatrix} 14 & -2 \\ -2 & 11\end{pmatrix}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The characteristic equation is $(14-\lambda)(11-\lambda) - 4 = 0$, which gives $\lambda^2-25\lambda+150=0$. 
+The eigenvalues are $\frac{25\sqrt{625-600}}{2}=\frac{25\pm 5}{2}$, which are $\lambda_1=10$ and $\lambda_2=15$. 
+
+Eigenvectors for $\lambda_1=10$:
+$$
+\begin{pmatrix} 14 & -2 \\ -2 & 11\end{pmatrix} -10I = \begin{pmatrix} 4 & -2 \\ -2 & 1\end{pmatrix} \sim \begin{pmatrix} 1 & -1/2 \\ 0 & 0 \end{pmatrix}
+$$
+$(1,2)$ is a particular eigenvector. An eigenvector with length 1 is $(1,2)/\sqrt{5}$.
+
+Eigenvectors for $\lambda_2=15$:
+$$
+\begin{pmatrix} 14 & -2 \\ -2 & 11\end{pmatrix} - 15I = \begin{pmatrix} -1 & -2 \\ -2 & -4\end{pmatrix} \sim \begin{pmatrix} 1 & 2 \\ 0 & 0\end{pmatrix}
+$$
+$(-2,1)$ is a particular eigenvector. An eigenvector with length 1 is $(-2,1)/\sqrt{5}$. 
+
+An orthogonal diagonalisation is thus 
+$$
+A = 
+\frac{1}{\sqrt{5}}\begin{pmatrix} 1 & -2 \\ 2 & 1\end{pmatrix}
+\begin{pmatrix} 10 & 0 \\ 0 & 15 \end{pmatrix}
+\left( \frac{1}{\sqrt{5}}\begin{pmatrix} 1 & -2 \\ 2 & 1\end{pmatrix} \right)^T.
+$$
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Show that $U_1U_2$ is orthogonal when $U_1$ and $U_2$ are orthogonal. 
+:::
+
+::: {#exr-}
+Show that $\left(\begin{array}{c|c} U_1 & \mathbf{0} \\ \hline \mathbf{0} & U_2 \end{array}\right)$ 
+is orthogonal when $U_1$ and $U_2$ are orthogonal (here zeros are inserted so that the resulting matrix is square).
+:::
+
+::: {#exr-kontrollsjekk}
+As before we set $A=\frac{1}{2}\begin{pmatrix}1+\epsilon & 1-\epsilon \\ 1-\epsilon & 1+\epsilon\end{pmatrix}$ and $\mathbf{b}=\begin{pmatrix}1 \\ 1\end{pmatrix}$. 
+
+(a) Find the eigenvalues of $A$ and the corresponding eigenvectors. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$ \det(\lambda I -A) = (\lambda-(1+\epsilon)/2)^2 - (1-\epsilon)^2/4 = \lambda^2 - (1+\epsilon)\lambda + \epsilon.$$
+This has roots
+$$\frac{1+\epsilon \pm\sqrt{(1+\epsilon)^2   -4\epsilon}}{2}= \frac{1+\epsilon \pm(1-\epsilon)}{2}.$$
+The largest eigenvalue is $\lambda_1=1$, the smallest is $\lambda_2=\epsilon$. Let us find the eigenvectors.
+
+* An eigenvector for $\lambda_1=1$:
+$$
+I-A = \begin{pmatrix} 1-(1+\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & 1-(1+\epsilon)/2 \end{pmatrix} 
+= \begin{pmatrix} (1-\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & (1-\epsilon)/2\end{pmatrix}
+\sim \begin{pmatrix} 1 & -1 \\ 0 & 0 \end{pmatrix},
+$$
+so that we can set $\mathbf{v}_1=(1,1)$.
+* An eigenvector for $\lambda_2=\epsilon$:
+$$
+\epsilon I-A = \begin{pmatrix} \epsilon-(1+\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & \epsilon-(1+\epsilon)/2 \end{pmatrix} 
+= \begin{pmatrix} -(1-\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & -(1-\epsilon)/2 \end{pmatrix} 
+\sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix},
+$$
+so that we can set $\mathbf{v}_2=(1,-1)$.
+:::::::
+:::::
+
+(b) Set $\mathbf{e}=10^{-3}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$. Show that the solution of $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ is 
+$$\mathbf{y}=\begin{pmatrix} 1 \\ 1 \end{pmatrix} + 10^{-3}\epsilon^{-1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $\mathbf{y}=\mathbf{v}_1 + 10^{-3}\epsilon^{-1}\mathbf{v}_2$, so that 
+$$
+A\mathbf{y} = A\mathbf{v}_1 + 10^{-3}\epsilon^{-1}A\mathbf{v}_2 = \mathbf{v}_1 + 10^{-3}\mathbf{v}_2 = \mathbf{b} + \mathbf{e}.
+$$
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+Let $A$ be the matrix $A=\begin{pmatrix} 0.2 & 0.8 \\ 0.8 & 0.2 \end{pmatrix}$.
+
+(a) Find the eigenvalues and eigenvectors of $A$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$\det(\lambda I -A) = (\lambda-0.2)^2 - 0.64,$$
+and this is $0$ when $\lambda-0.2 = \pm 0.8$. The eigenvalues are thus $\lambda_1=-0.6$ and $\lambda_2=1$.
+
+Eigenvector for $\lambda_1=-0.6$: 
+$$
+-0.6I-A = \begin{pmatrix} -0.8 & -0.8 \\ -0.8 & -0.8\end{pmatrix}
+\sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix}.
+$$
+$\mathbf{v}_1=\begin{pmatrix} -1 \\ 1 \end{pmatrix}$ is a particular eigenvector.
+
+Eigenvector for $\lambda_2=1$:
+$$
+I-A = \begin{pmatrix} 0.8 & -0.8 \\ -0.8 & 0.8\end{pmatrix}
+\sim \begin{pmatrix} 1 & -1 \\ 0 & 0 \end{pmatrix}
+$$
+$\mathbf{v}_2=\begin{pmatrix} 1 \\ 1 \end{pmatrix}$ is a particulr eigenvector. 
+:::::::
+:::::
+
+(b) What is the condition number $K(A)$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The matrix is symmetric. It is also invertible, since both eigenvalues are $\neq 0$. 
+The condition number is thus the ratio between the largest and smallest eigenmvalue (in absolute value), which gives $K(A)=1/0.6=5/3$.
+:::::::
+:::::
+:::
+
+
+::: {#exr-symminveig}
+Suppose $A$ is invertible, symmetric, and $n\times n$, with eigenvalues $\lambda_1$, $\lambda_2$,...,$\lambda_n$.
+Prove that $A^{-1}$ also is symmetric, with eigenvalues $1/\lambda_1,...,1/\lambda_n$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $A$ is invertible, all $\lambda_i\neq 0$. If we transpose both sides in $A^{-1}A=I$ we get that $A^T(A^{-1})^T=I$.
+Since $A$ is symmetric this means that $A(A^{-1})^T=I$, so that $A^{-1}=(A^{-1})^T$. It follows that $A^{-1}$ also is symmetric.
+
+Suppose $A\mathbf{v}=\lambda\mathbf{v}$. Then $\mathbf{v}=A^{-1}(\lambda\mathbf{v})$, so that $A^{-1}\mathbf{v}=\frac{1}{\lambda}\mathbf{v}$. It follows that $1/\lambda$ is an eigenvalue for  for $A^{-1}$ when
+$\lambda$ is an eigenvalue for $A$. $A$ and $A^{-1}$ also have the same eigenvectors.
+
+This also follows easily from that $A$ is orthogonally diagonalisable, so that we can write $A^PDP^{-1}$, where $D$ is the diagonal matrix with eigenvalues $\lambda_i$ on the diagonal. From this it follows that
+$A^{-1}=PD^{-1}P^T$, where $D^{-1}$ is the diagonal matrix with $1/\lambda_i$ on the diagonal.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+An $n\times n$-matrix is called orthogonal if $U^{-1}=U^T$. Explain that the condition number of $U$ is $1$. 
+This is the case regardless of whether $U$ is symmetric or not. 
+What does this tell us about such matrices when it comes to solving a perturbed system?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+It is clear that
+$$
+|U\mathbf{x}|^2 = \mathbf{x}^TU^TU\mathbf{x}=|\mathbf{x}|^2.
+$$
+It follows that, if $\mathbf{x}$ is an eigenvector, then $|U\mathbf{x}|=|\lambda||\mathbf{x}|=|\mathbf{x}|$, so that $|\lambda|=1$. 	
+Since all eigenvalues are equal in absolute value it follows that $K(A)=1$. Note that we do not appeal to 
+orthogonal diagonalisability here.
+:::::::
+:::::
+:::
+
+::: {#exr-semilog}
+If $y=Ke^{kx}$, we say that $y$ is *exponential* in $x$, with constant $K$ and exponent $k$.
+
+(a) The command `plt.semilogx(x,y)` \index{python!plt.semilogx} plots $\log x$ against $y$.
+Suppose that `plt.semilogx(x,y)` displays a line. Show that then $x$ must be exponential in $y$. 
+How can we find the constant $K$ and the exponent $k$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+A line in such a plot means that $y=a\log x + b$, where $a$ and $b$ are constants we can read out from the line ($a$ is the slope, $b$ is the intersection with the $y$-axis).
+$y=a\log x + b$ gives that $x= e^{(y-b)/a}=e^{-b/a}e^{y/a}$, so that $x$ is exponential in $y$ with constant 
+$K=e^{-b/a}$ and exponent $1/a$.
+:::::::
+:::::
+
+(b) The command `plt.semilogy(x,y)` \index{python!plt.semilogy} in the same way plots $x$ against $\log y$. Suppose that `plt.semilogy(x,y)` 
+displays a line. Show that then $y$ must be exponential in $x$. How can we find the constant and the exponent now?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+A line in such a plot means that $\log y = ax+b$. This gives that $y=e^be^{ax}$, so that $y$ is exponential in $x$ with constant 
+$K=e^b$ and exponent $a$.
+:::::::
+:::::
+:::

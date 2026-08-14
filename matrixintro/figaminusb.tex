@@ -1,0 +1,30 @@
+%\usepackage{tikz} %pakke for tikzpicture
+%\usetikzlibrary{calc} %utregning med koordinater
+%\usetikzlibrary{positioning} %nodeposisjoner
+%\usepackage{amsmath} %\mathbf
+\begin{tikzpicture}
+  \begin{scope}[scale = 4]
+    \def\xaxislen{1}
+    \def\yaxislen{1}
+    \draw[-latex, thick] (0,0)--(\xaxislen,0);
+    \draw[-latex, thick] (0,0)--(0,\yaxislen);
+    \def\ax{.9*\xaxislen}
+    \def\ay{.3*\yaxislen}
+    \def\bx{.4*\xaxislen}
+    \def\by{.6*\yaxislen}
+    \coordinate (a) at (\ax, \ay);
+    \coordinate (b) at (\bx, \by);
+    \draw[dashed, color=blue] (a)--($(a)-(b)$);
+    \draw[-latex,color=blue] (0,0)--(a) node[below, right,color=black]{$\mathbf{a}$};
+    \draw[-latex,color=blue] (0,0)--(b) node[below = .5em,color=black]{$\mathbf{b}$};
+    \draw[-latex,color=blue] (0,0)--($(a)-(b)$) node[below = .5em, right, color=black]{%
+      $\mathbf{a} - \mathbf{b}$};
+    \draw[-latex,color=blue] (b)--(a);
+    \def\magnitude{1.02}
+    \draw[thick, decorate,%
+      decoration = {calligraphic brace, amplitude = .5em}]%
+    ($\magnitude*(b)$)--($(a) - (b) + \magnitude*(b)$) node[%
+      midway, above, sloped, yshift = .5em]{%
+      $\mathbf{a} - \mathbf{b}$};
+  \end{scope}
+\end{tikzpicture}

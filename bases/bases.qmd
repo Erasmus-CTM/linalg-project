@@ -1,0 +1,1235 @@
+# Linear independence and bases
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+Let $\{\mathbf{a}_i\}_{i=1}^n$ be $n$ vectors in $\mathbb{R}^m$. 
+If $c_1,c_2,...,c_n$ are scalars, we call 
+$$c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n$$
+a *linear combination*\index{Linear!combination} of $\{\mathbf{a}_i\}_{i=1}^n$. 
+The *Span* of $\{\mathbf{a}_i\}_{i=1}^n$, \index{Span} written 
+$$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n),$$
+is the collection of av all linear combinations of $\{\mathbf{a}_i\}_{i=1}^n$. We say that 
+
+* the $\mathbf{a}_i$ *span* $\mathbb{R}^m$ if $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)=\mathbb{R}^m$,
+* the $\mathbf{a}_i$ are *linearly independent*\index{Linear!independence} 
+if every $\mathbf{b}\in \text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ can be written as a linear combination of 
+the $\mathbf{a}_i$ in a unique way.
+
+The following result is often useful when it comes to proving linear independence for a set of vectors. 
+
+::: {#prp-linindequivalence}
+The following are equivalent:
+
+1. $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent
+2. $c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = \mathbf{0}$ always implies that $c_1=c_2=\cdots=c_n=0$.
+
+:::
+
+A relation as in 2. is also called a *linear dependence relation*\index{Linear!dependence relation}. 
+In other words, if $\mathbf{c}=(c_1,...,c_n)$, then $A\mathbf{c}=\mathbf{0}$ is a linear dependence relation between the columns of $A$.
+
+::: {.proof}
+We first prove 1.$\Rightarrow$ 2.. Assume that the $\mathbf{a}_i$ are linearly independent, and that
+$$
+c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = \mathbf{0}
+$$ {#eq-satisfythisagain}
+One way of satisfying @eq-satisfythisagain is by setting $c_1=c_2=\cdots=c_n=0$. 
+Since $\mathbf{0}$ can be written uniquely in this way (due to linear independence of the $\mathbf{a}_i$), it follows that in fact $c_1=c_2=\cdots=c_n=0$, so that 2. holds. 
+
+We prove 2.$\Rightarrow$ 1. contrapositively. \index{Proof by contrapositivity!Condition for linear independence}
+Assume thus that the $\mathbf{a}_i$ are not linearly independent. Then there exists a vector $\mathbf{b}$ which can be written in two different ways:
+\begin{align*}
+\mathbf{b} &= c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n \\
+\mathbf{b} &= d_1\mathbf{a}_1 + d_2\mathbf{a}_2 + \cdots + d_n\mathbf{a}_n
+\end{align*} 
+If we subtract these we obtain
+$$
+(c_1-d_1)\mathbf{a}_1 + (c_2-d_2)\mathbf{a}_2 + \cdots + (c_n-d_n)\mathbf{a}_n = \mathbf{0}
+$$
+Setting $t_k = c_k-d_k$ we get that
+$$
+t_1\mathbf{a}_1 + t_2\mathbf{a}_2 + \cdots + t_n\mathbf{a}_n = \mathbf{0},
+$$
+where not all $t_k$ are zero. Thus, there exists some nonzero $(c_1,...,c_n)$ so that $c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = \mathbf{0}$. 
+This is the negated statement of 2., and this completes the proof.
+:::
+
+Orthogonal sets of vectors are linearly independent. To see this, consider a linear dependence relation
+$$
+c_1\mathbf{a}_1+c_2\mathbf{a}_2+\cdots + c_n\mathbf{a}_n=\mathbf{0}.
+$$
+Taking the scalar product with $\mathbf{a}_i$ on each side we get 
+$$
+c_1(\mathbf{a}_1\cdot\mathbf{a}_i)+c_2(\mathbf{a}_2\cdot\mathbf{a}_i)+\cdots + c_n(\mathbf{a}_n\cdot\mathbf{a}_i)=0,
+$$
+which simplifies to $c_i(\mathbf{a}_i\cdot\mathbf{a}_i)=0$, so that $c_i=0$ 
+(since $\mathbf{a}_i\cdot\mathbf{a}_i\neq 0$ when $\mathbf{a}_i\neq \mathbf{0}$).
+It follows from @prp-linindequivalence that $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent.
+
+Below we shall write $\mathbf{a}_i$ for the columns of the matrix $A$. We will have use for the following result about 
+linear dependence relations.
+
+::: {#prp-avhrel}
+Row equivalent matrices share the same linear dependence relations between columns. 
+In particular, linear dependence relations between columns in a matrix are preserved by elementary row operations. 
+:::
+
+::: {.proof}
+For the first part, assume that $B=EA$ where $E$ is elementary. 
+If $A\mathbf{c}=\mathbf{0}$ we have that $B\mathbf{c}=EA\mathbf{c}=\mathbf{0}$, so that 
+any linear dependence relation between columns isn $A$ also is a linear dependence relation between columns in $B$. 
+The other way, any elementary matrix is invertible, so that $A=E^{-1}B$. 
+From this it follows in the same way that any linear dependence relation between columns isn $B$ also is a linear dependence relation between columns in $A$. The two thus share the same linear dependence relations. 
+
+For the last part, if $A$ and $B$ are row equivalent, we have that 
+$B=E_1\cdots E_kA$, where the $E_i$ er elementary. 
+By iterating on the first part it follows that $A$ and $B$ have the same linear dependence relations. 
+:::
+
+The concepts linear independence and span can be interpreted by means of pivot elements:
+
+* That $\mathbf{b}$ is a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ is the same as that we can find $x_1,x_2,...,x_n$ so that 
+$$x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots x_n \mathbf{a}_n = \mathbf{b},$$
+which is the same as that  $A\mathbf{x}=\mathbf{b}$ has a solution, which again is the same as that the last column 
+in the augmented matrix $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ is not a pivot column. 
+* That $\mathbf{b}$ can be written as a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ in a unique way
+requires in addition that all columns in $A$ are pivot columns.
+* That $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ is the same as that $A\mathbf{x}=\mathbf{b}$ always 
+has a solution, which is the same as that all rows in $A$ are pivot rows. 
+(since this implies that that the last column in $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ never becomes a pivot column). 
+* In a reduced echelon form the pivot columns are linearly independent, and the other columns can be expressed in terms of these. 
+This therefore also applies for the matrix itself - the pivot columns are linearly independent, and the other columns are 
+linear combinations of these. 
+
+From this we will prove the following:
+
+::: {#prp-}
+The following hold
+
+* If $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ then we have that $n\geq m$. 
+* If $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent we have that $n\leq m$.
+
+:::
+
+::: {.proof}
+If $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ we know that all the rows in $A$ are pivot rows. This gives that
+$$m = \text{  \#rows = \#pivot rows = \#pivot columns } \leq\text{ \#columns =} n.$$
+If $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent we know that all columns in $A$ are pivot columns. This gives that
+$$n = \text{ \#columns = \#pivot columns = \#pivot rows } \leq \text{\#rows  =} m.$$
+:::
+
+A *basis*\index{Basis} for $\mathbb{R}^m$ is defined as a linearly independent set of vectors which span $\mathbb{R}^m$. 
+We will denote bases by $\mathcal{A}$, $\mathcal{B}$, $\mathcal{C}$, and so on. 
+From the result above it follows that a basis for $\mathbb{R}^m$ has exactly $m$ elements. 
+$\mathbb{R}^m$ has in particular the simple basis consisting of
+$$
+\mathbf{e}_1=\begin{pmatrix} 1 \\ 0 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix} \text{, }
+\mathbf{e}_2=\begin{pmatrix} 0 \\ 1 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix} \text{,..., }
+\mathbf{e}_m=\begin{pmatrix}0 \\ 0 \\ 0 \\ \vdots \\ 0 \\ 1 \end{pmatrix}.
+$$
+We will denote this by $\mathcal{E}$, and call it the *standard basis*\index{Basis!standard}.
+
+We can now expand the theorem for invertible matrices with another equivalence:
+
+{{< include invmatteo.qmd >}}
+
+::: {.proof}
+That the columns of $A$ is a basis for $\mathbb{R}^n$ is the same as that all rows and columns have pivot elements. 
+But this is the same as that $A$ is row equivalent to $I_n$. 
+:::
+
+Thus, the columns of any invertible matrix give a basis for $\mathbb{R}^m$. If we consider the DFT matrix, we conclude that the vectors 
+$$\mathcal{F} = \{ ( e^{2\pi in\cdot 0},e^{2\pi in\cdot 1},e^{2\pi in\cdot 2},...,e^{2\pi in(N-1)} ) \}_{n=0}^{N-1}$$
+is a basis for $\mathbb{R}^m$. This is also called the *Fourier basis*\index{Fourier!basis}. 
+
+
+::: {#exm- name='Find a linearly independent subset'}
+We have the vectors 
+\begin{align*}
+\mathbf{a}_1&= \begin{pmatrix} 0 \\ 2 \\ 1 \end{pmatrix} &
+\mathbf{a}_2&= \begin{pmatrix} 1\\ 1 \\ 2 \end{pmatrix} &
+\mathbf{a}_3&= \begin{pmatrix} 1 \\ 2 \\ 0 \end{pmatrix} &
+\mathbf{a}_4&= \begin{pmatrix} -2 \\ 3 \\ 4 \end{pmatrix}.
+\end{align*}
+Let us first show that these span $\mathbb{R}^3$. We row-reduce to echelon form:
+\begin{align*}
+\begin{pmatrix} 0 & 1 & 1 & -2 \\ 2 & 1 & 2 & 3 \\ 1 & 2 & 0 & 4 \end{pmatrix} &\sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 2 & 1 & 2 & 3 \\ 0 & 1 & 1 & -2 \end{pmatrix} \sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & -3 & 2 & -5 \\ 0 & 1 & 1 & -2 \end{pmatrix}
+\sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & 1 & 1 & -2 \\ 0 & 0 & 5 & -11 \end{pmatrix}
+\end{align*}
+From the echelon form it is clear that all rows are pivot rows - we don't need to bring the matrix to
+reduced echelon form to see this. It follows that the four vectors span $\mathbb{R}^3$. 
+Further we see that the first three columns are pivot columns, so that these are linearly independent. The fourth vector can be 
+expressed with the other three columns since it is not a pivot column.
+That the four vector can't be linearly independent can also be inferred from 
+that linear independence would require $m\geq n$, which is clearly not the case. 
+The three columns $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$ are therefore both linearly independent and span $\mathbb{R}^3$, since all rows and columns have pivot elements in this $3\times 3$-matrix. $\clubsuit$
+:::
+
+If the columns in a matrix do not span $\mathbb{R}^m$ we now get a simple procedure for expanding a set of pivot columns 
+to a basis for the whole of $\mathbb{R}^m$: 
+We modify the row-reduced echelon form of $A$ by adding columns which are standard basis vectors, 
+so that we obtain a new matrix with a leading one in each row. 
+The columns in this new matrix provide a basis for $\mathbb{R}^m$. If we row reduce backwards we get 
+$m$ vectors which also are a basis for $\mathbb{R}^m$, and which contain the original vectors. 
+This is easiest to illustrate with an example. 
+
+::: {#exm- name='Expand to a basis'}
+Let us see how we can expand 
+\begin{align*} \mathbf{a}_1&=\begin{pmatrix} 3 \\ 2 \\ 1\end{pmatrix} & \mathbf{a}_2&=\begin{pmatrix} 6 \\ -1 \\ 3\end{pmatrix} \end{align*}
+to a basis for $\mathbb{R}^3$. We row-reduce
+\begin{align*}
+\begin{pmatrix} 3 & 6 \\ 2 & -1 \\ 1 & 3 \end{pmatrix} 
+&\stackrel{I\leftrightarrow III}{\sim} \begin{pmatrix} 1 & 3 \\ 2 & -1 \\ 3 & 6 \end{pmatrix}
+\stackrel{II-2I}{\sim} \begin{pmatrix} 1 & 3 \\ 0 & -7 \\ 3 & 6 \end{pmatrix} 
+\stackrel{III-3I}{\sim} \begin{pmatrix} 1 & 3 \\ 0 & -7 \\ 0 & -3 \end{pmatrix} \\
+&\stackrel{II/(-7)}{\sim} \begin{pmatrix} 1 & 3 \\ 0 & 1 \\ 0 & -3 \end{pmatrix} 
+\stackrel{III+3II}{\sim} \begin{pmatrix} 1 & 3 \\ 0 & 1 \\ 0 & 0 \end{pmatrix} 
+\end{align*}
+Since both columns are pivot columns it follows that the two vectors are linearly independent. 
+To expand to a basis for $\mathbb{R}^3$ we add a third vector to the echelon form so that we get a third pivot column, and 
+row-reduce backwards:
+\begin{align*}
+\begin{pmatrix} 1 & 3 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+&\stackrel{III-3II}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 0 & 1 & 0 \\ 0 & -3 & 1\end{pmatrix}
+\stackrel{II\cdot(-7)}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 0 & -7 & 0 \\ 0 & -3 & 1\end{pmatrix}
+\stackrel{III+3I}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 0 & -7 & 0 \\ 3 & 6 & 1\end{pmatrix} \\
+&\stackrel{II+2I}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 2 & -1 & 0 \\ 3 & 6 & 1\end{pmatrix}
+\stackrel{I\leftrightarrow III}{\sim} \begin{pmatrix} 3 & 6 & 1\\ 2 & -1 & 0 \\ 1 & 3 & 0  \end{pmatrix}
+\end{align*}
+It follows that we obtain a basis for $\mathbb{R}^3$ by adding $\mathbf{a}_3=(1,0,0)$. $\clubsuit$
+:::
+
+## Subspaces
+By a *subspace*\index{Subspace} (of $\mathbb{R}^m$) we mean a set $U\subseteq\mathbb{R}^m$ so that
+
+1. if $\mathbf{u}_1,\mathbf{u}_2\in U$, then also $\mathbf{u}_1+\mathbf{u}_2\in U$
+2. if $\mathbf{u}\in U$, then also $c\mathbf{u}\in U$ for all scalars $c$.
+
+In particular, $\mathbb{R}^m$ is a subspace. 
+It is an exercise to show that, more generally, $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ is a subspace. 
+In particular,
+
+* the *column space*\index{Column space} of a matrix (the span of all the columns in the matrix) is a subspace (of $\mathbb{R}^m$), and 
+* the *row space*\index{Row space} of a matrix (the span of all the rows in the matrix) is a subspace (of $\mathbb{R}^n$). 
+
+We will write $\text{Col}(A)$ and $\text{Row}(A)$ for the column- and row space of $A$, respectively. 
+It is an exercise to show that, If $B$ is obtained from $A$ by means of elementary row operations, then $A$ and $B$ have the same row space. 
+
+The *Null space*\index{Null space} of a matrix $A$, written $\text{Nul}(A)$, is the collection of all vectors $\mathbf{x}$ so that  $A\mathbf{x}=\mathbf{0}$. 
+Let us show that a null space actually is a subspace:
+
+1. if $\mathbf{u}_1,\mathbf{u}_2\in \text{Nul}(A)$, then $A\mathbf{u}_1=A\mathbf{u}_2=\mathbf{0}$. 
+But then $A(\mathbf{u}_1+\mathbf{u}_2)=A\mathbf{u}_1+A\mathbf{u}_2=\mathbf{0}+\mathbf{0}=\mathbf{0}$, so that also $\mathbf{u}_1+\mathbf{u}_2\in \text{Nul}(A)$.
+2. if $\mathbf{u}\in \text{Nul}(A)$, then $A\mathbf{u}=\mathbf{0}$. But then $A(c\mathbf{u})=cA\mathbf{u}=c\mathbf{0} = \mathbf{0}$.
+
+It is an exercise to show that all subspaces can be written as the null space of some matrix. $\clubsuit$
+
+
+More generally we define a *basis*\index{Basis} of a subspace as a linearly independent set of vectors which spans the whole subspace. 
+Any subspace of $\mathbb{R}^m$ has a basis. 
+To see this one can step-by-step expand a set of vectors by adding another vector, as long as one can find a new vector 
+which is linearly independent from the previous ones. This process will stop at latest at $m$ vectors. 
+When it stops we know that the subspace is the span of the (linearly independent) vectors we incrementally added. 
+
+From the reduced echelon form of $A$ it follows that
+
+* the pivot rows of $A$ (the rows with a leading one) are a basis for $\text{Row}(A)$,
+* the pivot columns of $A$ are a basis for $\text{Col}(A)$.
+
+Since bases of $\mathbb{R}^m$ have exactly $m$ vectors, a subspace of $\mathbb{R}^m$ 
+can't have bases with more than $m$ vectors. 
+
+
+
+::: {#exm-returntothis}
+Let us find bases for the row space, column space, and null space of  
+$A=\begin{pmatrix} 2 & 1 & 3 & 8\\ 1 & 3 & -1 & 4 \\ 4 & -3 & 11 & 16 \end{pmatrix}$. 
+Row reduction first gives
+$$A\sim \begin{pmatrix} 1 & 0 & 2 & 4 \\ 0 & 1 & -1 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix}.$$
+The two first rows in the reduced echelon form are pivot rows, so that
+$\begin{pmatrix} 1 & 0 & 2 & 4 \end{pmatrix}$  and $\begin{pmatrix} 0 & 1 & -1 & 0 \end{pmatrix}$ provide a basis for $\text{Row}(A)$. 
+
+Since the two first columns are pivot columns, the column vectors $(2,1,4)$ and $(1,3,-3)$ in $A$ provide a basis for $\text{Col}(A)$. 
+
+The reduced echelon form says that a vector in the null space must satisfy $x_1+2x_3+4x_4=0$ and $x_2-x_3=0$, 
+so that $x_1=-2x_3-4x_4$ and $x_2=x_3$. 
+It follows that a vector in the null space must be on the form
+$$\begin{pmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{pmatrix} = \begin{pmatrix} -2x_3-4x_4 \\ x_3 \\ x_3 \\ x_4 \end{pmatrix} = x_3\begin{pmatrix} -2 \\ 1 \\ 1 \\ 0 \end{pmatrix} + x_4\begin{pmatrix}-4\\0\\0\\1\end{pmatrix}.$$
+It follows that $(-2,1,1,0)$ and $(-4,0,0,1)$ provide a basis for $\text{Nul}(A)$. $\clubsuit$
+:::
+
+In this example there were two free variables, and a null space of dimension two. 
+More generally it is the case that the number of free variables always equals the dimension of the null space.
+This is best demonstrated with another example. 
+Suppose $A$ has the reduced echelon form 
+$$\begin{pmatrix}1 & 2 & 3 & 4 \\ 0 & 0 & 0 & 0 \end{pmatrix}.$$
+There are three free variables, $x_2$, $x_3$, and $x_4$. 
+The first row then says that $x_1+2x_2+3x_3+4x_4=0$, which says that $x_1=-2x_2-3x_3-4x_4$. 
+A general vector in the null space is therefore
+$$
+\begin{pmatrix} x_1\\x_2\\x_3\\x_4\end{pmatrix} 
+= \begin{pmatrix} -2x_2-3x_3-4x_4\\x_2\\x_3\\x_4\end{pmatrix}
+=x_2\begin{pmatrix}-2\\1\\0\\0\end{pmatrix}+x_3\begin{pmatrix}-3\\0\\1\\0\end{pmatrix}+x_4\begin{pmatrix}-4\\0\\0\\1\end{pmatrix},
+$$ {#eq-linkomb0}
+so that
+$$\left\{ 
+\begin{pmatrix}-2\\1\\0\\0\end{pmatrix},\begin{pmatrix}-3\\0\\1\\0\end{pmatrix},\begin{pmatrix}-4\\0\\0\\1\end{pmatrix} 
+\right\}$$
+span the null space. These are clearly linearly independent, so that they are a basis for the null space: 
+If the linear combination to the right in @eq-linkomb0 is 0, the preceding expression there says that $x_2=x_3=x_4=0$. 
+All in all the dimension of the null space is three, which also was the number of free variables.
+
+From the above it follows more generally that all null spaces can be written as the span of a set of vectors. 
+It also was an exercises that all subspaces could be written as a null space. And since any span also is a subspace, 
+we can think of span, null space, and subspace, as the same thing. 
+The following also holds.
+
+::: {#prp-underromortbasis}
+All subspaces have an orthogonal basis. 
+:::
+
+This follows in the same way we proved that all subspaces have a basis - we step-by-step expand a set of 
+orthogonal vectors with new ones - as long as we can find new vectors orthogonal to the ones already added.
+
+
+
+A subspace has many different bases, but they all have the same number of vectors:
+
+::: {#prp-basesareequallength}
+All bases for a subspace have the same number of vectors.
+:::
+
+::: {.proof}
+Suppose that
+$$ \text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n) = \text{Sp}(\mathbf{b}_1,\mathbf{b}_2,...,\mathbf{b}_k) $$
+and assume for contradiction that $n>k$. We have a mapping $\mathbf{F}: \mathbb{R}^n\to\mathbb{R}^k$ given by \index{Proof by contradiction!All bases have the same number of vectors}
+$$\mathbf{F}(c_1,c_2,...,c_n)=(d_1,d_2,...,d_k)$$ {#eq-defcoordchange}
+when
+$$
+c_1\mathbf{a}_1+c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = d_1\mathbf{b}_1+d_2\mathbf{b}_2 + \cdots + d_n\mathbf{b}_k.
+$$
+$\mathbf{F}$ is defined on all of $\mathbb{R}^n$, and is well-defined. Furthermore, it is $1\to 1$ and linear, 
+and can therefore be expressed by a $k\times n$-matrix which we will denote by $P$. 
+Since $n>k$ there must at least be one column in $P$ which is not a pivot column. But then we must have a linear dependence 
+relation 
+$$ x_1\mathbf{p}_1 + x_2\mathbf{p}_2 + \cdots + x_n\mathbf{p}_n =\mathbf{0}.$$
+between the columns of $P$, so that $P\mathbf{x}=0$. This contradicts that $\mathbf{F}(\mathbf{x})=P\mathbf{x}$ is $1\to 1$, 
+since also $\mathbf{F}(\mathbf{0})=P\mathbf{0}=\mathbf{0}$. It follows that $n=k$, so that the number of vectors in the two bases is equal.
+:::
+
+
+
+The number of vectors in a basis is called the *dimension*\index{Dimension} of the subspace. 
+When a matrix is on reduced echelon form we see that the dimension of both the row space and the column space 
+equals the number of pivot elements. 
+This common dimension of $\text{Col}(A)$ and $\text{Row}(A)$ is called the *rank*\index{Rank} of the matrix, written $\text{rank}(A)$. 
+
+::: {#exm-rang1 name='Rank one matrices'}
+Let $\mathbf{a}$ and $\mathbf{b}$ be column vectors $\neq\mathbf{0}$, with $m$ and $n$ components, respectively. We have that 
+$$\mathbf{a}\mathbf{b}^T = \begin{pmatrix} a_1\mathbf{b}^T \\ a_2\mathbf{b}^T \\ \vdots \\ a_m\mathbf{b}^T\end{pmatrix} = \begin{pmatrix} b_1\mathbf{a} & b_2\mathbf{a} & \cdots & b_n\mathbf{a}\end{pmatrix}.$$
+It follows that $\{\mathbf{a}\}$ is a basis for the column space of $\mathbf{a}\mathbf{b}^T$, and that $\{\mathbf{b}^T\}$ is a basis for the row space of $\mathbf{a}\mathbf{b}^T$. 
+$\mathbf{a}\mathbf{b}^T$ thus has rank $1$. 
+It is also clear that all matrices with rank one kan be written on the form $\mathbf{a}\mathbf{b}^T$, where $\mathbf{a}$ and $\mathbf{b}$ are column vectors $\neq\mathbf{0}$.
+
+By adding multiples of the first row to the other rows it is clear that $\mathbf{a}\mathbf{b}^T$ can be row-reduced to 
+$\begin{pmatrix}\mathbf{b}^T\\ \mathbf{0} \\ \vdots \\ \mathbf{0} \end{pmatrix}$.
+It follows that we have $n-1$ free variables when we solve $\mathbf{a}\mathbf{b}^T\mathbf{x}=\mathbf{0}$, so that the null space has dimension $n-1$. $\clubsuit$
+:::
+
+Rank one matrices can be useful building blocks. For example, the outer form for matrices (@prp-matrixpodytreform) 
+said that a product of two matrices can be written as a sum of rank one matrices. 
+We shall return to this when we discuss diagonalisation. 
+
+::: {#prp-}
+Let $A$ be an $m\times n$-matrix. Then we have that
+$$
+\text{rank}(A) + \text{dim}(\text{Nul}(A))=n.
+$$
+:::
+
+In @exm-returntothis we found that both the column space and the row space had dimension $2$, so that the rank is $2$. 
+The dimension of the null space was $1$. This agrees with the proposition since $2+1=3=n$. 
+In @exm-rang1 we found that the rank was $1$, and the dimension of the null space was $n-1$. 
+This also agrees with the proposition, since $1+(n-1)=n$.
+
+::: {.proof}
+This follows from that the dimension of the null space equals the number of free variables, 
+that the rank equals the number of pivot columns, 
+and that the sum of the number of pivot columns and the number of free variables equals the number of columns in the matrix. 
+:::
+
+We round off this section with the following result.
+
+::: {#prp-}
+The reduced echelon form is unique.
+:::
+
+::: {.proof}
+Suppose that a matrix $A$ can be row-reduced to two reduced echelon forms $C_1$ and $C_2$. We need to show that $C_1=C_2$. 
+We first show that $C_1$ and $C_2$ have the same pivot columns (at the same column indices). 
+Assume by contradiction that this is not the case. Then there exists a column index $k$ so that \index{Proof by contradiction!Reduced echelon form is unique}
+
+* the columns $1,...,k-1$ in both $C_1$ and $C_2$ have the same columns with leading ones,
+* column $k$ in $C_1$ have a leading one, while column $k$ in $C_2$ does not.
+
+Then column $k$ in $C_1$ can not be expressed by columns $1,...,k-1$ in $C_1$, 
+while column $k$ in $C_2$, can be expressed by columns $1,...,k-1$ in $C_2$. 
+We thus have a linear dependence relation between the stated columns in $C_2$, which is not such a relation for $C_1$. 
+This is a contradiction, since $A$, $C_1$, and $C_2$ have the same linear dependence relations. 
+Thus, $C_1$ and $C_2$ have the same columns with leading ones (at the same indices). 
+This also means that these columns must be equal, since the leading ones must come in row 1,2,3, and so on. 
+
+The remaining columns (those without a leading one) can be written as linear combinations of the columns with leading ones.
+Since these are equal, and the linear dependence relations are the same, 
+it follows that the remaining columns in $C_1$ and $C_2$ also are equal. 
+:::
+
+Note that the concept "pivot column" was not used for the reduced echelon forms above. 
+In fact, it is first after this proof that the concept of pivot column for general matrices gives meaning - 
+since we now have proved that they are the same, regardless of how we row-reduce the matrix. 
+
+Previously we considered linear transformations from $\mathbb{R}^n$ to $\mathbb{R}^m$. 
+In the same way we say that a mapping $T$ between subspaces $U$ and $V$ is linear if 
+$T(\mathbf{u}_1+\mathbf{u}_2)=T(\mathbf{u}_1)+T(\mathbf{u}_2)$, and $T(\alpha\mathbf{u})=\alpha T(\mathbf{u})$ 
+for all scalars $\alpha$, and vectors $\mathbf{u}_i,\mathbf{u}\in U$. We say that 
+
+* $T$ is $1\to 1$ if $T(\mathbf{x})\neq T(\mathbf{y})$ whenever $\mathbf{x}\neq\mathbf{y}$,
+* $T$ is onto if, for any $\mathbf{y}\in V$, there exists a $\mathbf{x}\in U$ so that $T(\mathbf{x})=\mathbf{y}$,
+* $T$ is an *isomorphism*\index{Isomorphism} if it is linear, $1\to 1$, and onto. 
+
+It is an exercise to prove the following. 
+
+::: {#prp-isomorphism name='The inverse of an isomorphism is an isomorphism'}
+Assume that $T:U\to V$ is an isomorphism. 
+The mapping $S:V\to U$ defined by $S(\mathbf{y})=\mathbf{x}$ when $T(\mathbf{x})=\mathbf{y}$ is well-defined and satisfies $S(T(\mathbf{u}))=\mathbf{u}$ and $T(S(\mathbf{v}))=\mathbf{v}$ for all $\mathbf{u}\in U$, $\mathbf{v}\in V$. 
+Moreover, $S$ is an isomorphism, called the inverse of $T$.
+:::
+
+It is also an exercise to prove that isomorphisms preserve linear dependence relations, spanning sets, and bases. 
+In particular, any invertible matrix preserve linear dependence relations. 
+
+
+## Coordinate mappings and change of coordinates {#sec-coordmappings}
+Let $U$ be a supspace of $\mathbb{R}^m$, and let $\mathcal{A}=\{\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n\}$ be a basis for $U$. 
+Any $\mathbf{u}\in U$ can be written uniquely on the form $\mathbf{u}=c_1\mathbf{a}_1+c_2\mathbf{a}_2+\cdots+ c_nx_n\mathbf{a}_n$. 
+The mapping from $U$ to $\mathbb{R}^n$ defined by
+$$
+\mathbf{u}\to(c_1,c_2,...,c_n)
+$$
+is called the *coordinate mapping* of $\mathcal{A}$. 
+We also write $[\mathbf{u}]_{\mathcal{A}}$ for $(c_1,c_2,...,c_n)$ and call this the *coordinate vector* of $\mathbf{u}$ relative to $\mathcal{A}$. The coordinate mapping is
+
+* well-defined since $\mathbf{u}$ can be written uniquely on the given form,
+* $1\to 1$, since if $[\mathbf{x}]_{\mathcal{A}}=[\mathbf{y}]_{\mathcal{A}}=(c_1,c_2,...,c_n)$, we must have that $\mathbf{x}=\mathbf{y}=c_1\mathbf{a}_1+c_2\mathbf{a}_2+\cdots+ c_nx_n\mathbf{a}_n$. 
+* onto, since if $(c_1,c_2,...,c_n)\in\mathbb{R}^n$, then $\mathbf{x}=c_1\mathbf{a}_1+c_2\mathbf{a}_2+\cdots+ c_n\mathbf{a}_n\in U$, 
+has coordinate vector $[\mathbf{x}]_{\mathcal{A}}=(c_1,c_2,...,c_n)$. 
+
+We also have the following result: 
+
+::: {#prp-coordmapiso}
+The coordinate mapping of $\mathcal{A}$ is linear.
+:::
+
+The coordinate mapping is thus an isomorphism. Thus, we know that it preserves linear dependence relations, spanning sets, and bases.
+
+::: {.proof}
+The coordinate mapping is $1\to 1$ and onto since the vectors in $\mathcal{A}$ are linearly independent and span $U$, 
+ensuring a unique $(c_1,...,c_n)$ so that $\mathbf{x}=c_1\mathbf{a}_1+ \cdots + c_n\mathbf{a}_n$ for any $\mathbf{x}\in U$. 
+To prove linearity we need to show that 
+$$[\mathbf{u}_1+\mathbf{u}_2]_{\mathcal{A}} = [\mathbf{u}_1]_{\mathcal{A}} +[\mathbf{u}_2]_{\mathcal{A}},$$
+and that $[c\mathbf{u}]_{\mathcal{A}}=c[\mathbf{u}]_{\mathcal{A}}$ for any scalar $c$. Let us show only the first statement. Write
+$$
+\begin{aligned}
+[\mathbf{u}_1]_{\mathcal{A}}&=(c_1,c_2,...,c_n) & 
+[\mathbf{u}_2]_{\mathcal{A}}&=(d_1,d_2,...,d_n)
+\end{aligned}
+$$
+then 
+$$
+\begin{aligned}
+\mathbf{u}_1 &= c_1\mathbf{b}_1 + c_2\mathbf{b}_2 + \cdots + c_n\mathbf{b}_n & 
+\mathbf{u}_2 &= d_1\mathbf{b}_1 + d_2\mathbf{b}_2 + \cdots + d_n\mathbf{b}_n,
+\end{aligned}
+$$
+so that
+$$\mathbf{u}_1+\mathbf{u}_2 = (c_1+d_1)\mathbf{b}_1 + (c_2+d_2)\mathbf{b}_2 + \cdots + (c_n+d_n)\mathbf{b}_n,$$
+so that 
+$$
+\begin{aligned}
+[\mathbf{u}_1+\mathbf{u}_2]_{\mathcal{A}} &= (c_1+d_1,c_2+d_2,...,c_n+d_n) \\
+&= (c_1,c_2,...,c_n)+(d_1,d_2,...,d_n) = [\mathbf{u}_1]_{\mathcal{A}} + [\mathbf{u}_2]_{\mathcal{A}}.
+\end{aligned}
+$$
+:::
+
+
+::: {#exm-}
+Let us find the coordinate vector of $\mathbf{x}=(2,4)$ relative to the basis $\mathcal{B}=\{(-1,3),(3,1)\}$ for $\mathbb{R}^2$. We need to solve
+$$\begin{pmatrix} -1 & 3 \\ 3 & 1 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \end{pmatrix}=\begin{pmatrix} 2 \\ 4 \end{pmatrix}.$$
+We row-reduce
+$$\begin{pmatrix} -1 & 3 & 2 \\ 3 & 1 & 4 \end{pmatrix}\sim\begin{pmatrix} 1 & -3 & -2 \\ 0 & 10 & 10 \end{pmatrix}\sim\begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{pmatrix},$$
+so that
+$$\begin{pmatrix} 2 \\ 4 \end{pmatrix}=\begin{pmatrix} -1 \\3 \end{pmatrix} + \begin{pmatrix} 3 \\ 1 \end{pmatrix}.$$
+It follows that the coordinate vector of $\mathbf{x}$ relative to $\mathcal{B}$ is $[\mathbf{x}]_{\mathcal{B}}=(1,1)$. $\clubsuit$
+:::
+
+
+From @prp-coordmapiso it follows that, if $\mathcal{A}=\{\mathbf{a}_i\}_{i=1}^n$ and $\mathcal{B}=\{\mathbf{b}_i\}_{i=1}^n$ are bases for the same subspace, 
+the mapping from $\mathbb{R}^n$ to $\mathbb{R}^n$ defined by $[\mathbf{x}]_{\mathcal{A}}\to [\mathbf{x}]_{\mathcal{B}}$ (where $\mathbf{x}\in U)$
+is linear, well-defined, $1\to 1$, and onto (as it is a composition of two such mappings), 
+so that it is given by an invertible matrix (@exr-invertiblematrixiso). 
+This matrix is called the *change of coordinate matrix*\index{Change of coordinate matrix} from $\mathcal{A}$ to $\mathcal{B}$, 
+and is denoted $P_{\mathcal{B}\leftarrow\mathcal{A}}$. Thus, 
+$$
+[\mathbf{x}]_{\mathcal{B}} = P_{\mathcal{B}\leftarrow\mathcal{A}}[\mathbf{x}]_{\mathcal{A}}. 
+$$
+Note that the mapping $\mathbf{F}$ from the proof of @prp-basesareequallength 
+can be written as $[\mathbf{x}]_{\mathcal{B}}=\mathbf{F}([\mathbf{x}]_{\mathcal{A}})$, so that the matrix of $\mathbf{F}$ is $P_{\mathcal{B}\leftarrow\mathcal{A}}$. Note that 
+$$
+[\mathbf{a}_i]_{\mathcal{B}}
+= P_{\mathcal{B}\leftarrow\mathcal{A}}[\mathbf{a}_i]_{\mathcal{A}} 
+= P_{\mathcal{B}\leftarrow\mathcal{A}}\mathbf{e}_i,
+$$
+and the last expression is simply column $i$ in $P_{\mathcal{B}\leftarrow\mathcal{A}}$. Thus
+$$P_{\mathcal{B}\leftarrow\mathcal{A}} = \begin{pmatrix} [\mathbf{a}_1]_{\mathcal{B}} & [\mathbf{a}_2]_{\mathcal{B}}  & \cdots & [\mathbf{a}_n]_{\mathcal{B}} \end{pmatrix}.$$
+Clearly $P_{\mathcal{B}\leftarrow\mathcal{A}}$ is invertible with inverse $P_{\mathcal{B}\leftarrow\mathcal{A}}^{-1}=P_{\mathcal{A}\leftarrow\mathcal{B}}$ 
+(the inverse is the change of coordinates the opposite way). 
+
+::: {#exm-}
+Let us find the change of coordinate matrix from $\mathcal{A}=\{(2,1),(1,-2)\}$ to $\mathcal{B}=\{(-1,3),(3,1)\}$. We can express $\mathbf{a}_1$ and $\mathbf{a}_2$ in terms of $\mathbf{b}_1$ and $\mathbf{b}_2$ by row-reducing
+$$
+\begin{aligned}
+\begin{pmatrix} -1 & 3 & 2 & 1\\ 3 & 1 & 1 & -2 \end{pmatrix} 
+&\sim \begin{pmatrix} 1 & -3 & -2 & -1\\ 0 & 10 & 7 & 1 \end{pmatrix} 
+\sim \begin{pmatrix} 1 & -3 & -2 & -1\\ 0 & 1 & 7/10 & 1/10 \end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 0 & 1/10 & -7/10\\ 0 & 1 & 7/10 & 1/10 \end{pmatrix}
+\end{aligned}
+$$
+It follows that 
+$$
+\begin{aligned}
+[\mathbf{a}_1]_{\mathcal{B}}&=(1/10,7/10) & [\mathbf{a}_2]_{\mathcal{B}}&=(-7/10,1/10),
+\end{aligned}
+$$
+so that
+$$P_{\mathcal{B}\leftarrow\mathcal{A}}=\frac{1}{10}\begin{pmatrix} 1 & -7 \\ 7 & 1 \end{pmatrix}.$$ 
+To find $P_{\mathcal{A}\leftarrow\mathcal{B}}$ we can simply invert $P_{\mathcal{B}\leftarrow\mathcal{A}}$. We can also, similarly to as above, express $\mathbf{b}_1$ and $\mathbf{b}_2$ in terms of $\mathbf{a}_1$ and $\mathbf{a}_2$ by row-reducing
+$$
+\begin{aligned}
+\begin{pmatrix} 2 & 1 &-1 & 3 \\1 & -2 & 3 & 1 \end{pmatrix}
+&\sim \begin{pmatrix} 1 & -2 & 3 & 1 \\ 0 & 5 & -7 & 1 \end{pmatrix} 
+\sim \begin{pmatrix} 1 & -2 & 3 & 1 \\ 0 & 1 & -7/5 & 1/5 \end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 0 & 1/5 & 7/5 \\ 0 & 1 & -7/5 & 1/5 \end{pmatrix} 
+\end{aligned}
+$$
+It follows that 
+$$
+\begin{aligned}
+[\mathbf{b}_1]_{\mathcal{A}}&=(1/5,-7/5) & [\mathbf{b}_2]_{\mathcal{A}}&=(7/5,1/5),
+\end{aligned}
+$$
+so that
+$$P_{\mathcal{A}\leftarrow\mathcal{B}}=\frac{1}{5}\begin{pmatrix} 1 & 7 \\ -7 & 1 \end{pmatrix}.$$ 
+$\clubsuit$
+:::
+
+
+
+A particular case is when the subspace is all of $\mathbb{R}^m$. Then the standard basis can be one of the bases. 
+The change of coordinate matrix from $\mathcal{A}$ to the standard basis is simply the matrix with $\mathbf{a}_i$ as columns, 
+since $[\mathbf{a}_i]_{\mathcal{E}}=\mathbf{a}_i$. 
+
+::: {#exm- name='Change of coordinates from the Fourier basis'}
+The change of coordinate matrix from the Fourier basis to the standard basis has in particular the Fourier basis vectors $( e^{2\pi in\cdot 0},e^{2\pi in\cdot 1},e^{2\pi in\cdot 2},...,e^{2\pi in(N-1)} )$ as columns. 
+We saw in @exm-fourierinverse that the inverse of this has columns $( e^{-2\pi ik\cdot 0},e^{-2\pi ik\cdot 1},e^{-2\pi ik\cdot 2},...,e^{-2\pi ik(N-1)} )/N$, so that 
+the change of coordinates from the standard basis to the Fourier basis is given by the $1/N$ times the DFT matrix. $\clubsuit$
+:::
+
+Let $U\subseteq\mathbb{R}^n$ and $B\subseteq{R}^m$ be subspaces, and $T$ a linear transformation from $U$ to $V$. 
+Let also $\mathcal{A}$ and $\mathcal{B}$ be bases for $U$ and $V$, respectively. 
+The mapping 
+$$[\mathbf{x}]_{\mathcal{A}}\to [T(\mathbf{x})]_{\mathcal{B}}.$$
+is well-defined and linear (as a composition of three such mappings), but may not be $1\to1$ and onto (since $T$ may not be $1\to 1$ or onto). 
+The mapping can thus be represented by an $m\times n$-matrix, which is denoted by $[T]_{\mathcal{B}\leftarrow\mathcal{A}}$. 
+It is also called *the matrix of $T$ relative to the bases $\mathcal{A}$ and $\mathcal{B}$*. This satisfies
+$$[T(\mathbf{x})]_{\mathcal{B}} = [T]_{\mathcal{B}\leftarrow\mathcal{A}} [\mathbf{x}]_{\mathcal{A}}.$$
+The columns in $[T]_{\mathcal{B}\leftarrow\mathcal{A}}$ are $[T(\mathbf{a}_i)]_{\mathcal{B}}$ since
+$$
+[T]_{\mathcal{B}\leftarrow\mathcal{A}}\mathbf{e}_i 
+= [T]_{\mathcal{B}\leftarrow\mathcal{A}}[\mathbf{a}_i]_{\mathcal{A}}
+= [T(\mathbf{a}_i)]_{\mathcal{B}}.
+$$
+
+When $T$ is a mapping of $U$ to itself, and $\mathcal{A}=\mathcal{B}$, we denote the matrix
+$[T]_{\mathcal{B}\leftarrow\mathcal{A}}$ simply by $[T]_{\mathcal{B}}$, and call it the matrix of $T$ relative to $\mathcal{B}$. 
+
+::: {#exm-}
+Consider the linear transformation $T:\mathbb{R}^2\to\mathbb{R}^2$ with matrix $\begin{pmatrix} 5 & -1 \\ -1 & 5 \end{pmatrix}$.
+Let us find the matrix of $T$ relative to $\mathcal{B}=\{(1,1),(-1,1)\}$, i.e., $[T]_{\mathcal{B}}$ . We compute
+$$
+\begin{aligned}
+T(\mathbf{b}_1)&=\begin{pmatrix} 5 & -1 \\ -1 & 5 \end{pmatrix}\begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 4 \\ 4 \end{pmatrix} = 4\mathbf{b}_1 \\
+T(\mathbf{b}_2)&=\begin{pmatrix} 5 & -1 \\ -1 & 5 \end{pmatrix}\begin{pmatrix} -1 \\ 1 \end{pmatrix} = \begin{pmatrix} -6 \\ 6 \end{pmatrix} = 6\mathbf{b}_2
+\end{aligned}
+$$
+It follows that $[T(\mathbf{b}_1)]_{\mathcal{B}}=\begin{pmatrix}4\\0\end{pmatrix}$ and $[T(\mathbf{b}_2)]_{\mathcal{B}}=\begin{pmatrix}0\\6\end{pmatrix}$, so that
+$$[T]_{\mathcal{B}} = \begin{pmatrix} [T(\mathbf{b}_1)]_{\mathcal{B}} &  [T(\mathbf{b}_2)]_{\mathcal{B}}\end{pmatrix} = \begin{pmatrix} 4 & 0 \\ 0 & 6 \end{pmatrix}.$$
+The matrix of $T$ relative to this basis was thus diagonal. Since multiplying with a diagonal matrix is simpler computationally, linear transformations may be more easily computed in suitable bases. $\clubsuit$
+:::
+
+
+::: {#prp-ta_and_tb_similar}
+The following hold:
+$$[T]_{\mathcal{B}} = P_{\mathcal{B}\leftarrow\mathcal{A}} [T]_{\mathcal{A}} (P_{\mathcal{B}\leftarrow\mathcal{A}})^{-1}$$ {#eq-readsasthis}
+:::
+
+:::{.proof}
+We have that 
+$$[T(\mathbf{x})]_{\mathcal{A}} = [T]_{\mathcal{A}} [\mathbf{x}]_{\mathcal{A}}.$$
+If we apply change of coordinates on both sides we get
+$$[T(\mathbf{x})]_{\mathcal{B}} = P_{\mathcal{B}\leftarrow\mathcal{A}} [T]_{\mathcal{A}} [\mathbf{x}]_{\mathcal{A}},$$
+which also can be written as
+$$[T(\mathbf{x})]_{\mathcal{B}} = P_{\mathcal{B}\leftarrow\mathcal{A}} [T]_{\mathcal{A}} P_{\mathcal{A}\leftarrow\mathcal{B}}[\mathbf{x}]_{\mathcal{B}},$$
+which reads as @eq-readsasthis 
+:::
+
+
+
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+## Which of the following claims are true?
+
+1. [ ] If the matrix $A$ has a pivot in every column, then the system $A\mathbf{x}=\mathbf{b}$ always has a unique solution for any $\mathbf{b}$.
+> The augmented matrix can have a pivot in the last column, in which case there are no solutions.
+1. [ ] There exist linear systems of equations with exactly three solutions.
+> All systems have either 0,1, or infinitely many solutions. 
+1. [x] The reduced echelon form of a matrix is unique
+
+
+## Which of the following claims are true?
+1. [ ] If $\mathbf{a}_1$ and $\mathbf{a}_2$ are two vectors in $\mathbb{R}^3$ we can always find a 
+third vector $\mathbf{a}_3$ so that $\mathbf{a}_1$, $\mathbf{a}_2$, and $\mathbf{a}_3$ is a basis for $\mathbb{R}^3$. 
+>> If $\mathbf{a}_1$ and $\mathbf{a}_2$ are linearly dependent the three vectors as a whole will 
+also be linearly dependent, so that we can't always find a $\mathbf{a}_3$ providing a basis.
+1. [ ] If $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$, and $\mathbf{a}_4$ are vectors in $\mathbb{R}^3$, 
+we can always find three vectors among these which are linearly independent.
+> This is wrong. A counterexample is when all four vectors are equal.
+1. [x] Any set of three linearly independent vectors in $\mathbb{R}^3$ is also a basis for $\mathbb{R}^3$.
+
+
+
+## Which set of vectors is a basis?
+
+Which set of vectors is a basis for $\mathbb{R}^3$?
+
+1. [x] $(1,1,1)$, $(1,1,0)$, $(1,0,0)$. 
+1. [ ] $(1,2,3)$, $(4,5,6)$, $(5,7,9)$.
+> the third vector is the sum of the two first, so that the vectors are linearly dependent, and hence not a basis.
+1. [ ] $(1,1,0)$, $(1,-1,0)$, $(1,-2,0)$.
+> Row reduction gives 
+$$
+\begin{pmatrix} 1 & 1 & 1 \\ 1 & -1 & -2 \\ 0 & 0 & 0 \end{pmatrix}
+\sim 
+\begin{pmatrix} 1 & 1 & 1 \\ 0 & -2 & -3 \\ 0 & 0 & 0 \end{pmatrix}
+$$
+so that the third column is not a pivot column. The three vectors can thus not be a basis.
+
+
+
+## Extending to a basis.
+
+Which of the following vectors will extend $\{(1,2,3),(4,5,6)\}$ to a basis for $\mathbb{R}^3$. 
+
+> Row-reduce
+$$
+\begin{pmatrix} 1 & 4 & 0 & 3 & 5 \\2 & 5 & 0 & 3 & 7 \\ 3 & 6 & 1 & 3 & 9 \end{pmatrix}
+$$
+
+1. [x] $(0,0,1)$. 
+2. [ ] $(3,3,3)$.
+3. [ ] $(5,7,9)$.
+
+
+
+
+## The matrix of a linear transformation
+
+We have a linear transformation $T:\mathbb{R}^2\to\mathbb{R}^2$ satisfying 
+$$
+\begin{aligned}
+T\begin{pmatrix}1\\2\end{pmatrix} &= \begin{pmatrix}2\\5\end{pmatrix} &
+T\begin{pmatrix}2\\3\end{pmatrix} &= \begin{pmatrix}-1\\2\end{pmatrix}.
+\end{aligned}
+$$
+Then the matrix of $T$ is
+
+> Start by expressing $(1,0)$ and $(0,1)$ as linear combinations of $(1,2)$ and $(2,3)$, and then use the information above.
+
+1. [ ] $$\begin{pmatrix} 1 & 2 \\ 2 & 3 \end{pmatrix}$$
+2. [ ] $$\begin{pmatrix} 2 & 1 \\ 5 & 2 \end{pmatrix}$$
+3. [x] $$\begin{pmatrix} -8 & 5 \\ -11 & 8 \end{pmatrix}$$
+4. [ ] $$\begin{pmatrix} -11 & 9 \\ -7 & 5 \end{pmatrix}$$
+5. [ ] $$\begin{pmatrix} -11 & 8 \\ -8 & 5 \end{pmatrix}$$
+
+
+
+## Rank of a matrix
+
+The rank of the matrix
+$$
+\begin{pmatrix} 2 & 4 & 14 \\ 1 & -1 & 1 \\ -2 & 3 &0 \\ -1 & 3 & 3 \end{pmatrix}
+$$
+is
+
+1. [ ] 1
+1. [x] 2
+1. [ ] 3
+1. [ ] 4
+1. [ ] 5
+
+
+
+## Null space of a matrix
+
+A basis for the null space of the matrix 
+$$
+\begin{pmatrix} 
+2 & -1 & 3 & -2 \\ -1 & 2 & 3 & -2 \\ 7 & -5 & 6 & -4
+\end{pmatrix} 
+$$
+is
+
+1. [ ] $(-1,2,1,0)$ and $(1,3,0,1)$
+1. [ ] $(-2,-1,1,0)$ and $(-3,2,0,1)$
+1. [ ] $(-7,-3,1,0)$ and $(3,4,0,1)$
+1. [ ] $(-1,-2,0,1)$ and $(3,-1,1,0)$
+1. [x] $(-3,-3,1,0)$ and $(2,2,0,1)$
+
+## Coordinate vector
+
+Let $\mathbf{x}=(1,-2,3)$, and 
+$$
+\mathcal{A}=
+\left\{ 
+\begin{pmatrix} 2 \\ -3 \\ 1 \end{pmatrix},\begin{pmatrix} -1 \\ 2 \\ 0 \end{pmatrix},\begin{pmatrix} 3 \\ -1 \\ 2 \end{pmatrix}
+\right\}.
+$$
+Then $[\mathbf{x}]_{\mathcal{A}}$ is 
+
+1. [ ] $(4,-3,-4)$
+1. [ ] $(1,-2,-4)$
+1. [x] $(5,6,-1)$
+1. [ ] $(4,-1,5)$
+1. [ ] $(2,3,-4)$
+
+## Change of coordinate matrix
+
+Let 
+$$
+\begin{aligned}
+\mathcal{A} &= \left\{ \begin{pmatrix} -1 \\ 1\end{pmatrix} , \begin{pmatrix}2 \\ 1 \end{pmatrix}\right\}
+\mathcal{B} &= \left\{ \begin{pmatrix} 3 \\ 1\end{pmatrix} , \begin{pmatrix} -2 \\ 2\end{pmatrix}\right\}
+\end{aligned}
+$$
+Then $P_{\mathcal{B}\leftarrow\mathcal{A}}$ equals 
+
+1. [ ] $$\begin{pmatrix} 1/2 & -2 \\ 1/4 & -1/2 \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 3 & -1 \\ 2 & 3 \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 1 & 2 \\ -1 & 2 \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 3/4 & 0 \\ 1/8 & 1/2 \end{pmatrix}$$
+1. [x] $$\begin{pmatrix} 0 & 3/4 \\ 1/2 & 1/8 \end{pmatrix}$$
+
+## The matrix of a linear transformation relative to some basis
+
+Let 
+$$A=\begin{pmatrix} 1 & 2 & 4 \\ -3 & 6 & 7 \\ 2 & -2 & -1 \end{pmatrix}$$
+The matrix of $T(\mathbf{x})=A\mathbf{x}$ relative to 
+$$
+\mathcal{A}=\left\{ \begin{pmatrix} -1\\ -2\\ 1\end{pmatrix} , \begin{pmatrix} -2 \\ -5 \\ 2 \end{pmatrix} , \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix} \right\}
+$$
+is
+
+> Compute $A\mathbf{x}$, for $\mathbf{x}$ being the basis vectors in $\mathcal{A}$.
+
+1. [ ] $$[T]_{\mathcal{A}}=\begin{pmatrix} -1 & 2 & 3 \\ 2 & 1 & 2 \\ 1 & 1 & 4 \end{pmatrix}$$
+1. [ ] $$[T]_{\mathcal{A}}=\begin{pmatrix} 1 & 2 & -1 \\ 3 & 3 & 1 \\ 1 & 0 & 4 \end{pmatrix}$$
+1. [ ] $$[T]_{\mathcal{A}}=\begin{pmatrix} 2 & 1 & 3 \\ 1 & 4 & 7 \\ 1 & -1 & 2 \end{pmatrix}$$
+1. [x] $$[T]_{\mathcal{A}}=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 3 \end{pmatrix}$$
+1. [ ] $$[T]_{\mathcal{A}}=\begin{pmatrix} 2 & 1 & 1 \\ 4 & -1 & 1 \\ 1 & 2 & 2 \end{pmatrix}$$
+
+
+```
+:::
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr- name='Row equivalent matrices have the same row space'}
+Suppose that $A$ and $B$ are row equivalent. Show that $\text{Row}(A)=\text{Row}(B)$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since the order of the vectors $\mathbf{a}_i$ in $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ does not matter, 
+it is clear that $\text{Row}(A)=\text{Row}(B)$ if $B$ is obtained from $A$ by a row exchange. Since 
+$$\text{Sp}(s\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)=\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$$
+it is also clear that $\text{Row}(A)=\text{Row}(B)$ if $B$ is obtained from $A$ by multiplying a row with a scalar$\neq 0$.
+
+Finally it is clear that
+$$\text{Sp}(\mathbf{a}_1+c\mathbf{a}_2,\mathbf{a}_2,...,\mathbf{a}_n)\subseteq\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n).$$
+Since also $\mathbf{a}_1 = (\mathbf{a}_1+c\mathbf{a}_2) - c\mathbf{a}_2$ it is also clear that 
+$$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)\subseteq\text{Sp}(\mathbf{a}_1+c\mathbf{a}_2,\mathbf{a}_2,...,\mathbf{a}_n)$$
+It follows that
+$$\text{Sp}(\mathbf{a}_1+c\mathbf{a}_2,\mathbf{a}_2,...,\mathbf{a}_n)=\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n).$$
+Therefore it is clear that $\text{Row}(A)=\text{Row}(B)$ also if $B$ is obtained from $A$ by adding a multiple of 
+of one row to another. 
+Therefore, no elementary row operation changes the row space of the matrix, so that row equivalent matrices also have the same row space. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+We have the matrix $A=\begin{pmatrix} 2 & 4 & 1 & -1 \\ 1 & -1 & 2 & 3 \\ -1 & -11 & 4 & 11 \end{pmatrix}$. 
+
+(a) Find bases for the row- and column space of $A$. What is the rank of $A$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Row reduction of $A$ gives $A \sim \begin{pmatrix} 1 & 0 & 3/2 & 11/6  \\ 0 & 1 & -1/2 & -7/6 \\ 0 & 0 & 0 & 0 \end{pmatrix}$. 
+We see that the first two rows are pivot rows, so that these are a basis for the row space of $A$, which therefore has dimension $2$. 
+We also see that the first two columns in $A$ are pivot columns, so that these are a basis for the column space of $A$, 
+which also ha dimension $2$. The rank of $A$ is therefore $2$. 
+:::::::
+:::::
+
+(b) Find a basis for the null space of $A$. What is the dimension of the null space?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+A vector in the null space must satisfy 
+\begin{align*} x_1 + \frac{3}{2}x_3 + \frac{11}{6}x_4&=0 & x_2 - \frac{1}{2}x_3 - \frac{7}{6}x_4 &= 0,\end{align*}
+so that
+\begin{align*} x_1 &= -\frac{3}{2}x_3 - \frac{11}{6}x_4 & x_2 &= \frac{1}{2}x_3 + \frac{7}{6}x_4,\end{align*}
+so that
+$$
+\begin{pmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{pmatrix} = \begin{pmatrix} -\frac{3}{2}x_3 - \frac{11}{6}x_4  \\ \frac{1}{2}x_3 + \frac{7}{6}x_4 \\ x_3 \\ x_4 \end{pmatrix}
+= 
+x_3\begin{pmatrix} -\frac{3}{2} \\ \frac{1}{2}  \\ 1 \\ 0\end{pmatrix} + x_4\begin{pmatrix} - \frac{11}{6}  \\ \frac{7}{6} \\ 0 \\ 1 \end{pmatrix},
+$$
+so that $(-3,1,2,0)$ and $(-11,7,0,6)$ is a basis for the null space of $A$, which therefore has dimension $2$. 
+The last could have been concluded from that the rank plus the dimension of the null space equals the number of columns in the matrix, which is four.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Consider the matrix 
+$A=\begin{pmatrix}
+    2 & 8 & 6 & 1 \\
+    -4 & -16 & -12 & 2 \\
+    -1 & -4 & -3 & 1
+\end{pmatrix}$
+
+(a) Find a basis for the column space of $A$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We row reduce
+\begin{align*}
+\begin{pmatrix}
+    2 & 8 & 6 & 1 \\
+    -4 & -16 & -12 & 2 \\
+    -1 & -4 & -3 & 1
+\end{pmatrix}
+&\stackrel{I\leftrightarrow III}{\sim}
+\begin{pmatrix}
+    -1 & -4 & -3 & 1 \\
+    -4 & -16 & -12 & 2 \\
+    2 & 8 & 6 & 1
+\end{pmatrix}\\
+&\stackrel{I\cdot(-1)}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 \\
+    -4 & -16 & -12 & 2 \\
+    2 & 8 & 6 & 1
+\end{pmatrix}\\
+&\stackrel{II+4I,III-2I}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 \\
+    0 & 0 & 0 & -2 \\
+    0 & 0 & 0 & 3 
+\end{pmatrix}\\
+&\stackrel{II/(-2)}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 0 & 3 
+\end{pmatrix}\\
+&\stackrel{III-3II,I+II}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 0 & 0
+\end{pmatrix}
+\end{align*}
+We see that column 1 and 4 in $A$ are pivot columns, so that these provide a basis for the column space of $A$.
+:::::::
+:::::
+
+(b) Expand the basis you found in (a) to a basis for $\mathbb{R}^3$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We insert an extra column so that all rows have a pivot element, and row-reduce backwards:
+\begin{align*}
+\begin{pmatrix}
+    1 & 4 & 3 & 0 & 0\\
+    0 & 0 & 0 & 1 & 0\\
+    0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+&\stackrel{III+3II,I-II}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 & 0 \\
+    0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 3 & 1
+\end{pmatrix} \\
+&\stackrel{II(-2)}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 & 0 \\
+    0 & 0 & 0 & -2 & 0 \\
+    0 & 0 & 0 & 3 & 1
+\end{pmatrix}\\
+&\stackrel{II-4I,III+2I}{\sim}
+\begin{pmatrix}
+    1 & 4 & 3 & -1 & 0 \\
+    -4 & -16 & -12 & 2 & 0\\
+    2 & 8 & 6 & 1 & 1
+\end{pmatrix}\\
+&\stackrel{I\cdot(-1)}{\sim}
+\begin{pmatrix}
+    -1 & -4 & -3 & 1 & 0\\
+    -4 & -16 & -12 & 2 & 0 \\
+    2 & 8 & 6 & 1 & 1
+\end{pmatrix}\\
+&\stackrel{I\leftrightarrow III}{\sim}
+\begin{pmatrix}
+    2 & 8 & 6 & 1 & 1 \\
+    -4 & -16 & -12 & 2 & 0 \\
+    -1 & -4 & -3 & 1 & 0
+\end{pmatrix}
+\end{align*}
+We can therefore expand with the vector $(1,0,0)$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Suppose that $m>n$, and that the columns $\mathbf{a}_1,...,\mathbf{a}_n$ in $A$ are linearly independent. 
+Suppose also that the first $n$ rows in $A$ are linearly independent. Explain that
+$$\{ \mathbf{a}_1,...,\mathbf{a}_n,\mathbf{e}_{n+1},...,\mathbf{e}_m \}$$
+is a basis for $\mathbb{R}^m$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Do as follows:
+
+1. Row-reduce the $n$ first rows in $A$ to the $n\times n$ identity matrix. 
+2. Null out the $m-n$ last rows with help of elementary row operations. 
+3. Insert $\mathbf{e}_{n+1},...,\mathbf{e}_{n+m}$, so that we obtain the $m\times m$ identity matrix. 
+4. Row-reduce backwards.
+
+After this we will still have zeros above the standard basis vectors we inserted, 
+since the $m-n$ last rows never will affect the $n$ first rows in the operations we did. 
+The vectors $\mathbf{e}_{n+1},...,\mathbf{e}_{n+m}$ which we inserted will also not be affected by adding the rows above to these. 
+After backwards row-reduction we therefore get
+$$\{ \mathbf{a}_1,...,\mathbf{a}_n,\mathbf{e}_{n+1},...,\mathbf{e}_m \},$$
+which thus also must be a basis for $\mathbb{R}^m$.
+:::::::
+:::::
+:::
+
+::: {#exr- name='Spans are subspaces'}
+Show that $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ is a subspace of $\mathbb{R}^m$
+:::
+
+::: {#exr- name='The orthogonal complement is a subspace'}
+Let $A$ be a set in $\mathbb{R}^n$. 
+The *orthogonal complement* of $A$, $A^\perp$, is defined as the set of all vectors in $\mathbb{R}^n$ 
+that are orthogonal to all vectors in $A$, meaning that
+$$A^\perp=\{ \mathbf{x}\in\mathbb{R}^n: \mathbf{x}\cdot \mathbf{a}=0\forall\mathbf{a}\in A\}.$$
+Show that  $A^\perp$ is a subspace of $\mathbb{R}^n$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $\mathbf{x},\mathbf{y}\in A^\perp$, and let $\mathbf{a}\in A$. Then 
+\begin{align*}
+(\mathbf{x}+\mathbf{y})\cdot\mathbf{a}&=\mathbf{x}\cdot\mathbf{a} + \mathbf{y}\cdot\mathbf{a} = 0+0=0 \\
+(c\mathbf{x})\cdot\mathbf{a}&= c(\mathbf{x}\cdot\mathbf{a}=c0=0.
+\end{align*}
+This shows that both $\mathbf{x}+\mathbf{y}\in A^\perp$, and that $c\mathbf{x}\in A^\perp$. It follows that $A^\perp$ is a subspace.
+:::::::
+:::::
+:::
+
+::: {#exr- name='A sum of subspaces is a supspace'}
+Let $U$ and $V$ be subspaces of $\mathbb{R}^n$. Show that 
+$$\{ \mathbf{u}+\mathbf{v}: \mathbf{u}\in U,\mathbf{v}\in V\}$$
+also is a subspace of $\mathbb{R}^n$.
+:::
+
+
+
+::: {#exr-isomorphism}
+Prove Proposition @prp-isomorphism (i.e., the inverse of an isomorphism is also an isomorphism).
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $T:U\to V$ be an isomorphism, and let $S:V\to U$ be defined by $S(\mathbf{v})=\mathbf{u}$ when $T(\mathbf{u})=\mathbf{v}$. $S$ is
+
+* well-defined on all of $V$ since $T$ is onto, 
+* onto since $T$ is defined on all of $U$, 
+* $1\to 1$ since $T$ is well-defined. 
+
+For linearity of $S$, assume that $S(\mathbf{v}_1)=\mathbf{u}_1$ and $S(\mathbf{v}_2)=\mathbf{u}_2$. 
+Then $T(\mathbf{u}_1)=\mathbf{v}_1$ and $T(\mathbf{u}_2)=\mathbf{v}_2$, so that 
+$$T(\mathbf{u}_1+\mathbf{u}_2) = T(\mathbf{u}_1)+T(\mathbf{u}_2))=\mathbf{v}_1+\mathbf{v}_2,$$
+so that 
+$$S(\mathbf{v}_1+\mathbf{v}_2)=\mathbf{u}_1+\mathbf{u}_2=S(\mathbf{v}_1)+S(\mathbf{v}_2).$$
+Similarly, if $T(\mathbf{u})=\mathbf{v}$ then $T(\alpha\mathbf{u})=\alpha\mathbf{v}$, so that 
+$$S(\alpha\mathbf{v})=T(\alpha\mathbf{u})=\alpha T(\mathbf{u})=\alpha S(\mathbf{v}).$$
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-}
+Show that any subspace can be written as the null space of a matrix. 
+
+::::: {.callout-tip title='Hint' collapse="true"}
+A general subspace can be written as 
+$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$, where the vectors are linearly independent. 
+Expand this to a basis for $\mathbb{R}^m$, and let $A$ be the matrix with these as columns. 
+Then consider the null space of the matrix\index{Block matrix!write a subspace as a null space} 
+$$C=\left(\begin{array}{l|l} \mathbf{0} & \mathbf{0} \\ \hline \mathbf{0} & I \end{array}\right) A^{-1}.$$
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Suppose that the subspace is $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$, where the vectors are linearly independent. 
+Expand these to a basis for $\mathbb{R}^m$, and let $A$ be the matrix with these as columns. 
+Then we know that $A$ is invertible, and that $A\mathbf{e}_i=\mathbf{a}_i$ for all $i$. 
+Then we also have that $A^{-1}\mathbf{a}_i=\mathbf{e}_i$. Now set 
+$$C=\left(\begin{array}{l|l} \mathbf{0} & \mathbf{0} \\ \hline \mathbf{0} & I \end{array}\right) A^{-1},$$
+where the upper left block is $n\times n$.
+Then $C\mathbf{a}_1=C\mathbf{a}_2=\cdots=C\mathbf{a}_n=\mathbf{0}$, so that 
+$$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)\subseteq\text{Nul}(C).$$
+We also have that
+$$ C\mathbf{a}_{n+1}=\mathbf{e}_{n+1} \text{, } C\mathbf{a}_{n+2}=\mathbf{e}_{n+2},...,C\mathbf{a}_m=\mathbf{e}_m $$
+If $\mathbf{x}\not\in\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ then we can write 
+$$
+\mathbf{x}=c_1\mathbf{a}_1 + \cdots + c_n\mathbf{a}_n + c_{n+1}\mathbf{a}_{n+1} + \cdots + c_m\mathbf{a}_m,
+$$
+where at least one of $c_{n+1},...,c_m\neq 0$. We now get 
+$$
+C\mathbf{x}=c_{n+1}\mathbf{e}_{n+1} + \cdots + c_m\mathbf{e}_m,
+$$
+which then is$\neq\mathbf{0}$. It follows that $\mathbf{x}\not\in\text{Nul}(C)$, so that 
+$\text{Nul}(C) \subseteq \text{Sp}(\mathbf{v}_1,\mathbf{v}_2,...,\mathbf{v}_n)$
+It follows that $\text{Nul}(C)=\text{Sp}(\mathbf{v}_1,\mathbf{v}_2,...,\mathbf{v}_n)$
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-reqcoordbasis}
+Let $U\subseteq\mathbb{R}^m$, $V\subseteq\mathbb{R}^m$ be subspaces, 
+and $T:U\rightarrow V$ a linear transformation between them. 
+Let also $\{\mathbf{x}_i\}_{i=1}^k$ be vectors in $U$. 
+
+(a) Assume that $\{T(\mathbf{x}_i)\}_{i=1}^k$ are linearly independent. 
+Show that $\{\mathbf{x}_i\}_{i=1}^k$ also are linearly independent. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Assume that $c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k=\mathbf{0}$. 
+Since $T$ is linear we have that
+$c_1T(\mathbf{x}_1)+\cdots+c_kT(\mathbf{x}_k)=\mathbf{0}$, from which it follows that $c_1=\cdots=c_k=0$ 
+due to linear independence of the $\{T(\mathbf{x}_i)\}_{i=1}^k$.
+Thus, $\{\mathbf{x}_i\}_{i=1}^k$ are also linearly independent.
+:::::::
+:::::
+
+(b) Assume that $T$ is $1\to 1$, and that $\{\mathbf{x}_i\}_{i=1}^k$ are linearly independent.
+Show that $\{T(\mathbf{x}_i)\}_{i=1}^k$ are also linearly independent. 
+are also linearly independent. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Assume that $c_1T(\mathbf{x}_1)+\cdots+c_kT\mathbf{x}_k)=\mathbf{0}$. 
+Then we also have that
+$T( c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k)=\mathbf{0}$. Since $T$ is $1\to 1$ we must have that 
+$c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k=\mathbf{0}$, so that $c_1=\cdots=c_k$ due to linear independence of the 
+$\{\mathbf{x}_i\}_{i=1}^k$. It follows that $\{T(\mathbf{x}_i)\}_{i=1}^k$ are linearly independent. 
+:::::::
+:::::
+
+
+(c) Assume that $T$ is onto and that $\{\mathbf{x}_i\}_{i=1}^k$ span $U$ 
+Show that $\{T(\mathbf{x}_i)\}_{i=1}^k$ span $V$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $\mathbf{b}\in V$. Since $T$ is onto there exists a linear combination 
+$c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k$ so that $T(c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k)=\mathbf{b}$. 
+But then $c_1T(\mathbf{x}_1)+\cdots+c_kT(\mathbf{x}_k)=\mathbf{b}$, so that $\{T(\mathbf{x}_i)\}_{i=1}^k$ also span $V$. 
+:::::::
+:::::
+
+(d) Assume that $T$ is $1\to 1$ and that $\{T(\mathbf{x}_i)\}_{i=1}^k$ span $V$ 
+Show that $\{\mathbf{x}_i\}_{i=1}^k$ span $U$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $\mathbf{y}\in U$. Since $\{T(\mathbf{x}_i)\}_{i=1}^k$ span $V$ there exist $c_1,...,c_k$ so that 
+$$c_1T(\mathbf{x}_1)+\cdots+c_kT(\mathbf{x}_k)=T(\mathbf{y}).$$
+But then $T(c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k)=T(\mathbf{y})$. Since $T$ is $1\to 1$ we have that 
+$c_1\mathbf{x}_1+\cdots+c_k\mathbf{x}_k=\mathbf{y}$, so that $\{\mathbf{x}_i\}_{i=1}^k$ span $U$.
+:::::::
+:::::
+
+
+(e) 
+Assume that $T$ is $1\to 1$ and onto. Show that $\{\mathbf{x}_i\}_{i=1}^k$ is a basis for $U$ if and only if $\{T(\mathbf{x}_i)\}_{i=1}^k$ is a basis for $V$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+This follows from (a)-(d). 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Assume that $P$ is invertible and $m\times m$, and that $A$ is $m\times n$. 
+Show that the column spaces of $A$ and $PA$ have the same dimensions. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $\text{Col}(PA)=\text{Span}\{P\mathbf{a}_1,...,P\mathbf{a}_n\}$. 
+Since $P$ is an isomorphism, linear dependence relations are preserved under $P$, which in particular means that the dimension will not change.
+:::::::
+:::::
+:::
+
+
+::: {#exr-composeisomorphisms}
+Let $T:U\to V$ and $S:V\to W$ be isomorphisms. Prove that the mapping sending $\mathbf{x}$ to $S(T(\mathbf{x}))$ is an isomorphism from $U$ to $W$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that 
+$$
+S(T(\mathbf{u}_1+\mathbf{u}_2)) = S(T(\mathbf{u}_1)+T(\mathbf{u}_2)) = S(T(\mathbf{u}_1))+S(T(\mathbf{u}_2)).
+$$
+A similar argument can be made for multiplication with a scalar, so that the composition of $S$ and $T$ is linear.
+
+Assume that $\mathbf{u}_1\neq \mathbf{u}_2$ are vectors in $U$. Since $T$ is $1\to 1$ we have that $T(\mathbf{u}_1)\neq T(\mathbf{u}_2)$.
+Since $S$ also is $1\to 1$ it follows that $S(T(\mathbf{u}_1))\neq S(T(\mathbf{u}_2))$, so that the composition of $S$ and $T$ also is $1\to 1$. 
+
+Finally, let $\mathbf{w}\in W$. Since $S$ is onto there exists a $\mathbf{v}\in V$ so that $S\mathbf{v}=\mathbf{w}$. And since $T$ is onto there exists a $\mathbf{u}\in U$ so that $T(\mathbf{u})=\mathbf{v}$. 
+But then $S(T(\mathbf{u})=S(\mathbf{v})=\mathbf{w}$, so that the composition of $S$ and $T$ also is onto. Since this composition is onto, $1\to 1$, and linear, it is also an isomorphism.
+:::::::
+:::::
+:::
+
+::: {#exr-reqTinvertible}
+Let $T:V\to W$ be a linear transformation between subspaces, and let $\mathcal{A}$ be a basis for $V$, and $\mathcal{B}$ a basis for $W$. 
+Show that $T$ is $1\to 1$/onto/an isomorphism if and only if $[T]_{\mathcal{B}\leftarrow\mathcal{A}}$ is $1\to 1$/onto/an isomorphism.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$[T]_{\mathcal{B}\leftarrow\mathcal{A}}$ is the composition of $T$, one coordinate mapping, and one inverse coordinate mapping. 
+Since the two latter are isomorphisms (between $V/W$ and $\mathbb{R}^m/\mathbb{R}^n$), it follows that
+$[T]_{\mathcal{B}\leftarrow\mathcal{A}}$ is $1\to 1$/onto/an isomorphism if and only if $T$ is. 
+Since a matrix gives an isomorphism if and only if $m=n$, $V$ and $W$ must have the same dimension when $T$ is an isomorphism. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Find the coordinate vector of $\mathbf{x}=(-10,20)$ relative to the basis $\mathcal{B}=\{(2,4),(-4,2)\}$ for $\mathbb{R}^2$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We row-reduce
+$$\begin{pmatrix} 2 & -4 & -10 \\ 4 & 2 &20 \end{pmatrix} \sim \begin{pmatrix} 1 & -2 & -5 \\ 0 & 10 &40 \end{pmatrix} \sim \begin{pmatrix} 1 & 0 & 3 \\ 0 & 1 & 4 \end{pmatrix},$$
+so that $(-10,20)=3(2,4)+4(-4,2)$. It follows that $[\mathbf{x}]_{\mathcal{B}}=(3,4)$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Consider the bases $\mathcal{A}=\{(-1,1),(1,1)\}$, and $\mathcal{B}=\{(-1,2),(-1,3)\}$.
+
+(a) Find the change of coordinate matrix from $\mathcal{A}$ to $\mathcal{B}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We row-reduce
+$$
+\begin{pmatrix} -1 & -1 & -1 & 1 \\ 2 & 3 & 1 & 1 \end{pmatrix} \sim \begin{pmatrix} 1 & 1 & 1 & -1 \\ 0 & 1 & -1 & 3 \end{pmatrix} \sim \begin{pmatrix} 1 & 0 & 2 & -4 \\ 0 & 1 & -1 & 3 \end{pmatrix},
+$$
+so that $(-1,1)=2(-1,2)-(-1,3)$ and $(1,1)=-4(-1,2)+3(-1,3)$, so that $[\mathbf{a}_1]_{\mathcal{B}}=(2,-1)$ $[\mathbf{a}_2]_{\mathcal{B}}=(-4,3)$. It follows that 
+$$
+P_{\mathcal{B}\leftarrow\mathcal{A}}=\begin{pmatrix} [\mathbf{a}_1]_{\mathcal{B}} & [\mathbf{a}_2]_{\mathcal{B}}\end{pmatrix} = \begin{pmatrix} 2 & -4 \\ -1 & 3 \end{pmatrix}.
+$$
+:::::::
+:::::
+
+(b) Let $\mathbf{x}=4\mathbf{a}_1-5\mathbf{a}_2$. Find $[\mathbf{x}]_{\mathcal{B}}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have $[\mathbf{x}]_{\mathcal{A}}=(4,-5)$, so that 
+$$
+[\mathbf{x}]_{\mathcal{B}}=P_{\mathcal{B}\leftarrow\mathcal{A}}[\mathbf{x}]_{\mathcal{A}}    = \begin{pmatrix} 2 & -4 \\ -1 & 3 \end{pmatrix}\begin{pmatrix} 4 \\-5 \end{pmatrix} = \begin{pmatrix}28\\-19\end{pmatrix}.
+$$
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+Consider the linear transformation $T:\mathbb{R}^2\to\mathbb{R}^2$ with matrix $\begin{pmatrix} 2 & 6 \\ -6 & 2 \end{pmatrix}$.
+Find the matrix of $T$ relative to $\mathcal{B}=\{(3,1),(-1,4)\}$, i.e., $[T]_{\mathcal{B}}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We first find $T(\mathbf{b}_1)=(12,-16)$, $T(\mathbf{b}_2)=(22,14)$. We then row-reduce
+$$\begin{pmatrix} 3 & -1 & 12 & 22 \\ 1 & 4 & -16 & 14 \end{pmatrix} \sim \begin{pmatrix} 1 & 4 & -16 & 14 \\ 0 & -13 & 60 & -20 \end{pmatrix}$$
+$$\sim \begin{pmatrix} 1 & 4 & -16 & 14 \\ 0 & 1 & -60/13 & 20/13 \end{pmatrix}\sim \begin{pmatrix} 1 & 0 & 32/13 & 102/13 \\ 0 & 1 & -60/13 & 20/13 \end{pmatrix}$$
+It follows that $[T(\mathbf{b}_1)]_{\mathcal{B}}=(32,-60)/13$, $[T(\mathbf{b}_2)]_{\mathcal{B}}=(102,20)/13$, so that
+$$
+[T]_{\mathcal{B}} = \begin{pmatrix} [T(\mathbf{b}_1)]_{\mathcal{B}} & [T(\mathbf{b}_2)]_{\mathcal{B}}\end{pmatrix} = \frac{2}{13}\begin{pmatrix} 16 & 51 \\ -30 & 10 \end{pmatrix}.
+$$
+:::::::
+:::::
+:::

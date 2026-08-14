@@ -1,0 +1,25 @@
+---
+title: "Foils for Chapter 4 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+
+# The inverse matrix {#sec-invers}
+
+Let $A$ be square. If there exists a matrix $B$ so that $AB=I_n$ we say that $A$ is invertible, and call $B$ the inverse of $A$. We also write $A^{-1}$ for $B$. 
+
+- $A^{-1}$ is uniquely defined.
+- $AA^{-1}=A^{-1}A=I_n$.
+
+{{< include inverse/invmatteo.qmd >}}
+
+

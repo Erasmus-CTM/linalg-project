@@ -1,0 +1,19 @@
+project:
+  title: "Projects for linear algebra and numerical methods"
+  type: book
+
+format:
+  pdf:
+    documentclass: book
+  html:
+    theme: cosmo
+
+book:
+  title: "Projects for linear algebra and numerical methods"
+  author: "Øyvind Ryan"
+  date: last-modified
+  chapters:
+    - index.qmd
+    - svd/svdproject.qmd
+    - numeigenvals/jacobiproject.qmd
+    - numeigenvals/companionproject.qmd

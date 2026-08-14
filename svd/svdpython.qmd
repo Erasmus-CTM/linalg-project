@@ -1,0 +1,47 @@
+## Some useful Python commands
+
+We will consider an application of the SVD to image analysis. An image can simply be considered as a matrix, a rectangular grid where each point in the grid corresponds to an element in the matrix. 
+In image analysis one rather uses the term *pixel*, instead of grid point. 
+
+In *gray tone* images every pixel has an associated value measuring its intensity. Pixel values in such images are often stored as integers between 0 and 255, where 0 corresponds to black and 255 corresponds to white. 
+*Colour images* on the other hand are often stored in the *rgb-format*, where every pixel has three components, one for red (r), one for green (g), and one for blue (b). 
+All possible colours can be produced by combining these three base colours in different ways.
+This means that we need 3 different matrices to store an image in the rgb format.
+In this project we shall stick to gray tone images, so that one matrix is enough to store the image.
+
+\medskip Below is a description of some Python commands that may be useful. 
+$A$ is here a two-dimensional \texttt{numpy} array. We start by importing the packages we need:
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+The \texttt{linalg.matrix\_rank} function in \texttt{numpy} returns the rank of $A$, and can be invoked in two ways:
+```{python}
+#| eval: false
+r=np.linalg.matrix_rank(A)
+r=np.linalg.matrix_rank(A,tol=epsilon)
+```
+The second line here requires some explanation.
+We are used to finding the rank by row reducing the matrix, and counting the number of pivot columns. 
+The entries in a matrix are sensitive to roundoff errors, however. The effect of these can be that, after row reduction, it may look like 
+the matrix has full rank, even if this is not the case. 
+Instead we can use the fact that the rank equals the number of singular values greater than 0. 
+Python applies this procedure, and assumes that $\sigma_j > 0$ if $\sigma_j > \epsilon$ for a given tolerance $\epsilon > 0$. 
+This tolerance is set on the second line above (\texttt{tol=epsilon}).
+
+The function \texttt{U,S,V = linalg.svd(A)} in the \texttt{numpy} module returns the singular value decomposition of \texttt{A}, i.e., it returns
+matrices $U$, $V$, and a vector $S$ so that $A = U \Sigma V$, where $\Sigma$ is diagonal with the entries of $S$ on the diagonal. Note the difference from the mathematical definition in that the matrix $V$ is not transposed!
+
+We also have the following three functions in the \texttt{matplotlib.pyplot} module
+```{python}
+#| eval: false
+A = np.double(plt.imread(filename,format=None))
+plt.imwrite(filename,A,format=str)
+plt.imshow(img,cmap='gray')
+```
+On the first line an image is read from a given file in a given format, and stored it in the matrix $A$. Note the conversion to \texttt{double} here, which is needed.
+On the second line the image stored in $A$ is written to a given file, with the given format 
+(to print images you have generated, use this command first, then send the resulting file to the printer). 
+On the third line the matrix $A$ is displayed as an image. The named parameter \texttt{cmap='gray'} states that the image should be interpreted as a grayscale image 
+(with values between 0 and 255).

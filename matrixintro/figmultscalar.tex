@@ -1,0 +1,19 @@
+%\usepackage{tikz} %pakke for tikzpicture
+%\usetikzlibrary{calc} %utregning med koordinater
+%\usetikzlibrary{positioning} %nodeposisjoner
+%\usepackage{amsmath} %\mathbf
+\begin{tikzpicture}
+  \begin{scope}[scale = 4]
+    \def\xaxislen{1}
+    \def\yaxislen{1}
+    \draw[-latex, thick] (-\xaxislen,0)--(\xaxislen,0);
+    \draw[-latex, thick] (0,-\yaxislen)--(0,\yaxislen);
+    \coordinate (a) at ({.3*\xaxislen}, {.3*\yaxislen});
+    \draw[-latex,color=blue] (0,0)--(a) node[right = .5em, below,color=black]{$\mathbf{a}$};
+    \draw[dashed, -latex, color=blue] (a)--($3*(a)$) node[%
+      right = .5em, below,color=black]{$3\mathbf{a}$};
+    \node[rotate = 45] at ($2*(a)$) {$\times$};
+    \draw[dashed, -latex, color=blue] (0,0)--($-2*(a)$) node[below,color=black]{$-2\mathbf{a}$};
+    \node[rotate = 45] at ($-1*(a)$) {$\times$};
+  \end{scope}
+\end{tikzpicture}

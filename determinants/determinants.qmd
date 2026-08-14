@@ -1,0 +1,1066 @@
+# Determinants
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+In this chapter we will look at *determinants*. These are useful theoretically, with a long history in multivariable analysis. 
+We will start with the general definition of determinants, which looks rather complex at a first glance. 
+After this we will consider how elementary row operations change the determinant. 
+From this it will be clear that the determinant says something about how a matrix transforms a volume in $\mathbb{R}^n$. 
+We all have some intuition about volumes in $\mathbb{R}^3$ and areas in $\mathbb{R}^2$, 
+but when it comes to volumes in $\mathbb{R}^n$ for $n>3$, things are different. 
+We shall define this, and see that, if $A$ is an $n\times n$-matrix and $X$ a set in $\mathbb{R}^n$, then the set
+$$AX=\{A\mathbf{x}:\mathbf{x}\in X\}$$
+has a volume, written $V(AX)$, which depends linearly on the volume $V(X)$ of $X$  - regardless how the set $X$ must look. 
+We thus have that $V(AX)=kV(X)$ for a constant $k$ which only depends on the matrix $A$. $k$ can be interpreted as a *magnification factor* for volumes for the matrix $A$, 
+and we shall see that magnification factors change under elementary row operations in the same way as determinants do. 
+From this we deduce that the absolute value of the determinant equals the magnification factor. 
+
+One of the things we will show is that the determinant of a product equals the product of the determinants. 
+If we disregard the sign of the determinant, this is perhaps simpler to see when thinking in terms of magnification factors:
+If $A_1$ and $A_2$ have magnification factors $k_1$ and $k_2$, respectively, then $A_2X$ has volume $k_2V(X)$, so that $A_1A_2X$ has volume $k_1(k_2V(X))=k_1k_2V(X)$, 
+so that $A_1A_2$ has magnification factor $k_1k_2$. 
+
+We round off this chapter with a useful geometric interpretation of the determinant. 
+
+
+
+
+
+
+
+## The definition of the determinant 
+The general definition of determinant is as follows
+
+::: {#def- name='Determinant'}
+The *determinant*\index{Determinant} of an $n\times n$-matrix $A$ is defined recursively as follows: 
+
+1. The determinant of a $1\times 1$-matrix $A$ is defined as $a_{11}$.
+2. The determinant of an $n\times n$-matrix $A$ is defined in terms of determinants of $(n-1)\times(n-1)$-submatrices of $A$ as
+
+$$
+\begin{aligned}
+\left| \begin{array}{cccc} 
+a_{11} & a_{12} & \cdots & a_{1n} \\ 
+a_{21} & a_{22} & \cdots & a_{2n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{nn}
+\end{array}\right|
+=&
+a_{11}
+\left| \begin{array}{cccc} 
+a_{22} & a_{23} & \cdots & a_{2n} \\ 
+a_{32} & a_{33} & \cdots & a_{3n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n2} & a_{n3} & \cdots & a_{nn}
+\end{array}\right|
+- a_{12}
+\left| \begin{array}{cccc} 
+a_{21} & a_{23} & \cdots & a_{2n} \\ 
+a_{31} & a_{33} & \cdots & a_{3n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n3} & \cdots & a_{nn}
+\end{array}\right| \nonumber \\ 
+&+\cdots + (-1)^{n+1} a_{1n}
+\left| \begin{array}{cccc} 
+a_{21} & a_{22} & \cdots & a_{2(n-1)} \\ 
+a_{31} & a_{32} & \cdots & a_{3(n-1)} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{n(n-1)}
+\end{array}\right|
+\end{aligned}
+$$ {#eq-detdef}
+Row $1$ of $A$ has been left out in all submatrices on the right side.
+In the first submatrix column $1$ of $A$ has also been left out, in the second column $2$ of $A$ has been left out, and so on. 
+:::
+
+
+
+Vertical lines are used as notation for determinants above, but it is also common to write $\det(A)$ for the determinant of $A$. 
+Let us also write $A^{(ij)}$ for the $(n-1)\times(n-1)$-matrix we obtain by leaving out row $i$ and column $j$ of $A$. 
+The quantities $\det\left(A^{(ij)}\right)$ are also called *minors*\index{Minor}. With this notation @eq-detdef can be written as 
+$$ \det(A)=a_{11}\det(A^{(11)})-a_{12}\det(A^{(12)})+a_{13}\det(A^{(13)})-\cdots + a_{1n}(-1)^{n+1}\det(A^{(1n)}),$$
+or even more compactly as 
+$$
+\det(A)=\sum_{j=1}^n (-1)^{j+1}a_{1j}\det(A^{(1j)}).
+$$
+The determinant of a $1\times 1$-matrix is per definition the one component in the matrix, and for a $2\times 2$-matrix it is
+$$
+\det(A)=\left| \begin{array}{cc}  a_{11} & a_{12} \\ a_{21} & a_{22} \end{array} \right| = a_{11}a_{22}-a_{12}a_{21},
+$$
+The determinant of a $3\times 3$-matrix is 
+\begin{align*}
+\left| \begin{array}{ccc}  a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{array} \right| 
+= a_{11}\left| \begin{array}{cc}  a_{22} & a_{23} \\ a_{32} & a_{33} \end{array} \right| 
+-a_{12}\left| \begin{array}{cc}  a_{21} & a_{23} \\ a_{31} & a_{33} \end{array} \right| 
++a_{13}\left| \begin{array}{cc}  a_{21} & a_{22} \\ a_{31} & a_{32} \end{array} \right| 
+\end{align*}
+
+
+
+
+
+::: {#exm-regndetdef name='A $3\times 3$-determinant'}
+Let us compute the determinant of the matrix $\begin{pmatrix} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{pmatrix}$ using the definition. We get
+\begin{align*}
+\left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|
+&= 
+2 \left|\begin{array}{ccc} 4 & 2 \\ 1 & -1\end{array}\right|
+- 1 \left|\begin{array}{ccc} 1 & 2 \\ 3 & -1\end{array}\right|
++3 \left|\begin{array}{ccc} 1 & 4 \\ 3 & 1 \end{array}\right| \\
+&= 2(-4-2) -(-1-6) +3(1-12) = -12 +7 -33 = -38.
+\end{align*}
+We can check the answer with the built-in function for computing the determinant: \index{python!np.linalg.det}
+
+```{python}
+A=np.array([[2,1,3],[1,4,2],[3,1,-1]])
+np.linalg.det(A)
+```
+
+$\clubsuit$
+:::
+
+Let $K(n)$ be the number of operations needed to compute the determinant recursively using @eq-detdef. It is clear that
+$$K(n)=nK(n-1)+n+n-1\geq nK(n-1).$$
+We see from this that we must have $K(n)\geq n!$.\index{Operation count!definition of determinant}
+When $n$ is large this leads to too much computation, even for the most powerful computers. 
+Laster in this chapter we will see that one can compute the determinant more efficiently using Gaussian elimination. 
+The definition above is more of theoretical interest - it does not give a good implementation even if it is easily programmed, as seen below.
+
+```{python}
+def detdef(A):
+    n = np.shape(A)[0]
+    if n>1:
+        d=0
+        for k in range(n):
+            colinds = np.arange(0,n)
+            colinds=np.delete(colinds, k)
+            d += (-1)**k*A[0,k]*detdef( A[1:,colinds] )
+        return d
+    else:
+        return A.item()
+```
+
+One could guess that @eq-detdef is not used to compute the determinant in @exm-regndetdef: 
+The answer there comes with four decimals, so the answer is not $-38$ exactly. 
+Had @eq-detdef been used, only integer arithmetic would have been needed, and the answer should be $-38$ exactly. 
+It is straightforward to verify that this is the case:
+
+```{python}
+detdef( np.array([[2,1,3],[1,4,2],[3,1,-1]]) )
+```
+
+
+
+## Properties of the determinant
+Let us prove some useful properties of determinants. We start with the following.
+
+::: {#prp-nullradsoyle}
+We have that $\det(A)=0$ if $A$ has a row with zeros only, or a column with zeros only.
+:::
+
+::: {.proof}
+This is simplest to see for rows with zeros only: 
+If we use @eq-detdef so many times that all sub-matrices start with a row of zeros, it is clear that the next application of @eq-detdef 
+will give $0$. 
+Suppose instead that we have a column of zeros. For $1\times 1$-matrices with a column of zeros it is clear that the determinant is $0$. 
+Suppose we have shown that all $(n-1)\times(n-1)$-matrices with a column of zeros have determinant $0$. 
+When we use @eq-detdef on an $n\times n$-matrix with a column of zeros, we get a contribution from $n-1$ $(n-1)\times(n-1)$-sub-matrices with columns of zeros. 
+And the contribution from the remaining column is $0$, since we have a zero on the corresponding place in the first row that is multiplied in. 
+It follows that  $n\times n$-matrices with a zero column also have determinant $0$.
+:::
+
+
+Recall that a square matrix is called *upper triangular* if everything below the diagonal is $0$, and *lower triangular* 
+if everything above the diagonal is $0$. 
+\index{Triangular!upper} \index{Triangular!lower}
+
+::: {#prp-}
+The determinant of an upper- or lower triangular matrix equals the product of the diagonal elements. 
+:::
+
+::: {.proof}
+The result is obvious for $n=1$. 
+If $A$ is lower triangular @eq-detdef says that $\det(A)=a_{11}\det(A^{(11)})$. Since $A^{(11)}$ also is lower triangular, and with 
+$a_{22}$, $a_{33}$,...$,a_{nn}$ on the diagonal, it follows by induction that
+$$\det(A)=a_{11}(a_{22}a_{33}\cdots a_{nn})=a_{11}a_{22}a_{33}\cdots a_{nn}.$$
+Suppose instead that $A$ is upper triangular. The first column in the minors $A^{(12)},A^{(13)},...,A^{(1n)}$ are then all zero, 
+and then @prp-nullradsoyle says that 
+$$\det(A^{(12)})=\det(A^{(13)}=\cdots=\det(A^{(1n)})=0.$$
+Only the first minor contributes in @eq-detdef, so that $\det(A)=a_{11}\det(A^{(11)})$, which again by induction gives that 
+$\det(A)=a_{11}a_{22}a_{33}\cdots a_{nn}$
+:::
+
+We have the following result on how elementary row operations change the determinant. 
+
+::: {#prp-radbytte}
+Let $A$ and $B$ be square matrices of equal dimension. The following hold:
+
+1. If $B$ is obtained from a simple row interchange in $A$, then $\det(B)=-\det(A)$. 
+2. If $B$ is obtained by multiplying a row in $A$ with $s$, then $\det(B)=s\det(A)$. 
+3. If $B$ is obtained by adding $s$ times row $i$ to row $j$ in $A$, then $\det(B)=\det(A)$. 
+
+:::
+
+::: {.proof}
+We prove 1.. 
+Let $D_{ij}$ be the determinant of the matrix obtained by removing row $1$ and $2$ in $A$, as well as column $i$ and $j$ in $A$. 
+We have that
+\begin{align*}
+\det(A)&=\sum_{i<j} ( (-1)^{i+1}(-1)^j a_{1i}a_{2j} + (-1)^{j+1}(-1)^{i+1}a_{1j}a_{2i})D_{ij}\\
+&=\sum_{i<j} (-1)^{i+j}(a_{1j}a_{2i}-a_{1i}a_{2j})D_{ij}
+\end{align*}
+If $B$ is the matrix where row 1 and 2 in $A$ er swapped, we have that $b_{1i}=a_{2i}$ and $b_{1j}=a_{2j}$ and so on, and we get
+\begin{align*}
+\det(B) &= \sum_{i<j} (-1)^{i+j}(b_{1j}b_{2i}-b_{1i}b_{2j})D_{ij}
+= \sum_{i<j} (-1)^{i+j}(a_{2j}a_{1i}-a_{2i}a_{1j})D_{ij} \\
+&= -\sum_{i<j} (-1)^{i+j} (a_{2i}a_{1j}-a_{2j}a_{1i})D_{ij} = -\det(A)
+\end{align*}
+If two other neighbouring rows are swapped it follows by induction, and from the definition
+$\det(A)=\sum_{j=1}^n(-1)^{j+1}a_{1j}A_{1j}$ that the determinant also changes sign. 
+Further, if  row $i$ and $j$ not are neighbouring rows, a row interchange of these can be expressed as $j-i+(j-i-1)=2(j-i)-1$ 
+neighbouring row interchanges. 
+Since this is an odd number the determinant also then will change sign. This proves 1..
+
+The proofs for 2. and 3. are given as exercises. 
+:::
+
+If $A$ has two equal rows, we end up with the same matrix if these are interchanged. 
+As a consequence of 1. above we must have that $\det(A)=-\det(A)$, so that $\det(A)=0$. 
+
+::: {#cor-tolikerader}
+$\det(A)=0$ if $A$ has two identical rows.
+:::
+
+This result is useful when it comes to proving 3. above. 
+We can also expand the determinant along any given row (This is an exercise):
+
+::: {#prp-ekspanderi name='Determinants can be expanded along any row'}
+For all $1\leq i\leq n$ we have that 
+$$ \det(A)=\sum_{j=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
+:::
+
+
+If we in particular set $A=I_n$ (which has determinant 1) and $B=E$ (where $E$ is an elementary matrix) in @prp-radbytte we get that 
+$$
+\det(E)=
+\begin{cases} 
+-1 \text{ if $E$ is a row interchange.} \\ 
+s \text{ if $E$ multiplies a row with $s$.} \\ 
+1 \text{ if $E$ adds a multiple of one row to another.}
+\end{cases}
+$$ {#eq-elementar00}
+
+
+We can now prove the following. 
+
+::: {#prp-detprodmatr}
+If $A$ and $B$ both are square we have that $\det(AB)=\det(A)\det(B)$.
+:::
+
+::: {.proof}
+we can write 
+\begin{align*} A&=E_1E_2\cdots E_k C & B&=F_1F_2\cdots F_l D \end{align*}
+where $E_1,F_1,E_2,F_2,...$ are elementary matrices, and $C$ and $D$ are reduced echelon forms. 
+If $C=D=I_n$ then
+\begin{align*}
+\det(AB) &= \det(E_1E_2\cdots E_kF_1F_2\cdots F_l) = \det(E_1)\det(E_2)\cdots \det(E_k)\det(F_1F_2\cdots F_l) \\
+&= \det(E_1E_2\cdots E_k)\det(F_1F_2\cdots F_l) = \det(A)\det(B).
+\end{align*}
+Suppose then that one of $C,D$ is$\neq I_n$. 
+It follows that one of $\det(A)$ or $\det(B)$ equals 0, so that also $\det(A)\det(B)=0$. It is therefore enough to show that also 
+$\det(AB)=0$. It is clear that $\det(AB)=0$ if and only if $\det(CF_1F_2\cdots F_l D)=0$. We consider two possibilities:
+
+1. If $C=I_n$, $D\neq I_n$: Then $\det(D)=0$ (since $D$ has a row of zeros). But then 
+$$\det(CF_1F_2\cdots F_l D)=\det(F_1F_2\cdots F_l D)=0.$$
+2. If $C\neq I_n$ then $C$ has a row of zeros. But then also $CF_1F_2\cdots F_l D$ has a row of zeros, and then 
+$\det(CF_1F_2\cdots F_l D)=0$
+
+:::
+
+In particular we can find the determinant with the help of Gaussian elimination. Let us show this with an example. 
+
+::: {#exm- name='A $3\times 3$-determinant using Gaussian elimination'}
+Let us verify the determinant we found in @exm-regndetdef, using Gaussian elimination. We get 
+\begin{align*}
+\begin{pmatrix} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{pmatrix}
+&\sim \begin{pmatrix} 1 & 4 & 2 \\ 2 & 1 & 3 \\ 3 & 1 & -1\end{pmatrix}
+\sim \begin{pmatrix} 1 & 4 & 2 \\ 0 & -7 & -1 \\ 0 & -11 & -7\end{pmatrix}
+\sim \begin{pmatrix} 1 & 4 & 2 \\ 0 & 1 & 1/7 \\ 0 & -11 & -7\end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 4 & 2 \\ 0 & 1 & 1/7 \\ 0 & 0 & -38/7\end{pmatrix}
+\end{align*}
+The first row operation was a row interchange. 
+This is followed by two operations where we add a multiple of row $1$ to the other rows. 
+Then we scale row 2 with (-1/7), before adding a multiple of row 2 to row 3. 
+We ended up with an upper triangular matrix, where we know that the determinant is the product of the diagonal elements. We then get
+$$
+\left|\begin{array}{ccc} 1 & 4 & 2 \\ 0 & 1 & 1/7 \\ 0 & 0 & -38/7 \end{array}\right|
+=
+1\times(-1/7)\times(1) \times(-1)
+\left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|
+$$
+som gir at 
+$$
+(-38/7)=(1/7) \left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|,
+$$
+so that the determinant is $-38$. $\clubsuit$
+:::
+
+For large matrices (which often is the case in applications) it is more efficient to compute determinants by Gaussian elimination as above, 
+when compared with using the definition of the determinant as in @exm-regndetdef: 
+In @sec-numopsgauss we showed that the number of operations needed by Gaussian elimination is about $2n^3/3$, while 
+using the definition needed at least $n!$ operations.
+ 
+ Again we can expand the theorem for invertible matrices with an equivalence. This will be the final version of this theorem: 
+
+{{< include invmatteo.qmd >}}
+
+::: {.proof}
+$4.\Rightarrow 7.$: If $A=E_k\cdots E_1$ then 
+$$\det(A)=\det(E_k\cdots E_1)=\det(E_k)\cdots\det(E_1)\neq 0,$$
+where we used @prp-detprodmatr, and that elementary matrices have a determinant different from $0$. 
+
+$7.\Rightarrow 1.$ Suppose that $A$ is not row equivalent with $I_n$. Then we can write $C=E_k\cdots E_1A$, and $A=F_1\cdots F_kC$, 
+where $C\neq I_n$ is the reduced echelon form of $A$. But then $\det(C)=0$, and it follows from @prp-detprodmatr that $\det(A)=0$. 
+:::
+
+
+::: {#prp-}
+For all square matrices $A$ we have that $\det(A)=\det(A^T)$.
+:::
+
+::: {.proof}
+It is clear that for all elementary matrices $E$, we have that $\det(E)=\det(E^T)$. 
+Suppose $A=E_1E_2\cdots E_k C$, where $C$ is the reduced echelon form of $A$. We have that 
+\begin{align*}
+\det(A^T) &= \det(C^TE_k^TE_{k-1}^T\cdots E_1^T) = \det(C^T) \det(E_k^T)\det(E_{k-1}^T)\cdots \det(E_1^T) \\
+&= \det(E_1)\det(E_2)\cdots \det(E_k)\det(C) = \det(E_1E_2\cdots E_kC) = \det(A). 
+\end{align*}
+We used here that $\det(C)=\det(C^T)$. It is clear that this holds if $C=I_n$. If $C\neq I_n$ then $C$ has a row of zeros, 
+so that $\det(C)=0$. But then $C^T$ has a column of zeros, so that also $\det(C^T)=0$. 
+:::
+
+From this we can deduce that we also can expand the determinant along any column (this is an exercise). 
+
+::: {#prp-ekspanderj name='Determinants can be expanded along any column'}
+For all $1\leq j\leq n$ we have that 
+$$\det(A)=\sum_{i=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
+:::
+
+From @prp-ekspanderi and @prp-ekspanderj we see that the minor $\det(A^{(ij)})$ should have an alternating sign $(-1)^{i+j}$, 
+regardless of which row or column we expand along. This can also be indicated with the following sign table:
+$$
+\begin{pmatrix} 
++ & - & + & - & \cdots \\
+- & + & - & + & \cdots \\
++ & - & + & - & \cdots \\
+- & + & - & + & \cdots \\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{pmatrix}.
+$$
+For practical use we should expand the determinant along the row/column which has the most zeros. 
+
+::: {#exm-}
+Let us consider the $4\times 4$-matrix
+$A=\begin{pmatrix} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 & 2 & 3 \end{pmatrix}$. 
+We see quickly that the row/column with most zeros is column $2$. Expanding along this we get
+\begin{align*}
+\left|\begin{array}{cccc} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 & 2 & 3 \end{array}\right|
+&= (-1)^{3+2} \left|\begin{array}{ccc} 2 & 2 & 3 \\  1 & 0 & 2  \\ -1 & 2 & 3 \end{array}\right| 
+= -\left( 
+(-1)^{2+1}\left|\begin{array}{cc} 2 & 3 \\ 2 & 3 \end{array}\right| 
++(-1)^{2+3}2\left|\begin{array}{cc} 2 & 2 \\ -1 & 2 \end{array}\right| 
+\right) \\
+&= -(-(6-6)-2(4+2))=12.
+\end{align*}
+Here we also expanded along row 2, where there also was a zero. $\clubsuit$
+:::
+
+
+
+
+
+## Magnification factors for matrices(*)
+Let us now consider the geometrical interpretation of the determinant as a magnification factor. 
+When we now explain what we mean by the *volume*\index{Volume} $V(X)$ of a set $X$ in $\mathbb{R}^n$ for $n>3$, 
+let us list some properties $V(X)$ intuitively should have:
+
+1. *Unit boxes*
+$$B=\{\mathbf{x}\in\mathbb{R}^n:0\leq x_i\leq 1\forall i\}$$
+should have volume $1$.
+2. If $X$ is *translated* with a vector $\mathbf{r}$, then the volume should stay the same. 
+In formula: $V(X+\mathbf{r})=V(X)$, where $X+\mathbf{r} = \{\mathbf{x}+\mathbf{r}:\mathbf{x}\in X\}$.
+3. If $X$ is *stretched* with a factor $r$ in direction $\mathbf{e}_i$, the volume should be multiplied with $r$. 
+In formula: $V(X_{i,r})=rV(X)$, where 
+$$X_{i,r}=\{\mathbf{x}: (x_1,...,x_{i-1},x_i/r,x_{i+1},...,x_n)\in X\}.$$
+4. If $X_1$ and $X_2$ are disjoint sets then $V(X_1\cup X_2)=V(X_1)+V(X_2)$. 
+5. Volume should equal base times height, as we are used to in $\mathbb{R}^2$ and $\mathbb{R}^3$. 
+But now we must think of the base as a volume in $\mathbb{R}^{n-1}$. 
+
+If we use 1. 2., and 3. repeatedly on a unit box, the boxes
+$$B_{\mathbf{r},\delta}=\{\mathbf{x}\in\mathbb{R}^n:r_i\delta\leq x_i\leq(r_i+1)\delta\forall i\}$$
+should have volume $\delta^n$ for all choices of vectors $\mathbf{r}$. This gives us the partition
+$$\mathbb{R}^n=\cup_\mathbf{r} B_{\mathbf{r},\delta}.$$
+Most sets in $\mathbb{R}^n$ can be approximates arbitrarily well with the help of enough, and small enough, such boxes
+(more generally volume should be defined as a limit where $\delta\to 0$).
+Let us therefore restrict ourselves to regions which can be written as a finite union of boxes. Due to 4. we must have
+$$ V(\cup_i B_{\mathbf{r}_i,\delta})=\sum_i \delta^n.$$
+If $X= \cup_i B_{\mathbf{r}_i,\delta}$, and $A$ is invertible, it is clear that 
+$AX=A(\cup_i B_{\mathbf{r}_i,\delta}) = \cup_i A(B_{\mathbf{r}_i,\delta})$ is a partition of $AX$ into disjoint sets.
+
+::: {#prp-}
+Let $X=\cup_i B_{\mathbf{r}_i,\delta}$ be a disjoint union of boxes. Then $V(AX)=V(AB)V(X)$.
+:::
+
+This means that $V(AB)$ works as a *magnification factor*\index{Magnification factor} for $A$ for sets $X$ on the form $\cup_i B_{\mathbf{r}_i,\delta}$. 
+The ide is that, since $V(AX)=V(AB)V(X)$ for such $X$, and since moste sets can be approximated arbitrarily well with 
+such sets, the also 
+$V(AX)=V(AB)V(X)$ for more general sets $X$. Thus, $V(AB)$ works as a magnification factor more generally sets as well!
+
+::: {.proof}
+Since $B_{\mathbf{r},\delta}=\delta (B + \mathbf{r})$ we have that 
+$$AB_{\mathbf{r},\delta}=A(\delta (B + \mathbf{r}))=\delta (AB + A\mathbf{r}).$$
+From property 2. and 3. it follows that $V(AB_{\mathbf{r},\delta})=\delta^n V(AB)$. If we use property 4. we now get
+\begin{align*}
+V(AX)&=V(A(\cup_i B_{\mathbf{r}_i,\delta})) 
+= V(\cup_i AB_{\mathbf{r}_i,\delta}) 
+= \sum_i V(AB_{\mathbf{r}_i,\delta}) \\
+&= \sum_i \delta^n V(AB)
+= V(AB) \sum_i \delta^n
+= V(AB)V(X).
+\end{align*}
+:::
+
+Since $B=\{ \sum_{i=1}^n x_i\mathbf{e}_i : 0\leq x_i\leq 1\forall i \}$ then
+$$AB=\left\{ \sum_{i=1}^n x_iA\mathbf{e}_i: 0\leq x_i\leq 1\forall i\right\}
+=\left\{ \sum_{i=1}^n x_i\mathbf{a}_i: 0\leq x_i\leq 1\forall i\right\},$$
+where $\mathbf{a}_i$ is column $i$ in $A$. More generally, if $\mathbf{a}_1,...,\mathbf{a}_m$ are vectors in $\mathbb{R}^n$,
+the set 
+$$F(\mathbf{a}_1,...,\mathbf{a}_m):=\left\{\sum_{i=1}^mx_i\mathbf{a}_i,0\leq x_i\leq 1\forall i\right\}$$
+is called the *parallelepiped*\index{Parallellepiped} spanned by $\{\mathbf{a}_i\}_{i=1}^m$ (parallelograms correspond to setting $m=2$). 
+Our magnification factors are thus volumes of parallelepipeds. 
+@fig-parallellepiped shows a parallelepiped spanned by three vectors $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$, in space. 
+
+![A parallelepiped in space.](parallellepiped.pdf){#fig-parallellepiped}
+
+Since $A$ can be written as $E_k\cdots E_1$, where the $E_i$ are elementary, we shall look at how volumes are 
+magnified for every such. There are 3 different types of elementary matrices we will look at.
+
+
+
+
+
+
+::: {#prp-elementar0}
+The magnification factor of an elementary matrix $E$ is given by
+$$V(EB)=\begin{cases} 1 \text{ if $E$ is a row interchange.} \\ |s| \text{ if $E$ multiplies a row with $s$.} \\ 1 \text{ if $E$ adds a multiple of one row to another.}\end{cases}$$
+:::
+
+::: {.proof}
+We go through the three possibilities.
+
+1. Suppose $E$ swaps row $i$ and $j$. Then $EB=B$, so that $V(EB)=1$.
+2. If $E$ multiplies row $i$ with $s$ then $EB=\left\{ \mathbf{x}: 0\leq x_i\leq s, 0\leq x_j\leq 1,j\neq i\right\}$, so that $V(EB)=s$ 
+due to point 3..
+3. Suppose $E$ adds $c$ times row $n$ to row $n-1$ (other choices of rows are handled similarly), i.e., 
+$$ E(x_1,...,x_{n-1},x_n)=(x_1,...,x_{n-1}+cx_n,x_n).$$
+For the cross section where $x_n=k$ we get
+$$ E(x_1,...,x_{n-1},k)=(x_1,...,x_{n-1},k)+(0,...,ck,0),$$
+so that the cross section where $x_n=k$ is translated by $E$ with a constant vector $(0,...,ck,0)$, so that all cross sections of $EB$ on the form $x_n=k$ have the same area as $B$. 
+This means that both base and height ($x_n=1$) are equal for $B$ and $EB$. It follows then from point 5. that $V(EB)$ is $1$.
+
+:::
+
+
+
+
+
+Comparing with @eq-elementar00 we now see that $|\det(E)|=V(EB)$ for all elementary matrices $E$, and from @prp-radbytte applied several times it follows that 
+$$\det(E_k\cdots E_1) = \det(E_k)\cdots \det(E_1).$$
+Since also 
+$$ V(E_k\cdots E_1B) = V(E_kB)\cdots V(E_1B) $$
+it follows from $|\det(E_i)|=V(E_iB)$ that $|\det(A)| =V(AB)$, 
+as long as $A$ can be written as a product of elementary matrices (i.e., that $A$ is invertible).
+Vi har dermed vist følgende:
+
+::: {#prp-detlikffaktor}
+If $A$ is invertible then the magnification factor $V(AB)$ equals $|\det(A)|$.
+:::
+
+For $n=2$ this says in particular that $\left| \begin{array}{cc} a_{11} & a_{12} \\ a_{21} & a_{22} \end{array} \right|$ equals the area of the  parallelogram
+spanned by $\mathbf{a}_1$ and $\mathbf{a}_2$. If we set $\mathbf{a}_1=|\mathbf{a}_1|(\cos\theta_1,\sin\theta_1)$, and $\mathbf{a}_2=|\mathbf{a}_2|(\cos\theta_2,\sin\theta_2)$ then
+\begin{align*}
+\left| \begin{array}{cc} a_{11} & a_{12} \\ a_{21} & a_{22} \end{array} \right|
+&= \left| \begin{array}{cc}  |\mathbf{a}_1|\cos\theta_1 & |\mathbf{a}_1|\sin\theta_1 \\ |\mathbf{a}_2|\cos\theta_2 & |\mathbf{a}_2|\sin\theta_2 \end{array} \right|
+= |\mathbf{a}_1||\mathbf{a}_2|( \cos\theta_1\sin\theta_2 - \sin\theta_1\cos\theta_2) \\
+&= |\mathbf{a}_1||\mathbf{a}_2| \sin(\theta_2-\theta_1)
+\end{align*}
+This was also deduced in @exr-parallellogram.
+
+
+
+
+The magnification vector $A=E_k\cdots E_1$ is now obtained by multiplying the magnification factors from the elementary matrices.
+
+
+
+## Geometrical interpretation of the determinant. The vector product.
+If we define
+$$
+\mathbf{b}=\left( \det(A^{(11)}),-\det(A^{(12)}),\det(A^{(13)}),...,(-1)^{n+1}\det(A^{(1n)}) \right),
+$$ {#eq-bdef}
+then the definition of the determinant given by @eq-detdef can be written as the scalar product of $\mathbf{a}_1\cdot \mathbf{b}$ ($\mathbf{a}_i$ is here row $i$ in $A$). 
+This gives us the following geometrical interpretation.
+
+::: {#prp-geomtolkning}
+
+We have that
+
+1. $\mathbf{b}$ is orthogonal to all $\mathbf{a}_2,...,\mathbf{a}_n$, 
+2. $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$,
+3. $|\mathbf{a}_1\cdot\mathbf{b}|=V(AB)=|\det(A)|$.
+
+:::
+
+Shortly we will look at the proof of this, but let us first take a closer look at the case $n=3$. Then we have that
+$$
+\mathbf{b}=\left( a_{22}a_{33}-a_{23}a_{32}, - (a_{21}a_{33}-a_{23}a_{31}),a_{21}a_{32}-a_{22}a_{31}\right).
+$$ {#eq-vectorproddef}
+This also has its own name:
+
+::: {#def-}
+@eq-vectorproddef is called the *vector product*\index{Vector product} of $\mathbf{a}_2$ and $\mathbf{a}_3$. 
+We also write $\mathbf{a}_2\times\mathbf{a}_3$ for the vector product of $\mathbf{a}_2$ and $\mathbf{a}_3$. 
+:::
+
+It is common to write the vector product as
+ \begin{align*}
+&\left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{array} \right| \\
+=& (a_{22}a_{33}-a_{23}a_{32})\mathbf{e}_1 - (a_{21}a_{33}-a_{23}a_{31})\mathbf{e}_2 + (a_{21}a_{32}-a_{22}a_{31})\mathbf{e}_3 \\
+=& \left(a_{22}a_{33}-a_{23}a_{32},- (a_{21}a_{33}-a_{23}a_{31}),a_{21}a_{32}-a_{22}a_{31}\right),
+\end{align*}
+i.e., we have inserted vectors instead of scalars in the first row in the matrix. 
+
+In particular $\mathbf{a}_2\times\mathbf{a}_3$ is orthogonal to $\mathbf{a}_2$ and $\mathbf{a}_3$, 
+with length equal to the area of the parallelogram spanned by the two vectors. 
+These two properties do not characterise the vector product completely, since if $\mathbf{b}$ satisfy these two properties, then $-\mathbf{b}$ will as well!
+It can be shown, however, that $\mathbf{b}=\mathbf{a}_2\times\mathbf{a}_3$ also satisfies what is called the *right hand rule*, something $-\mathbf{b}$ not does: 
+
+::: {#def-}
+Let the right index finger point in the same direction as $\mathbf{a}_2$, and let the middle finger point in the same direction as $\mathbf{a}_3$, 
+in such a way that there is less than 180 degrees between the two. 
+The thumb will now point in the direction of the vector product $\mathbf{a}_2\times\mathbf{a}_3$, perpendicular to both $\mathbf{a}_2$ and $\mathbf{a}_3$. 
+:::
+
+::: {#prp-}
+$\mathbf{b}=\mathbf{a}_2\times\mathbf{a}_3$ is the unique vector orthogonal to both $\mathbf{a}_2$ and $\mathbf{a}_3$, 
+with length equal to the area of the parallelogram spanned by $\mathbf{a}_2$ and $\mathbf{a}_3$, and with direction given by the right hand rule.
+:::
+
+We will not prove that the direction of the vector product abides to the right hand rule.
+A $3\times 3$ determinant can also be written as $\det(A) = \mathbf{a}_1\cdot (\mathbf{a}_2\times\mathbf{a}_3)$,
+which due to @prp-detlikffaktor also equals the volume volumet of the parallelepiped spanned by $\mathbf{a}_1$, $\mathbf{a}_2$, and $\mathbf{a}_3$.
+
+
+Note that $\mathbf{x}\times\mathbf{y}=\mathbf{0}$ if $\mathbf{x}$ and $\mathbf{y}$ are parallel. 
+This can be seen by observing that the parallelogram the two span then has
+area $0$. The length of the vector product is then also $0$, and then $\mathbf{x}\times\mathbf{y}=\mathbf{0}$. 
+One can also argue that the vector product then is a determinant where the second and third rows are equal (after a scaling), which is $0$ due to @cor-tolikerader.
+
+
+::: {#exm-}
+Let $\mathbf{a}_1=(1,3,2)$, and $\mathbf{a}_2=(2,-1,3)$. Then we have that
+ \begin{align*}
+\mathbf{a}_1\times\mathbf{a}_2 &=
+\left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ 1 & 3 & 2 \\ 2 & -1 & 3 \end{array} \right| \\
+&= (3\cdot 3-2\cdot(-1))\mathbf{e}_1 - (1\cdot 3 - 2\cdot 2)\mathbf{e}_2 + (1\cdot(-1) - 3\cdot 2)\mathbf{e}_3 \\
+&= \left(9+2,-(3-4),-1-6\right) = (11,1,-7).
+\end{align*}
+The vector product can also be computed with help of the command `cross`:
+
+```{python}
+a1 = [1,3,2]
+a2 = [2,-1,3]
+np.cross(a1,a2)
+```
+$\clubsuit$
+:::
+
+::: {#exm-}
+In @exm-plan we found the expression for a plane through a given point, and with a given normal vector. 
+If we instead have three points, we can use the vector product to find a normal vector, and then also an expression for the plane: 
+If the three points are $\mathbf{x}_0$, $\mathbf{x}_1$, and $\mathbf{x}_2$, then clearly $\mathbf{x}_1-\mathbf{x}_0$ and $\mathbf{x}_2-\mathbf{x}_0$ 
+will be vectors in this plane, and the vector product of these will then give a normal vector. 
+
+To illustrate this, consider the three points 
+$\mathbf{a}=(4,-2,-1)$, $\mathbf{b}=(1,0,0)$, and $\mathbf{c}=(2,-1,0)$. 
+We first get that $\mathbf{b}-\mathbf{a}=(-3,2,1)$, and $\mathbf{c}-\mathbf{a}=(-2,1,1)$. 
+The vector product of these is
+$$
+\left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ -3 & 2 & 1 \\ -2 & 1 & 1 \end{array} \right| 
+= (2-1)\mathbf{e}_1 -(-3+2)\mathbf{e}_2 + (-3+4)\mathbf{e}_3 = \mathbf{e}_1+\mathbf{e}_2+\mathbf{e}_3 = (1,1,1). 
+$$
+From this it follows that the plane can be written on the form $x+y+z=1$. 
+
+By the properties of the vector product we also have that
+
+* The area of the parallellogram spanned by $\mathbf{a}$ and $\mathbf{b}$ is the length of the vector
+$$
+\left| \begin{array}{ccc} 
+\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\
+4 & -2 & -1 \\ 
+1 & 0 & 0  
+\end{array} \right|
+=(0,-1,2),
+$$
+which is $\sqrt{5}$.
+
+* The volume of the parallellepiped spanned by $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$, is
+$$
+\left| \begin{array}{ccc} 
+4 & -2 & -1 \\ 
+1 & 0 & 0 \\
+2 & -1 & 0 
+\end{array} \right|
+=
+-\left| \begin{array}{cc} -2 & -1 \\ -1 & 0 \end{array} \right| = 1.
+$$
+$\clubsuit$
+:::
+
+
+::: {.proof}
+(for @prp-geomtolkning)
+We first prove point 1.. 
+Define the matrix 
+$$A_0=\begin{pmatrix} \mathbf{a}_i \\ \mathbf{a}_2 \\ \mathbf{a}_3 \\ \vdots \\ \mathbf{a}_n\end{pmatrix},$$
+where $\mathbf{a}_i$ is inserted in both row $1$ and $i$. 
+Since a matrix with two equal rows has determinant 0 (@cor-tolikerader), we have that
+$$0=\det(A_0)=\mathbf{a}_i\cdot\mathbf{b} \text{ for } i=2,...,n,$$
+so that $\mathbf{b}$ is orthogonal to all $\{\mathbf{a}_i\}_{i=2}^n$. 
+
+To see that $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$ (punkt 2.), observe first that the projection of $\mathbf{a}_1$ onto $\mathbf{b}$ is 
+$\frac{\mathbf{a}_1\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$, 
+which has length $\frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}$. This equals the distance from $\mathbf{a}_1$ to the plane spanned by $\mathbf{a}_2,...,\mathbf{a}_n$. 
+Since volume equals base times height we get that
+$$V(AB)=V(F(\mathbf{a}_1,...,\mathbf{a}_n)) = \frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}V(F(\mathbf{a}_2,...,\mathbf{a}_n)).$$
+Since $|\det(A)|=V(AB)$ (@prp-detlikffaktor) it follows that
+$$|\mathbf{a}_1\cdot\mathbf{b}| =  \frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}V(F(\mathbf{a}_2,...,\mathbf{a}_n))$$
+so that $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$.
+
+Point 3. follows directly from the definition of the determinant given by @eq-detdef, and the connection we have proved between volume and determinant. 
+:::
+
+The result above is perhaps simplest to interpret on (the obviously true) form
+$$|\mathbf{a}_1\cdot \mathbf{b}|=\frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}|\mathbf{b}|.$$
+On the left side here stands the volume of the parallelepiped spanned by $\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n$ ($V(AB)$). 
+On the right side $\frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}$ is the height over the plane spanned by $\mathbf{a}_2,\mathbf{a}_3,...,\mathbf{a}_n$, 
+while $|\mathbf{b}|$ is the area of the parallelepiped spanned by $\mathbf{a}_2,\mathbf{a}_3,...,\mathbf{a}_n$ ($V(F(\mathbf{a}_2,...,\mathbf{a}_n))$).
+In other words, volume equals base times height!
+
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+## The determinant of a $3\times 3$-matrix
+
+The determinant of the matrix $$\begin{pmatrix} 0 & 0 & 3 \\ 0 & 2 & 0 \\ 1 & 0 & 0 \end{pmatrix}$$ is
+
+1. [ ] 6
+2. [ ] 0
+3. [x] -6 
+
+## The determinant of a reduced echelon form
+
+We bring a square matrix to reduced echelon form, and denote the resulting matrix by $C$. Then the determinant of $C$ is 
+
+> The reduced echelon form of a square matrix is either the identity matrix, or has zero row. 
+
+1. [x] either 0 or 1
+2. [ ] always 0
+> The identity matrix is on reduced echelon form, and has determinant one
+3. [ ] always 1
+> The reduced echelon form of a square matrix can have a zero row at the end. in which case the determinant must be 0.
+
+## The determinant of a $4\times 4$-matrix
+
+We have that 
+$$\left|\begin{array}{cccc} 0 & 0 & 1 & 0 \\ 2 & 3 & 0 & 4 \\ 1 & 0 & 2 & 0 \\ 4 & 1 & 2 & 3\end{array}\right|$$ 
+is
+
+1. [x] -5
+2. [ ] 5
+3. [ ] 7
+
+## The determinant of a $4\times 4$-matrix.
+
+The determinant of 
+$$\begin{pmatrix} 
+2  & 3 &   -2   & 1 \\
+0  &  1 &   3 &   0 \\
+1  & -1  &  2  &  0 \\
+0  &  0  & 1 &  0
+\end{pmatrix}
+$$
+is 
+
+> Expand the determinant along the last column, and then along the last row we get.
+
+1. [ ] $-1$
+2. [x] $1$
+3. [ ] $2$
+4. [ ] $0$
+5. [ ] $3$
+
+## A vector product
+
+The vector product of ${\bf a}=(1,0,2)$ and ${\bf b}=(2,2,1)$ is
+
+1. [x] ${\bf a}\times{\bf b}=(-4,3,2)$
+1. [ ] ${\bf a}\times{\bf b}=(2,3,4)$
+1. [ ] ${\bf a}\times{\bf b}=(-4,-3,-2)$
+1. [ ] ${\bf a}\times{\bf b}=(4,-3,-2)$
+1. [ ] ${\bf a}\times{\bf b}=(-4,-3,2)$
+
+
+
+## Area of parallellogram
+
+The area of the parallellogram spanned by the two vectors $(-1,2,3)$ and $(2,1,2)$
+
+1. [ ] $2$
+1. [x] $\sqrt{126}$
+1. [ ] $4$
+1. [ ] $11$
+1. [ ] $\sqrt{119}$
+
+
+
+
+## Finding a plane passing through 3 given points
+
+We have the three points $\mathbf{a}=(2,1,2)$, $\mathbf{b}=(-1,3,1)$, $\mathbf{c}=(3,1,-1)$
+
+> Compute $\mathbf{b}-\mathbf{a}$ and $\mathbf{c}-\mathbf{a}$, and take the vector product of these
+
+1. [x] $-6x-10y-2z=-26$
+1. [ ] $-6x-10y-2z=-24$
+1. [ ] $-6x-10y-2z=-20$
+1. [ ] $-7x-10y-2z=-22$
+1. [ ] $-7x-11y-2z=-21$
+
+
+## The volume of a parallellepiped
+
+The volume of the parallellepiped spanned by the three vectors $(1,1,2)$, $(2, 4,3)$, and $(0,2,1)$ is
+
+> Compute the $3\times 3$-determinant having the three vectors as rows.
+
+1. [ ] $11$
+1. [ ] $5$
+1. [ ] $3$
+1. [ ] $0$
+1. [x] $4$
+
+
+```
+:::
+
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-}
+Compute
+
+(a) $\left|\begin{array}{cc} 4 & -1 \\ 2 & 3 \end{array}\right|$
+(b) $\left|\begin{array}{ccc} 2 & 0 & 1 \\ 3 & -1 & 7 \\ 0 & 2 & 5 \end{array}\right|$
+(c) $(2,0,4)\times(-1,2,1)$.
+
+:::
+
+::: {#exr- name='Properties of the vector product'}
+Let $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$ be vectors in $\mathbb{R}^3$. Show that
+
+(a) $\mathbf{x}\times\mathbf{y}=-\mathbf{y}\times\mathbf{x}$.
+(b) For all scalars $s$, $\mathbf{x}\times(s\mathbf{y}) = (s\mathbf{x})\times\mathbf{y}=s(\mathbf{x}\times\mathbf{y})$.
+(c) $\mathbf{x}\times(\mathbf{y}+\mathbf{z})=\mathbf{x}\times\mathbf{y}+\mathbf{x}\times\mathbf{z}$.
+
+:::
+
+::: {#exr-}
+Let $\mathbf{x}$ be a given vector in $\mathbb{R}^3$. 
+From 2. and 3. in the preceding exercise it follows that the mapping $\mathbf{y}\to\mathbf{x}\times\mathbf{y}$ (which goes from $\mathbb{R}^3$ to $\mathbb{R}^3$) is linear. 
+What is the matrix of this linear mapping? 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Define the mapping $T$ by $T(\mathbf{y})=\mathbf{x}\times\mathbf{y}$. We get that 
+
+* $T(\mathbf{e}_1) = \left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ x_1 & x_2 & x_3 \\ 1 & 0 & 0 \end{array} \right|
+= \left| \begin{array}{cc} \mathbf{e}_2 & \mathbf{e}_3 \\ x_2 & x_3 \end{array} \right| = x_3\mathbf{e}_2-x_2\mathbf{e}_3=(0,x_3,-x_2)$
+* $T(\mathbf{e}_2) = \left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ x_1 & x_2 & x_3 \\ 0 & 1 & 0 \end{array} \right|
+= -\left| \begin{array}{cc} \mathbf{e}_1 & \mathbf{e}_3 \\ x_1 & x_3 \end{array} \right| = -(x_3\mathbf{e}_1-x_1\mathbf{e}_3)=(-x_3,0,x_1)$
+* $T(\mathbf{e}_3) = \left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ x_1 & x_2 & x_3 \\ 0 & 0 & 1 \end{array} \right|
+= \left| \begin{array}{cc} \mathbf{e}_1 & \mathbf{e}_2 \\ x_1 & x_2 \end{array} \right| = x_2\mathbf{e}_1-x_1\mathbf{e}_2=(x_2,-x_1,0)$
+
+The matrix of $T$ is thus $\begin{pmatrix} 0 & -x_3 & x_2 \\ x_3 & 0 & -x_1 \\ -x_2 & x_1 & 0 \end{pmatrix}$.
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+We are given the three points $\mathbf{a}=(-1,2,-2)$, $\mathbf{b}=(2,-1,4)$, and $\mathbf{c}=(3,3,1)$.
+
+(a) Find an expression for the plane going through the three points.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We find first $\mathbf{b}-\mathbf{a}=(3,-3,6)$ and $\mathbf{c}-\mathbf{a}=(4,1,3)$. 
+A normal vector to the plane is 
+$$
+(\mathbf{b}-\mathbf{a})\times(\mathbf{c}-\mathbf{a}) 
+=
+\left|\begin{array}{ccc} 
+\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ 3 & -3 & 6 \\ 4 & 1 & 3 
+\end{array} \right|
+= (-9-6)\mathbf{e}_1 - (9-24)\mathbf{e}_2 + (3-12)\mathbf{e}_3 = (-15,15,15)
+$$
+The plane can thus be written $-15x+15y+15z=d$ for some constant $d$. Inserting the point 
+$\mathbf{a}=(-1,2,-2)$ gives that $d=15+30-30=15$, so that the plane can be written as
+$-15x+15y+15z=15$, which can be simplified to $-x+y+z=1$. 
+:::::::
+:::::
+
+(b) Find the area of the parallellogram spanned by $\mathbf{a}$ and $\mathbf{b}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We compute 
+$$
+\mathbf{a}\times\mathbf{b} = 
+\left|\begin{array}{ccc} 
+\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ -1 & 2 & -2 \\ 2 & -1 & 4 
+\end{array} \right|
+=
+= (8-2)\mathbf{e}_1 - (-4+4)\mathbf{e}_2 + (1-4)\mathbf{e}_3 = (6,0,-3).
+$$
+The length of this vector is $\sqrt{45}=3\sqrt{5}$, which also is the area of the parallellogram. 
+:::::::
+:::::
+
+(c) Find the volume of the parallellepiped spanned by $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We compute 
+$$
+\begin{aligned}
+\left|\begin{array}{ccc} 
+-1 & 2 & -2 \\ 
+2 & -1 & 4 \\
+3 & 3 & 1 
+\end{array} \right|
+&= - \left| \begin{array}{cc} -1 & 4 \\ 3 & 1\end{array}\right| 
+-2 \left| \begin{array}{cc} 2 & 4 \\ 3 & 1\end{array}\right|
+-2 \left| \begin{array}{cc} 2 & -1 \\ 3 & 3\end{array}\right| \\
+&= -(-1-12)-2(2-12)-2(6+3)=13+20-18=15,
+\end{aligned}
+$$
+which also is the volume of the parallellepiped.
+:::::::
+:::::
+
+:::
+
+
+
+
+
+
+::: {#exr-}
+Compute the determinant of  
+$$A=\begin{pmatrix} 2 & -1 & 1 \\ 0 & 1 & 4 \\ 1 & -2 & -6\end{pmatrix}.$$
+in two different ways: By help of the steps in Gaussian elimination (those were written down in @exr-proveeks2), 
+and by expanding the determinant along the first column. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+In the steps of Gaussian elimination there is only one row interchange which contributes to changing the determinant, which therefore is $-1$. 
+If we expand the determinant along the first column we get
+    $$
+    \left|\begin{array}{ccc} 2 & -1 & 1 \\ 0 & 1 & 4 \\ 1 & -2 & -6\end{array} \right|
+    = 2(-6+8) - 0 + (-4-1) = 4 -5 = -1.
+    $$
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Prove that the determinant of a vandermonde matrix with generators $x_0,...,x_n$ is\index{Vandermonde matrix!determinant}
+$$
+\prod_{i>j} (x_i-x_j).
+$$
+
+::::: {.callout-tip title='Hint' collapse="true"}
+Write down all row operations which change the determinant in @exm-vandermondeinv.
+:::::
+:::
+
+::: {#exr-}
+Prove @prp-ekspanderi. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+First apply $i-1$ row interchanges so that row $i$ occurs first. After this apply @eq-detdef. The sign becomes $(-1)^{i+j}$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Prove point 2. and 3. in @prp-radbytte.
+
+::::: {.callout-tip title='Hint' collapse="true"}
+Use point 1. of @prp-radbytte, and @cor-tolikerader. 
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We first prove point 2. 
+If the first row is multiplied with $s$ it follows from @eq-detdef that
+\begin{align*}
+\det(B) &= sa_{11}\det(A^{(11)}) + sa_{12}\det(A^{(12)}) + \cdots + sa_{1n}\det(A^{(1n)}) \\
+&= s\left(a_{11}\det(A^{(11)}) + a_{12}\det(A^{(12)}) + \cdots + a_{1n}\det(A^{(1n)})\right) = s\det(A).
+\end{align*}
+If one of the other rows is multiplied with $s$, we combine three operations: First a row interchange with row $1$, followed by multiplication of row $1$ with $s$, and finally
+the same row interchange one more time. @prp-radbytte then gives
+\begin{align*}
+\det(B) &= -(s(-\det(A)))= s\det(A).
+\end{align*} 
+Let us now prove point 3.. 
+Let $C$ be the matrix obtained by swapping row $1$ and $j$ in $B$. The first row in $C$ then has components $a_{jk}+sa_{ik}$, so that 
+@eq-detdef gives
+\begin{align*}
+-\det(B) &= \det(C) = \sum_{k=1}^n (-1)^{k+1}(a_{jk}+sa_{ik})\det(C_{1k}) \\
+&= \sum_{k=1}^n (-1)^{k+1} a_{jk}\det(C_{1k})  + s\sum_{k=1}^n (-1)^{k+1} a_{ik}\det(C_{1k}) \\
+&= \sum_{k=1}^n (-1)^{k+1} a_{jk}\det(C_{1k}),
+\end{align*} 
+where the other sum became zero since row $1$ and $i$ are equal (@cor-tolikerader). 
+The last expression is the determinant of the matrix obtained by swapping rows $1$ and $j$ in $A$, and this is $-\det(A)$. 
+It follows that $\det(A)=\det(B)$. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Suppose $A$ is invertible. Show that $\det(A^{-1})=1/\det(A)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $1=\det(I_n)=\det(A^{-1}A)=\det(A^{-1})\det(A)$, it follows that $\det(A^{-1})=1/\det(A)$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Suppose $U$ is orthogonal, i.e., $U$ is real, and $U^TU=I_n$. Show that $\det(U)$ equals $1$ or $-1$. 
+:::
+
+::: {#exr-}
+Prove @prp-ekspanderj.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that 
+\begin{align*}
+\det(A) = \det(A^T) = \sum_{j=1}^n (-1)^{j+i} a_{ji}\det(A^{(ji)}) = \sum_{i=1}^n (-1)^{i+j} a_{ij}\det(A^{(ij)}).
+\end{align*}
+where we expanded the determinant of $A^T$ along row $i$. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Let $A$ and $B$ be square matrices, and set 
+$D=\left(\begin{array}{c|c} A & C\\ \hline \mathbf{0} & B \end{array}\right)$, where $\mathbf{0}$ and $C$ have dimensions so that 
+$D$ is square. Show that $\det(D)=\det(A)\det(B)$.\index{Block matrix!determinant}
+:::
+
+::: {#exr-cramer name="Cramer's rule"} 
+Suppose $A$ is invertible, and that $\mathbf{x}$ solves the system $A\mathbf{x}=\mathbf{b}$. 
+Let also $A_i(\mathbf{b})$ be the matrix $A$ with column $i$ replaced with $\mathbf{b}$.
+
+(a) Show that
+$$
+A
+\begin{pmatrix}
+1 & 0 & \cdots & 0 & x_1 & 0 & \cdots & 0 & 0 \\
+0 & 1 & \cdots & 0 & x_2 & 0 & \cdots & 0 & 0 \\
+\vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & \cdots & 0 & x_{n-1} & 0 & \cdots & 1 & 0 \\
+0 & 0 & \cdots & 0 & x_n & 0 & \cdots & 0 & 1
+\end{pmatrix}
+=
+A_i(\mathbf{b})
+$$
+The vector $\mathbf{x}$ her comes in column $i$.
+
+(b) Explain that the determinant of the large matrix above is $x_i$. Deduce from this that $x_i=\det(A_i(\mathbf{b}))/\det(A)$.
+
+As a result of this, the solution to a linear system can be expressed in terms of determinants. 
+This is also called *Cramer's rule*\index{Cramer's rule}.
+
+(c) Let $A=\begin{pmatrix} a & b \\ c & d \end{pmatrix}$ be a general invertible $2\times 2$-matrix. 
+In a previous exercise it was proved that 
+$A^{-1}=\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$.
+Prove this also by using Cramer's rule. 
+
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The inverse matrix of $A$ can be obtained by solving $A\mathbf{x}=\mathbf{e}_1$, and $A\mathbf{x}=\mathbf{e}_2$. 
+Cramer's rule gives that $A\mathbf{x}=\mathbf{e}_1$ has solution 
+$$
+\left( \frac{\left| \begin{array}{cc} 1 & b \\ 0 & d \end{array} \right|}{\left| \begin{array}{cc} a & b \\ c & d \end{array} \right|} , 
+       \frac{\left| \begin{array}{cc} a & 1 \\ c & 0 \end{array} \right|}{\left| \begin{array}{cc} a & b \\ c & d \end{array} \right|}\right)
+= 
+\frac{1}{ad-bc}\begin{pmatrix} d \\ -c \end{pmatrix},
+$$
+and that $A\mathbf{x}=\mathbf{e}_2$ has solution 
+$$
+\left( \frac{\left| \begin{array}{cc} 0 & b \\ 1 & d \end{array} \right|}{\left| \begin{array}{cc} a & b \\ c & d \end{array} \right|} , 
+       \frac{\left| \begin{array}{cc} a & 0 \\ c & 1 \end{array} \right|}{\left| \begin{array}{cc} a & b \\ c & d \end{array} \right|}\right)
+= 
+\frac{1}{ad-bc}\begin{pmatrix} -b \\ a \end{pmatrix}.
+$$
+The inverse matrix is thus $\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$.
+:::::::
+:::::
+
+(d) Sometimes we want to restrict ourselves to matrices with integer entries which also 
+have an inverse with integer entries. Explain how Cramer's rule can be used to produce such matrices.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If $A$ has integer entries and $\mathbf{b}=\mathbf{e}_i$ for some $i$, we have that 
+$\det(A_i\mathbf{b})$ also is an integer. if $\det(A)=\pm 1$ we will then have that $A^{-1}$ 
+has integer entries by Cramer's rule. Matrices with determinant 1 are easy to construct - 
+we can take a diagonal matrix with ones on the diagonal. And by adding multiples of rows to other rows the determinant will be unchanged at 1. 
+
+:::::::
+:::::
+:::

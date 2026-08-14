@@ -1,0 +1,1375 @@
+# Interpolation {#sec-app}
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+
+A basic idea in mathematics is to approximate something complicated with something simpler, 
+in the hope that the approximation captures some of the most important information.
+The theory of *approximation* has been central in mathematics since the dawn of calculus, and is
+often useful in the study of functions. Most functions in mathematics can't be expressed as combinations of the elementary functions we had in school. 
+Nevertheless, so to say all functions of practical interest can be approximated arbitrarily well with simple functions like 
+polynomials, trigonometric functions, or exponential functions. 
+In computational mathematics polynomials and trigonometric functions in particular are used much. 
+
+*Interpolation* is one particular branch of approximation theory. 
+To explain the setting, consider a function $f$ which may only be known at a set of points $x_0,x_1,...,x_m\in[a,b]$ (which are assumed to be distinct). 
+We say that the function $p\colon[a,b]\to\mathbb{R}$ *interpolates* $f$ in these points if
+$$
+f(x_k)=p(x_k) \qquad\text{for } k=0,1,\dots,m.
+$$ {#eq-interpolasjon}
+The $x_0,x_1,\dots,x_m$ are called *interpolation points*.
+The basic question in interpolation theory is the following:
+ 
+*Given functions $\phi_0(x),\phi_1(x),...,\phi_n(x)$. 
+How can we find scalars $c_0,c_1,...,c_n$ so that the linear combination*
+$$
+p(x)=c_0\phi_0(x)+c_1\phi_1(x)+\cdots+c_n\phi_n(x)
+$$ {#eq-howcanwefind}
+*interpolates $f$ in $x_0,x_1,...,x_m$?*
+
+The functions $\phi_i(x)$ will be called *basis functions*. The above leads to the system
+$$
+\begin{aligned}
+c_0\phi_0(x_0)+c_1\phi_1(x_0)+\cdots+c_n\phi_n(x_0) &= f(x_0) \\
+c_0\phi_0(x_1)+c_1\phi_1(x_1)+\cdots+c_n\phi_n(x_1) &= f(x_1) \\
+\vdots & \\
+c_0\phi_0(x_m)+c_1\phi_1(x_m)+\cdots+c_n\phi_n(x_m) &= f(x_m).
+\end{aligned}
+$$ {#eq-basicquestionintpol1}
+Setting $\mathbf{c}=(c_0,c_1,...,c_n)$ and $\mathbf{f}=(f(x_0),f(x_1),...,f(x_m))$,
+This gives the matrix equation
+$$
+\begin{pmatrix} 
+\phi_0(x_0) & \phi_1(x_0) & \cdots & \phi_n(x_0) \\
+\phi_0(x_1) & \phi_1(x_1) & \cdots & \phi_n(x_1) \\
+\vdots & \vdots & \ddots & \vdots \\
+\phi_0(x_m) & \phi_1(x_m) & \cdots & \phi_n(x_m)
+\end{pmatrix}
+\mathbf{c} = \mathbf{f}
+$$ {#eq-basicquestionintpol2}
+which has a unique solution $\mathbf{c}$ for all vectors $\mathbf{f}$ if and only if the coefficient matrix (which has components $\phi_j(x_i)$) is invertible. 
+It must thus be square, i.e., the number of interpolation points must equal the number of basis functions. 
+This will always be the case in what follows. Once @eq-basicquestionintpol2 has been solved for the column vector $\mathbf{c}$, the interpolant can easily be plotted: 
+For any $x$ @eq-howcanwefind can be rewritten as
+$$
+p(x)=\begin{pmatrix} \phi_0(x) & \phi_1(x) & \cdots & \phi_n(x)\end{pmatrix} \mathbf{c}
+$$
+which means that we obtain a vector of plot points^[the vector of plot points is usually much longer than the vector of interpolation points, although they here are denoted in the same way.] as the matrix-vector product
+$$
+\begin{pmatrix} p(x_0) \\ p(x_1) \\ p(x_2) \\ \vdots \end{pmatrix} =
+\begin{pmatrix} 
+\phi_0(x_0) & \phi_1(x_0) & \cdots & \phi_n(x_0) \\
+\phi_0(x_1) & \phi_1(x_1) & \cdots & \phi_n(x_1) \\
+\phi_0(x_2) & \phi_1(x_2) & \cdots & \phi_n(x_2) \\
+\vdots & \vdots & \vdots & \vdots
+\end{pmatrix} 
+\begin{pmatrix} c_0 \\ c_1 \\ \vdots \\ c_n\end{pmatrix}
+$$ {#eq-basicquestionintpol3}
+Our plots of the interpolant will use this expression.
+
+We start this chapter with *interpolation with polynomials*, where the basis functions $\phi_j$ are assumed to be 
+polynomials of degree $j$. 
+When we choose the basis functions as $\{1,x^1,...,x^n\}$ we will get what we call the 
+*canonical form* of the interpolation polynomial (@sec-kanonisk). 
+When we choose the basis functions to be 
+$$\{ 1, x-x_0, (x-x_0)(x-x_1),...,(x-x_0)(x-x_1)\cdots(x-x_{n-1}) \}$$
+we get what we call the *Newton form* of the interpolating polynomial (@sec-newtonform). 
+Other choices for $\{\phi_k\}_{k=0}^n$ are also possible - the point is that all polynomials are expressible in terms of them. 
+
+We then consider the error in polynomial interpolation (@sec-interpolasjonsfeil), and find an expression for this similar to that of the remainder term in Taylor series. 
+
+We end the chapter with interpolation with trigonometric functions in @sec-trigpol. 
+In this setting the basis functions are on the form $\sin(2\pi nt/T)$, or $\cos(2\pi nt/T)$, and defined on an interval $[0,T]$. 
+
+In the next chapters we will use interpolating polynomials to derive numerical methods for the derivates, and integrals, of functions.
+
+
+
+
+
+## Interpolation on canonical form {#sec-kanonisk}
+When the basis functions are $\phi_i(x)=x^i$ the interpolating polynomial takes the form
+$$ 
+p_n(x)=c_0+c_1x+ c_2x^2+ \dots + c_nx^n.
+$$ {#eq-npolstandard}
+This is called the *canonical form* of the interpolating polynomial. The matrix form in @eq-basicquestionintpol2 now takes the form
+$$
+\begin{pmatrix}
+1 & x_0 & x_0^2 & \cdots & x_0^n \\
+1 & x_1 & x_1^2 & \cdots & x_1^n \\
+1 & x_2 & x_2^2 & \cdots & x_2^n \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_n & x_n^2 & \cdots & x_n^n
+\end{pmatrix}
+\begin{pmatrix} c_0 \\ c_1 \\ c_2 \\ \vdots \\ c_n \end{pmatrix}
+=
+\begin{pmatrix} f(x_0) \\ f(x_1) \\ f(x_2) \\ \vdots \\ f(x_n) \end{pmatrix}
+$$ {#eq-solveforc}
+The left side matrix is a square vandermonde matrix.\index{Vandermonde matrix!in interpolation}
+From @exm-vandermondeinv we know that these are invertible. 
+@eq-solveforc therefore has a unique solution for $\mathbf{c}$, and we can conclude that there is a unique interpolating polynomial. 
+The function in @lst-findpoints plots this: It takes the vectors $\mathbf{x}=(x_0,x_1,...,x_n)$ and $\mathbf{f}=(y_0,y_1,...,y_n)$ as input, 
+finds the coefficients $\mathbf{c}=(c_0,c_1,...,c_n)$ of the polynomial interpolating in these points, 
+and repeats what we did in @sec-polyplot to plot this.
+Since we are only interested in the solution to the system $V\mathbf{c}=\mathbf{f}$, 
+it is more efficient to do as in the code, instead of computing $\mathbf{c}=V^{-1}\mathbf{f}$.
+
+```{python}
+#| lst-cap: "Code for finding points of the interpolating polynomial, adapted to canonical form"
+#| lst-label: lst-findpoints
+def points_canonical(xsp, fsp):
+    numpoints = xsp.shape[0] - 1
+    n = np.arange(0,numpoints+1).reshape((1,-1))
+    c = np.linalg.solve(xsp**n, fsp)
+    x = np.linspace(xsp[0,0], xsp[-1,0], 100).reshape((-1,1))
+    p = x**n @ c
+    return x, p
+```
+
+Some comments on this code are needed:
+
+* The code assumes that `xsp` and `fsp` are column vectors, and have equal number of components.
+* `x**n` computes a vandermonde matrix where the generators are listed in the column vector `x`, and the powers in the row vector `n`.
+* The coefficients `c` of the interpolating polynomial are found by solving @eq-solveforc.
+* `x` is a column vector with plot points, and which covers the interpolation points.
+* The code `x**n @ c` computes the expression in @eq-basicquestionintpol3, returning a column vector with values of the interpolating polynomial. 
+
+The code above makes priority of simplicity rather than efficiency and memory usage.
+A Vandermonde matrix can be computed with about $n^2$ operations on a computer (see @exr-numopssyst).
+In @sec-numopsgauss we saw that about $\approx \frac{2}{3}n^3$ operations are required in order to solve a general system with $n$ equations and $n$ unknowns.
+In other words: It is more demanding to solve the system than computing the matrix for the system.
+
+
+
+Once the plot points have been obtained it is easy to plot the interpolating polynomial for a function over a given interval.
+
+::: {#exm-firstexcanonical}	
+Suppose we want to find the polynomial passing through the three points $(0,1)$, $(1,3)$, and $(2,2)$. 
+In other words, we want to find a polynomial $p$ so that
+$$
+p(0)=1, \quad p(1)=3, \quad p(2)=2.
+$$ {#eq-quadintex}
+Since there are three points we assume a quadratic polynomial  $p(x)=c_0 + c_1 x + c_2 x^2$. Inserting in @eq-quadintex we get the three equations. 
+\begin{align*}
+1=p(0)&=c_0,\\
+3=p(1)&=c_0+c_1+c_2,\\
+2=p(2)&=c_0+2c_1+4c_2.
+\end{align*}
+Solving these gives $c_0=1$, $c_1=7/2$, and $c_2=-3/2$, so that $p$ is given by
+$$
+p(x)=1+\frac{7}{2}x - \frac{3}{2}x^2.
+$$
+A plot of this polynomial is shown in @fig-quadintex. The code verifies that the computation above gives the same plot as 
+`points_canonical`.
+
+```{python}
+#| fig-cap: "Three interpolation point and the corresponding quadratic interpolation polynomial."
+#| label: fig-quadintex
+xsp = np.array([[0],[1],[2]])
+fsp = np.array([[1],[3],[2]])
+x, p = points_canonical(xsp, fsp)
+plt.plot(x,p)
+plt.plot(x,1+7*x/2-3*x**2/2,'--')
+```
+
+$\clubsuit$
+:::
+
+If we instead of the interpolation points are given the function itself, we can plot one or several interpolating polynomials together with the help of @lst-plotint. 
+The code takes as input a function `points_p_n` which computes the plot points. 
+At start we set this to `points_canonical`. In the next section we will replace this with another method for computing the plot points. 
+
+```{python}
+#| lst-cap: "Code for the plotting the interpolating polynomials"
+#| lst-label: lst-plotint
+def plot_p_n(f, a, b, nvals, points_p_n):
+    x=[]
+    for n in nvals:
+        xsp = np.linspace(a, b, n + 1).reshape((-1,1))
+        x, p = points_p_n(xsp, f(xsp))
+        plt.plot(x, p, '--', label = f'p_{n}')
+    plt.plot(x, f(x), '-k', label = 'f')
+    plt.legend()
+```
+
+In @fig-plotintpol we have used this code to plot the interpolating polynomials 
+$p_2$, $p_3$, and $p_4$, for $f(x)=\cos(2\pi x)$, given a uniform partition of $[0,1]$.
+
+```{python}
+#| label: fig-plotintpol
+#| fig-cap: "The interpolating polynomials $p_2$, $p_3$, and $p_4$, for $f(x)=\\cos(2\\pi x)$. $f$ is also shown."
+plot_p_n( lambda x: np.cos(2*np.pi*x),  
+         0, 1, [2,3,4,5], points_canonical)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Interpolation on Newton form {#sec-newtonform}
+Let again $x_0,x_1,\dots,x_n$ be interpolation points. We say that the polynomial $p_n$ is on *Newton form* if it is written on the form.
+
+$$
+\begin{split}
+p_n(x)=&\,c_0+c_1(x-x_0)+c_2(x-x_0)(x-x_1)+\dots \\
+&+c_n(x-x_0)(x-x_1)\cdots(x-x_{n-1}).
+\end{split}
+$$ {#eq-Newtonform}
+
+The Newton form has some advantages compared to the canonical one. 
+The interpolation conditions now take the form
+
+$$ 
+\begin{split}
+f(x_0)&= c_0 \\
+f(x_1)&= c_0 + c_1(x_1-x_0) \\
+&\ \  \vdots  \\
+f(x_n)&= c_0 + c_1(x_n-x_0) + \cdots + c_n(x_n-x_0)\cdots(x_n-x_{n-1}),
+\end{split}
+$$ {#eq-divdiffsys}
+
+or on matrix form:
+
+$$
+\begin{pmatrix}
+1 & 0 & \cdots & 0 \\
+1 & x_1-x_0 & \cdots & 0 \\
+\vdots & \vdots & \ddots  & \vdots \\
+1 & x_n - x_0 & \cdots &  (x_n-x_0)\cdots(x_n-x_{n-1})
+\end{pmatrix}
+\begin{pmatrix}
+c_0 \\
+c_1 \\
+\vdots \\
+c_n
+\end{pmatrix}
+=
+\begin{pmatrix}
+f(x_0) \\
+f(x_1) \\
+\vdots \\
+f(x_n)
+\end{pmatrix}.
+$$ {#eq-newtonsystem}
+This is a *triangular system*, and if the interpolation points are distinct, all components on the diagonal will be nonzero.
+The determinant of the matrix is then also nonzero, så that the matrix is invertible. 
+@eq-newtonsystem thus has a unique solution $(c_0,c_1,\dots,c_n)$. In other words, the Newton form is unique.. 
+
+Triangular systems are simpler to solve than general systems. To see this, denote the triangular matrix by $A$, let $A=\bigl(a_{ij}\bigr)_{i,j=0}^n$ be the components of $A$, and let $A\mathbf{c}=\mathbf{f}$ be the system we want to solve. 
+It is clear that we can find $c_0$ from the first equation, since this only says that $c_0=f_0$ (recall that $a_{00}=1$). Suppose we have found $c_0,c_1,\dots,c_{k-1}$ from the $k$ first equations. Equation $k+1$ says that
+$$
+a_{k0}c_0 + a_{k1}c_1 + \cdots + a_{k(k-1)}c_{k-1} + a_{kk}c_k = f_k.
+$$
+We can write this as
+$$
+c_k = \frac{1}{a_{kk}}\left( f_k - a_{k0}c_0 - a_{k1}c_1 - \cdots - a_{k(k-1)}c_{k-1}\right)
+$$ {#eq-finnckfradenne}
+(the diagonal element $a_{kk}=x_k-x_0$ is nonzero, so this expression gives meaning). We can therefore find $c_k$ from equation $k+1$ in the system. This method to solve a triangular system is called *forward substitution*: 
+We first find $c_0$, use this to find $c_1$, then use these to find $c_2$, and so on.
+
+Using @eq-finnckfradenne to find $c_k$ requires $k$ subtractions and $k$ multiplications. If we sum over all $k$ we get
+$$ 2 + 4 + 6 + \cdots + 2n = 2(1+2+\dots+n)= n(n+1) \approx n^2$$
+operations (we approximate with $n^2$ since $n^2$ is the dominating term here). 
+In addition we have $\approx n^2/2$ operations to find the numbers $x_i-x_j$. 
+Together this gives $3n^2/2$ operations.\index{Operation count!Triangular systems} 
+This is a great reduction when we compare with $\approx\frac{2}{3}n^3$ operations for the canonical system.
+By adapting the form of the interpolating polynomials, we thus get computation reduction for our method. 
+The learning outcome for the newton form is thus that it can be smart to look at other ways to represent polynomials.
+
+
+In @lst-pointsnewton we computed values of the interpolating polynomial using the Newton form, 
+analogous to @lst-findpoints for the canonical form. 
+The first `for`-loop applies forward substitution to find $c_0,c_1,...,c_n$. 
+
+```{python}
+#| lst-cap: "Code to find values of the interpolating polynomial, adapted to Newton form"
+#| lst-label: lst-pointsnewton
+def points_newton(xsp, fsp):
+    numpoints = np.shape(xsp)[0] - 1
+    x = np.linspace(xsp[0], xsp[-1], 100).reshape((-1,1))
+    V = np.ones((100, numpoints + 1))
+    c = np.zeros((numpoints+1,1))
+    c[0,0] = fsp[0,0]
+    for k in range(1,numpoints+1):
+        s = fsp[k,0]
+        p = 1
+        for r in range(0,k):
+            s = s - c[r,0]*p
+            p = p*(xsp[k,0] - xsp[r,0])
+        c[k,0] = s/p
+        V[:,[k]] = V[:,[k-1]]*(x - xsp[k-1,0])
+    p = V @ c
+    return x, p
+```
+
+
+::: {#exm- name='The Newton form for $n=0$, $1$, and $2$'}
+If there is only one interpolation point $x_0$, the Newton form becomes $p_0(x)=c_0$. We get that $c_0=f(x_0)$, so that
+$$p_0(x)=f(x_0).$$
+With two points $x_0$ and $x_1$ the newton form becomes $p_1(x)=c_0+c_1(x-x_0)$. We get the equations
+\begin{align*}
+f(x_0) &= c_0 \\
+f(x_1) &= c_0 + c_1(x_1-x_0)
+\end{align*}
+which have the solution
+$$
+c_0=f(x_0),\quad c_1=\frac{f(x_1)-f(x_0)}{x_1-x_0}.
+$$ {#eq-divdiff1}
+This gives
+$$
+p_1(x)= f(x_0) + \frac{f(x_1)-f(x_0)}{x_1-x_0}(x-x_0),
+$$
+which simply is the secant of $f$ through $x_0$ and $x_1$, see @fig-tansec. 
+For comparison, the first order Taylor polynomial of $f$ gives the tangent at the point.
+
+If we add yet another point $x_2$ we get a quadratic interpolation polynomial:
+$$
+p_2(x)=c_0+c_1(x-x_0)+c_2(x-x_0)(x-x_1)
+$$
+If we insert $x=x_0$ and $x=x_1$ we get the equations
+\begin{align*}
+f(x_0) &=c_0,\\
+f(x_1) &=c_0+c_1(x_1-x_0),
+\end{align*}
+These are the same equations we solved for $n=1$, so $c_0$ and $c_1$ must be given by @eq-divdiff1 also when $n=2$.
+If we insert $x=x_2$ we get
+$$
+f(x_2)=c_0+c_1(x_2-x_0)+c_2(x_2-x_0)(x_2-x_1),
+$$
+which gives
+$$
+c_2=\frac{f(x_2)-f(x_0)-\frac{f(x_1)-f(x_0)}{x_1-x_0}(x_2-x_0)}{(x_2-x_0)(x_2-x_1)}.
+$$
+After some simplification this can be written
+$$
+c_2=\frac{\frac{f(x_2)-f(x_1)}{x_2-x_1}-\frac{f(x_1)-f(x_0)}{x_1-x_0}}{x_2-x_0}.
+$$ {#eq-divdiff2}
+The interpolating polynomial is now a parabola, see @fig-tansec. 
+
+```{python}
+#| label: fig-tansec
+plot_p_n(np.exp, 0, 2, [1,2], points_newton)
+```
+
+$\clubsuit$
+:::
+
+
+
+
+
+::: {#exm-firstexnewton}
+Let us return to @exm-firstexcanonical, where the interpolation points were $(0,1)$, $(1,3)$, and $(2,2)$, 
+and make the computations on Newton form. We write the interpolating polynomial as 
+$$
+p_2(x)=c_0 + c_1x+c_2x(x-1).
+$$
+If we insert the points we get the three equations
+\begin{align*}
+1=p(0)&=c_0,\\
+3=p(1)&=c_0+c_1,\\
+2=p(2)&=c_0+2c_1+2c_2,
+\end{align*}
+which have the solution $c_0=1$, $c_1=3-c_0=2$, and $c_2=(2-c_0-2c_1)/2=-3/2$, 
+so that the Newton form of the interpolating polynomial is 
+$$
+p_2(x)=1+2x-\frac{3}{2}x(x-1)
+$$
+
+$\clubsuit$
+:::
+
+
+
+
+More generally we see from the triangular system in @eq-divdiffsys 
+that the equation obtained from the insertion $x=x_k$ only involves the points
+$\bigl(x_0,f(x_0)\bigr)$, $\bigl(x_1,f(x_1)\bigr)$, \dots, $\bigl(x_k,f(x_k)\bigr)$. Thus, $c_k$ will only depend on these points.
+It is therefore usual to write
+$$
+c_k=f[x_0,\ldots, x_k]
+$$ {#eq-divcoef}
+for $k=0$, $1$, \dots, $n$, so that the Newton form
+$$
+p_n(x)=c_0+c_1(x-x_0)+\cdots+c_n(x-x_0)(x-x_1)\cdots(x-x_{n-1})
+$$ {#eq-intpoly}
+can be written
+$$
+\begin{aligned}
+p_n(x) &= f[x_0] + f[x_0,x_1](x-x_0) + f[x_0,x_1,x_2](x-x_0)(x-x_1) \\
+&\quad + \cdots + f[x_0,x_1,\dots,x_n](x-x_0)(x-x_1)\cdots(x-x_{n-1}).
+\end{aligned}
+$$ {#eq-divdef}
+Note that the interpolating polynomials $p_n$ and $p_{n-1}$ satisfy
+$$
+p_n(x)=p_{n-1}(x)+f[x_0,\ldots,x_n](x-x_0)\cdots(x-x_{n-1}).
+$$
+@fig-sinint shows the interpolating polynomial $p_n$ for different values of $n$ for the function $f(x)=\sin(x)$. 
+We see that the approximation becomes better when we increase $n$.
+
+
+
+```{python}
+#| fig-cap: "Interpolation of $f(x)=\\sin(x)$ with polynomials of different degrees."
+#| label: fig-sinint
+plot_p_n(np.sin, 0, 4, [1,2,3,4], points_newton) 
+```
+
+
+
+
+::: {#exm-}
+We interpolate the function $f(x)=\sqrt{x}$ in the points $x_i=i$, for $i=0,1,2,3$. The Newton form becomes
+$$
+p_3(x)=c_0+c_1x + c_2 x(x-1) + c_3x(x-1)(x-2),
+$$
+and the interpolation conditions give
+\begin{align*}
+0 &=c_0,\\
+1 &= c_0+c_1,\\
+\sqrt{2} &=c_0+2c_1+2c_2,\\
+\sqrt{3} &=c_0+3c_1+6c_2+6c_3.
+\end{align*}
+If we solve this system we get
+\begin{align*}
+c_0&=0, & c_1&=1, & c_2,&=-(1-\sqrt{2}/2), & c_3&=(3+\sqrt{3}-3\sqrt{2})/6.
+\end{align*}
+@fig-sqrtcub shows the interpolating polynomial.
+
+```{python}
+#| label: fig-sqrtcub
+#| fig-cap: "The function $f(x)=\\sqrt x$ (solid line) and the cubic interpolant in the four points $0$, $1$, $2$, and $3$."
+plot_p_n(np.sqrt, 0, 3, [3], points_newton) 
+```
+$\clubsuit$
+:::
+
+If interpolation is used the right way, it will usually give a good approximation to the underlying function.
+As the distance between neighbouring points decrease 
+(either by increasing the number of points, or by moving the points closer to each other), 
+one can expect that the approximation gets better.
+But we know that there exist functions for which Taylor polynomials are bad approximations, 
+and the same thing can happen for interpolation. 
+We can get this problem when the derivative of the function gets very large, as the following example shows.
+
+::: {#exm-runge-function}
+The *Runge function* is defined by $f(x)=1/(1+x^2)$ on the interval $[-5,5]$. The interpolants of degree 10 and 20 
+are shown in @fig-runge. 
+
+```{python}
+#| fig-cap: "Interpolation of the Runge function $f(x)=1/(1+x^2)$ on the interval $[-5,5]$."
+#| label: fig-runge
+plot_p_n(lambda x: 1/(1+x**2), -5, 5, [10,20], points_newton)
+plt.axis([-5,5,-0.5,2])
+```
+
+Observe what happens when the degree increases: 
+The error then gets less in the middle of the interval, but larger near the end points. 
+We will analyse what goes wrong in @sec-interpolasjonsfeil.
+
+$\clubsuit$
+:::
+
+The Newton- and canonical forms are just two ways to write the interpolating polynomial 
+- many other variants exist also. One of these is the *Lagrange formen*, which we will consider in @exr-lagrange.
+
+
+
+
+
+
+
+
+## The interpolation error {#sec-interpolasjonsfeil}
+In the previous section we saw examples where the interpolating polynomial $p_n$ becomes a better approximation
+when we increase $n$, but we also saw examples where the opposite happens. 
+We will now give a mathematical explanation of why this happens.
+
+We shall explain that the error in polynomial interpolation can be expressed in a way similar to the remainder term in 
+Taylor series, which says that if $f$ is $n+1$ times continuously differentiable, then for any $x$ there is a number $\xi\in[a,x]$ so that
+$$
+f(x) = p(x) + \frac{(x-a)^{n+1}}{(n+1)!}f^{(n+1)}(\xi).
+$$ {#eq-taylor-med-restledd}
+If $x$ is near $a$, and the derivative $f^{(n+1)}$ is not very large, the remainder will be small, and $p$ is therefore near $f$. 
+In other words: If the derivatives of $f$ are not very large, the Taylor polynomial $p$ will be a good approximation to $f$, at least near $a$.
+
+
+
+::: {#thm-interpolasjonsfeil}
+Let $x_0,x_1,\dots,x_n\in[a,b]$ be distinct interpolation points, and suppose that the function $f\colon[a,b]\to\mathbb{R}$ is (at least) $n+1$ times continuously differentiable. Let $p_n$ be the unique interpolating polynomial of degree $\leq n$ in the points $x_0,x_1,\dots,x_n$.
+Then
+$$
+    |f(x)-p_n(x)| \leq \frac{M_{n+1}(b-a)^{n+1}}{(n+1)!}
+$$ {#eq-interpolation-error-estimate}
+for all $x\in[a,b]$, where $M_{n+1} = \max_{[a,b]} |f^{(n+1)}|$.
+:::
+
+::: {.proof}
+Let $x\in[a,b]$. We claim that there is a point $y\in[a,b]$ so that
+$$
+f(x)-p_n(x) = \frac{f^{(n+1)}(y)}{(n+1)!}Q_n(x),
+$$ {#eq-interpolation-error-identity}
+where $Q_n$ is the degree $(n+1)$ polynomial
+$$
+Q_n(x) = (x-x_0)(x-x_1)\cdots(x-x_n).
+$$
+If $x$ is one of the points $x_0,x_1,\dots,x_n$, then both sides of @eq-interpolation-error-identity are $0$, 
+so that the identity is automatically true. 
+Suppose then that $x$ is NOT one of the points $x_0,x_1,\dots,x_n$, and define the function
+$$
+\phi(t) = f(t) - p_n(t) - \frac{f(x)-p_n(x)}{Q_n(x)}Q_n(t) \qquad\text{for } t\in[a,b].
+$$
+Then $\phi$ has zeros in the $n+2$ distinct points $x, x_0,x_1,\dots,x_n$ (this is @exr-phiernull). 
+By the mean value theorem it follows then that there exist $n+1$ points in the interval $(a,b)$ where $\phi'$ equals 0. 
+By the same arguments, there must exist $n$ points where $(\phi')' = \phi''$ equals 0. 
+Continuing this way, we find that the function $\phi^{(n+1)}$ has at least one zero $y\in(a,b)$. Since 
+$p_n^{(n+1)} \equiv 0$ and $Q^{(n+1)} \equiv (n+1)!$ (this is @exr-regnutQn), we get
+$$
+0 = \phi^{(n+1)}(y) = f^{(n+1)}(y) - \frac{f(x)-p_n(x)}{Q_n(x)}(n+1)!.
+$$
+Reorganising this equation we get @eq-interpolation-error-identity.
+
+If we replace $|f^{(n+1)}(y)|$ on the right hand side in @eq-interpolation-error-identity with its maximum, we get
+$$
+|f(x)-p_n(x)| \leq \frac{M_{n+1}}{(n+1)!}|Q_n(x)|.
+$$
+Since each of the terms $(x-x_0), \dots, (x-x_n)$ can be at most $b-a$ (because the points $x,x_0,x_1,\dots,x_n$ 
+all lie in $[a,b]$), we see that $|Q_n(x)| \leq (b-a)^{n+1}$ for all $x$. This proves @eq-interpolation-error-estimate.
+:::
+
+Since the faculty $(n+1)!$ gets very large when $n$ increases, we see that the interpolation error decreases when $n$ grows, 
+AS LONG AS $M_{n+1}$ does not grow too fast!
+
+
+::: {#exm-}
+In @fig-sinint we interpolated the function $f(x) = \sin(x)$ on the interval $[a,b]=[0,2\pi]$. 
+If we choose $n+1$ uniformly distributed interpolation points $x_0,x_1,\dots,x_n$, we get an interpolating polynomial of degree $\leq n$. 
+We know that the derivatives of $f$ are either $\pm \cos(x)$ or $\pm\sin(x)$, and none of these functions obtain 
+values larger than $1$. Therefore, $M_{n+1} \leq 1$ for all $n$. We therefore get
+$$
+|f(x)-p_n(x)| \leq \frac{(2\pi)^{n+1}}{(n+1)!}.
+$$
+Since $(n+1)!$ grows much faster than $(2\pi)^{n+1}$ when $n$ grows, the error will go quickly to $0$ when $n$ grows. $\clubsuit$
+:::
+
+
+::: {#exm-}
+Let $f$ be the Runge function from @exm-runge-function, given by $f(x)=1/(1+x^2)$ for $x\in[-5,5]$. 
+A slightly technical computation shows that $M_{n+1} \approx (n+1)!$ on the interval $[-5,5]$. 
+The error estimate in @eq-interpolation-error-estimate therefore says that
+$$
+|f(x)-p_n(x)| \leq \frac{M_{n+1}(b-a)^{n+1}}{(n+1)!} \approx (b-a)^{n+1} = 10^{n+1},
+$$
+which is a very large number when $n$ is large. The error estimate thus DOES NOT guarantee that the interpolation error
+is small when $n$ is large. And, as we saw in @exm-runge-function, the error is actually quite large. $\clubsuit$
+:::
+
+
+
+
+
+
+## Interpolation with trigonometric functions {#sec-trigpol}
+We shall now interpolate with trigonometric functions, rather than with polynomials. 
+Trigonometric functions can be thought of as the building blocks of sound. 
+Think of a sound as a mathematical function which returns its amplitude at a given instance in time. 
+A sine wave on the form $\sin(2\pi t/T)$ ($T$ is the period of the sine wave) in particular makes a distinct sound it may be possible to match with a key on a piano. 
+And adding many sine waves with different periods together, it turns out that more complex sounds can be obtained. 
+We will therefore illustrate interpolation with trigonometric functions in terms of applications to sound.
+
+Sound on a computer is represented as numbers between $-1$ and $1$, called *sound samples*. 
+In many applications sound is represented by 44100 samples for each second, also called the *sampling frequency*, denoted `freq_s`. 
+
+The sounds we consider will be periodic. If a sound repeats 440 times per second we say that its *frequency* is $f=440$Hz. 
+The period is then `T=1/freq`, and the number of samples per period is `freq_s/freq` (which may not be an integer). 
+In the following we will plot the sound samples against time. First we will plot sounds over one period. 
+
+
+```{python}
+freq_s = 44100
+freq = 440
+T= 1/freq
+samples_per_period = int(freq_s/freq)
+t = np.linspace(0,T,samples_per_period).reshape((-1,1))
+```
+The interpolating function $p$ will agree with the function (denoted as before by $f$) at a subset of the plot points. 
+We pick $M=2N+1$ function values uniformly on $[0,T]$, so that $t_k=kT/M$, $0\leq k<M$. 
+We set
+$$\mathbf{f}=(f(0\cdot T/M),f(1\cdot T/M),...,f((M-1)T/M)).$$ 
+
+```{python}
+N=20
+M=2*N+1
+tsp = np.linspace(0,T-T/M,M).reshape((-1,1))
+```
+We will consider the square wave\index{Square wave} defined by 
+$$
+f_s(t)=\begin{cases} 1 & \text{ for } 0\leq t<T/2 \\ -1 & \text{ for } T/2\leq t<T.\end{cases}
+$$
+The following function returns samples of the square wave at concrete instances in time in 
+one period.
+
+```{python}
+def square_wave(t, T):
+    return 2*(t < T/2).astype(int) -1
+```
+We obtain the samples of the square wave at the interpolation points and the plot points as follows.
+```{python}
+fsp = square_wave(tsp, T) # samples from one period
+f = square_wave(t, T) # plot points
+```
+
+Let us now use the $M=2N+1$ trigonometric functions 
+$$\{1\}\cup\{\cos(2\pi nt/T),\sin(2\pi nt/T)\}_{n=1}^N$$
+as a basis for interpolation. Since
+\begin{align*}
+e^{it} &= \cos t + i\sin t & e^{-it} &= \cos t - i\sin t \\
+\cos t &= \frac{1}{2}(e^{it} + e^{-it}) & \sin t &= \frac{1}{2i}(e^{it} - e^{-it})
+\end{align*}
+we may as well use 
+$$
+\{ e^{2\pi int/T} \}_{n=-N}^N
+$$ {#eq-trigpolintfunctions}
+as a basis for interpolation instead. It turns out that these functions, which are complex, will simplify things a lot. We have the following result:
+
+::: {#thm-intpoltrig}
+The unique function interpolating $f$ at the points $\{kT/M\}_{k=0}^{M-1}$ using the basis from @eq-trigpolintfunctions is
+$$
+p(t)=\sum_{n=-N}^N c_n e^{2\pi int/T},
+$$ {#eq-this-is-real}
+where the $c_n$ can be found from 
+$$
+(c_0,...,c_N,c_{-N},c_{-1}) = \frac{1}{M}F_M\mathbf{f},
+$$ {#eq-trigpolinty}
+where $F_M$ is the DFT matrix from @exm-fouriermatrix. Moreover, $p(t)$ is a real function.
+:::
+
+The proof is a bit technical, so we defer it to the end of the section. Let us first consider how this result can be implemented. 
+The theorem says that the coefficients of the interpolating function can be obtained as\index{python!np.fft.fft}
+```{python}
+c = np.fft.fft(fsp, axis = 0)/M
+```
+We want the components in `c` to come in the same order as $(c_{-N},...,c_{-1},c_0,...,c_N)$, so we swap the two halves of this vector:\index{python!np.block}
+```{python}
+c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
+``` 
+
+@eq-this-is-real can now be written as a matrix-vector product, and we obtain plot points of $p$ with the following implmentation.\index{python!np.real}
+```{python}
+n = np.arange(-N,N+1).reshape((1,-1))
+p = np.real( np.exp(2*np.pi*1j*n*t/T) @ c )
+```
+We can plot this together with the square wave itself as follows.
+```{python}
+plt.plot( t, p)
+plt.plot( t, f)
+plt.legend([f"f(t), M={M}",'f(t)'])
+```
+In order to listen to a set of samples as a sound we need the following function
+```{python}
+def audiowrite(filename, f, freq_s):
+    ofile = wave.open(filename, 'w')
+    ofile.setsampwidth(2)
+    ofile.setframerate(freq_s)
+    ofile.setnchannels(1)
+    max_amplitude = 2**15-1
+    f=max_amplitude*f
+    f=f.astype(np.uint16)
+    ofile.writeframesraw(f.astype(np.uint16).tobytes())
+    ofile.close()
+```    
+We now generate sounds corresponding to a sine, a square wave and its interpolant (we set the sounds to last three seconds).
+```{python}
+numsec=3
+
+t = np.linspace(0,numsec,samples_per_period*numsec*freq)
+sine = np.sin(2*np.pi*freq*t)
+
+f = f.reshape(-1)
+f = np.tile(f, numsec*freq)
+
+p = p.reshape(-1)
+p = np.tile(p, numsec*freq)
+p = p/np.abs(p).max()
+```
+The periods of the square wave and its interpolant were tiled so many times that it lasts the given number of seconds. 
+The sound samples of the interpolant were scaled so that they are between -1 and 1, as is required for sound samples on a computer. 
+This was necessary since the plot showed that the values of the interpolant exceeded 1, although the square wave did not. 
+
+Finally we write sound data to file:
+```{python}
+#| eval: false
+audiowrite('sine.wav', sine, freq_s)
+audiowrite('square.wav', f, freq_s)
+audiowrite('interpolant.wav', p, freq_s)
+```
+You can now listen to the three generated files in your favourite audio player. 
+
+```{=html}
+<audio controls title="The sine wave">
+    <source src="sine.wav" type="audio/mpeg">
+</audio>
+<audio controls title="The square wave">
+    <source src="square.wav" type="audio/mpeg">
+</audio>
+<audio controls title="Interpolant">
+    <source src="interpolant.wav" type="audio/mpeg">
+</audio>
+ ```
+
+:::{.proof} 
+(of @thm-intpoltrig). The interpolation conditions are
+$$
+\sum_{n=-N}^N c_ne^{2\pi ink/M} = f(kT/M),
+$$ {#eq-intpoly2}
+where $0\leq k<N$. This corresponds to the matrix equation
+$$
+\left(\begin{array} {ccc|ccc}
+e^{2\pi i0(-N)/M} & \cdots & e^{2\pi i0(-1)/M} & e^{2\pi i00/M} & \cdots & e^{2\pi i0N/M}\\
+e^{2\pi i1(-N)/M} & \cdots & e^{2\pi i1(-1)/M} & e^{2\pi i10/M} & \cdots & e^{2\pi i1N/M}\\
+\vdots & \ddots & \vdots & \vdots &\ddots & \vdots \\
+e^{\frac{2\pi i(M-1)(-N)}{M}} & \cdots & e^{\frac{2\pi i(M-1)(-1)}{M}} & e^{\frac{2\pi i(M-1)0}{M}} & \cdots & e^{\frac{2\pi i (M-1)N}{M}}
+\end{array}\right)
+\left(\begin{array}{c} c_{-N} \\ \vdots \\ c_{-1} \\ \hline c_0 \\ \vdots \\ c_N \end{array}\right)
+=\mathbf{f}.
+$$
+Using @eq-tousefourier we get
+$$
+\left(\begin{array}{ccc|ccc} 
+e^{2\pi i00/M} & \cdots & e^{2\pi i0N/M} & e^{2\pi i0\cdots(-N)/M} & \cdots & e^{2\pi i0(-1)/M} \\
+e^{2\pi i10/M} & \cdots & e^{2\pi i1N/M} & e^{2\pi i1(-N)/M} & \cdots & e^{2\pi i1(-1)/M} \\
+\vdots & \ddots & \vdots & \vdots &\ddots & \vdots \\
+e^{\frac{2\pi i(M-1)0}{M}} & \cdots & e^{\frac{2\pi i (M-1)N}{M}} & e^{\frac{2\pi i(M-1)(-N)}{M}} & \cdots & e^{\frac{2\pi i(M-1)(-1)}{M}} 
+\end{array}\right)
+\left(\begin{array}{c} c_0 \\ \vdots \\ c_N \\ \hline c_{-N} \\ \vdots \\ c_{-1} \end{array}\right)
+=\mathbf{f}.
+$$
+Using that $e^{2\pi i(-n)k/M}=e^{2\pi i(M-n)k/M}$ we get 
+$$
+\begin{pmatrix} 
+e^{2\pi i00/M} & \cdots & e^{2\pi i0N/M} & e^{2\pi i0(M-N)/M} & \cdots & e^{2\pi i0(M-1)/M} \\
+e^{2\pi i10/M} & \cdots & e^{2\pi i1N/M} & e^{2\pi i1(M-N)/M} & \cdots & e^{2\pi i1(M-1)/M} \\
+\vdots & \ddots & \vdots & \vdots &\ddots & \vdots \\
+e^{\frac{2\pi i(M-1)0}{M}} & \cdots & e^{\frac{2\pi i (M-1)N}{M}} & e^{\frac{2\pi i(M-1)(M-N)}{M}} & \cdots & e^{\frac{2\pi i(M-1)(M-1)}{M}} 
+\end{pmatrix}
+\begin{pmatrix} c_0 \\ \vdots \\ c_N \\ c_{-N} \\ \vdots \\ c_{-1} \end{pmatrix}
+=\mathbf{f}.
+$$
+$M=2N+1$ implies that $M-N=N+1$, so that this can be written as
+$$
+\begin{pmatrix} 
+e^{2\pi i0\cdot 0/M} & e^{2\pi i0\cdot 1/M} & \cdots & e^{2\pi i0(M-1)/M}\\
+e^{2\pi i1\cdot 0/M} & e^{2\pi i1\cdot 1/M} & \cdots & e^{2\pi i1(M-1)/M}\\
+\vdots & \vdots & \ddots & \vdots \\
+e^{2\pi i(M-1)0/M} & e^{2\pi i(M-1)1/M} & \cdots & e^{2\pi i (M-1)(M-1)/M}
+\end{pmatrix}
+\begin{pmatrix} c_0 \\ \vdots \\ c_N \\ c_{-N} \\ \vdots \\ c_{-1} \end{pmatrix}
+=\mathbf{f}.
+$$
+From @exm-fourierinverse we see that the matrix on the left side is $MF_M^{-1}$.
+Multiplying with $F_M$ on both sides we get @eq-trigpolinty. 
+
+Finally, let us comment on why $p(t)$ must be real. Since $\mathbf{f}$  is real it follows that  $c_{-n}=\overline{c_n}$ (see @exr-yconjugate), so that 
+$$
+c_ne^{2\pi int/T} + c_{-n}e^{2\pi i(-n)t/T} = 2\Re(c_ne^{2\pi int/T}).
+$$
+Since also $c_0$ is real, it follows that @eq-this-is-real also evaluates to something real. 
+:::
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+
+## The interpolating polynomial of a sum.
+
+Suppose the polynomial $p_n$ interpolates $f$ in $n+1$ points, and that the polynomial $q_n$ interpolates $g$ in the same points. The polynomial interpolating $f + g$ in the same points is then $p_n+q_n$.
+
+1. [x] True
+2. [ ] False
+
+## The interpolating polynomial of a product.
+
+Suppose the polynomial $p_n$ interpolates $f$ in $n+1$ points, and that the polynomial $q_n$ interpolates $g$ in the same points. The polynomial interpolating $fg$ in the same points is then $p_nq_n$.
+
+1. [ ] True
+2. [x] False
+
+## Trur or false.
+
+There exist many polynomials of degree $\leq n$ which interpolate a given function $f$ in $n+1$ points.
+
+1. [ ] True
+2. [x] False
+
+```
+:::
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-numopssyst}
+In this exercise we will look at code which computes the matrix we need to find the canonical form of the interpolating polynomial. 
+@lst-plotint computed the Vandermonde matrix with the code
+
+```{python}
+#| eval: false
+p = np.arange(0,n+1).reshape((1,-1))
+A = x**p
+```
+
+Compare this with the following alternative code:
+
+```{python}
+#| eval: false
+A[:,0] = np.ones((n+1,1))
+for k in range(1,n+1):
+    A[:,[k]] = A[:,[k-1]]*x
+```
+
+Which of the two alternatives is to prefer? Justify your answer, and what assumptions you make.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If we assume that the computer finds $x^n$ by multiplying in $x$ $n-1$ times, the first code segment will use 
+$n(1+\cdots+n-2)=n(n-1)(n-2)/2$ operations, while the second code segment will use
+$n^2-n$ operations, and therefore is to prefer.
+
+It is not for granted, however, that the computer finds $x^n$ by means of $n-1$ multiplications. 
+The computer probably uses a more efficient algorithm. In particular, note that $x^n = e^{n\ln x}$,
+which the computer can exploit to find the powers, 
+as long as it has efficient algorithms to compute logarithms and the exponential functions.
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-inpolunique}
+In this exercise we will consider another proof of the fact that the interpolating polynomial is unique .
+
+(a) Suppose that there exist two quadratic polynomials $p_1$ and $p_2$ which interpolate $f$ in the three points $x_0$, $x_1$ and $x_2$.
+Consider the difference $p=p_2-p_1$. What are the values of $p$ in the interpolation points?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $p_1(x_0)=p_2(x_0)=f(x_0)$, $p_1(x_1)=p_2(x_1)=f(x_1)$, $p_1(x_2)=p_2(x_2)=f(x_2)$, we get that
+\begin{align*}
+p(x_0) &= p_2(x_0)-p_1(x_0)=f(x_0)-f(x_0)=0 \\
+p(x_1) &= p_2(x_1)-p_1(x_1)=f(x_1)-f(x_1)=0 \\
+p(x_2) &= p_2(x_2)-p_1(x_2)=f(x_2)-f(x_2)=0.
+\end{align*}
+The values in the interpolation points are thus $0$.
+:::::::
+:::::
+
+(b) Use the observation in (a) to show that $p_1$ and $p_2$ must be equal.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The second degree polynomial $p$ has three distinct zeros, but a second degree polynomial different from $0$ can not have more than two zeros. 
+We therefore must have that $p=0$, so that $p_1=p_2$, so that the interpolating polynomial is unique. 
+:::::::
+:::::
+
+(c) Generalise the results from (a) and (b) to polynomials of degree $n$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If we define $p=p_1-p_2$ as above, we see as before that $p(x_0)=p(x_1)=\ldots=p(x_n)=0$, so that $p$ is a polynomial of degree $n$ with $n+1$ distinct zeros. 
+From the fundamental theorem of algebra (i.e., that a polynomial of degrees $n$ can't have more than $n$ roots) it follows that $p=0$, so that $p_1=p_2$, 
+so that the interpolating polynomial is unique also in this case.
+:::::::
+:::::
+:::
+
+
+
+::: {#exr- name="Horner's rule"}
+A direct computation of @eq-npolstandard in a point $x$ requires $n$ multiplications and $n$ additions, as well as computation of the powers ($n-1$ multiplikasjoner). 
+In total this is $3n-1$ operations. Let us rewrite @eq-npolstandard to
+$$
+p_n(x)=c_0+x\left( c_1 + c_2x + c_3x^2 + \cdots c_nx^{n-1}\right).
+$$ {#eq-hornerbasis}
+Inside the parentheses on the right side here there is a polynomial of degree $n-1$ (which we call $p_{n-1}$), which in the same way can be expressed in terms of a polynomial of degree $n-2$ ($p_{n-2}$), and so on.
+We have that
+$$
+\begin{array} {ccc}
+p_n(x)       &=& c_0 + xp_{n-1}(x) \\
+p_{n-1}(x)  &=& c_1 + xp_{n-2}(x) \\
+p_{n-2}(x)  &=& c_2 + xp_{n-3}(x) \\
+\vdots         & & \vdots \\
+p_1(x)        &=& c_{n-1} + xp_0(x) \\
+p_0(x)        &=& c_n
+\end{array}
+$$
+To compute $p_n(x)$ we start from the last equation, and continue upwards to the first equation. 
+This algorithm is also called *Horner's rule*.\index{Horner's rule}
+
+(a) Write an implementation of Horner's rule.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If we denote the computation of the right hand side by $s$, and start with the last equation, the steps become
+$$
+\begin{array}{ccc}
+s&=&c_n \\
+s&=& c_{n-1} + xs \\
+\vdots & & \vdots \\
+s&=&c_2 + xs\\
+s&=&c_1 + xs\\
+s&=&c_0 + xs.
+\end{array}
+$$
+After this we get that $s=p_n(x)$. The code can look as follows.
+
+```{python}
+#| eval: false
+s = c[n]
+for k in range(n-1,-1,-1):
+    s = c[k] + x*s
+```
+:::::::
+:::::
+
+(b) How many arithmetic operations are required by Horner's rule?\index{Operation count!Horner's rule}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+In each iteration of the loop an addition and a multiplication are computed. The total number of operations is therefore $2n$, which is an improvement from $3n-1$.
+Horner's rule in fact turns out to be optimal computationally when it comes to  computing values of a polynomial.
+It is also optimal when it comes to memory usage - one only needs the variable $s$, in addition to $x$ and $\mathbf{c}$.
+In order to integrate Horner's rule in @lst-plotint, you should replace `Vp*c` with what you got from the code above.
+:::::::
+:::::
+
+(c) Explain how you can adapt Horner's rule to the Newton form in @eq-Newtonform.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+@eq-Newtonform is now rewritten to
+
+\begin{align*}
+p_n(x) &= c_0+(x-x_0)p_{n-1}(x) \\
+p_{n-1}(x) &= c_1 + (x-x_1)p_{n-2}(x) \\
+\vdots        & \vdots   & \vdots \\
+p_1(x) &= c_{n-1} + (x-x_{n-1})p_0(x) \\
+p_0(x) &= c_n
+\end{align*}
+
+The number of operations will be the same as above, with the exception that we now also must compute the differences $x-x_0,x-x_1,...,x-x_{n-1}$.
+
+:::::::
+:::::
+:::
+
+
+
+
+
+::: {#exr-}
+We interpolate the function $f(x) = x^2$ with a polynomial $p_3$ of degree $\leq 3$, in the points 0, 1, 2, and 3. What is  $p_3(4)$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+16
+:::::::
+:::::
+:::
+
+::: {#exr-lagrange name="Lagrange form"}
+We have the data
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+$x$    & 0 & 1 & 3 & 4\\
+\hline
+$f(x)$ & 1 & 0 & 2 & 1\\
+\end{tabular}
+\end{center}
+
+(a) Write the cubic polynomial which interpolate in these points as
+\begin{align*}
+p_3(x)=&\,c_0(x-1)(x-3)(x-4)+c_1x(x-3)(x-4)\\
+&+c_2x(x-1)(x-4)+c_3x(x-1)(x-3),
+\end{align*}
+and find the coefficients from the interpolation conditions. Dette This is called the  *Lagrange form* of the interpolating polynomial.
+
+::::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If we set $x=0$ we get $1 = c_0(-1)(-3)(-4)$, so that $c_0 = -1/12$.
+
+If we set $x=1$ we get $0 = c_1(1)(1-3)(1-4)$, so that $c_1 = 0$.
+
+If we set $x=3$ we get $2 = c_2(3)(3-1)(3-4)$, so that $c_2 = -1/3$.
+
+If we set $x=4$ we get $1 = c_3(4)(4-1)(4-3)$, so that $c_3 = 1/12$.
+
+We thus get
+$$p_3(x)= -\frac{(x-1)(x-3)(x-4)}{12}-\frac{x(x-1)(x-4)}{3} + \frac{x(x-1)(x-3)}{12}.$$
+:::::::
+:::::
+
+(b) Find the Newton form of the interpolating polynomial .
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If we set $p_3(x)=c_0 + c_1x + c_2x(x-1) + c_3x(x-1)(x-3)$, we get the equations
+\begin{align*}
+1 &= c_0 \\
+0 &= c_0 + c_1 \\
+2 &= c_0 + 3c_1 + 6c_2 \\
+1 &= c_0 + 4c_1 + 12c_2 + 12c_3.
+\end{align*}
+The first two equations give that $c_0 = 1$ and $c_1 = -1$. Inserting this is the third equation gives that $c_2 = (2-1+3)/6 = 2/3$. 
+Inserting this is the fourth equation gives that $c_3 = (1-1+4-8)/12 = -1/3$. This gives
+$$p_3(x)=1-x+\frac{2}{3}x(x-1)-\frac{1}{3}x(x-1)(x-3).$$
+:::::::
+:::::
+
+(c) Verify that the solutions you found in (a) and (b) are equal.
+
+:::
+
+
+
+::: {#exr-polrep name='Interpolation with a set of data'}
+
+(a) We have the data
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+$x$ & 0 & 1 & 2 \\
+\hline
+$f(x)$ & 2& 1& 0\\
+\end{tabular}
+\end{center}
+These are points on the line $y=2-x$. Find the Newton form of the quadratic interpolating polynomial and compare. 
+What is the difference?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The Newton form of the interpolating second degree polynomial is
+$$
+p_2(x) = f(x_0) + f[x_0,x_1](x-x_0) + f[x_0,x_1,x_2](x-x_0)(x-x_1).
+$$
+We have that
+\begin{align*}
+f[x_0,x_1]         &=\frac{f(x_1)-f(x_0)}{x_1-x_0}=\frac{1-2}{1-0}=-1 \\
+f[x_1,x_2]         &=\frac{f(x_2)-f(x_1)}{x_2-x_1}=\frac{0-1}{2-1}=-1 \\
+f[x_0,x_1,x_2] &=\frac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}=\frac{-1-(-1)}{2-0}=0.
+\end{align*}
+If we insert this in $p_2(x)$ we get that $p_2(x) = 2 -(x-x_0)=2-x$.
+:::::::
+:::::
+
+(b) Suppose we interpolate $f$ with polynomials of degree $\leq n$ in the points $x_0, \dots, x_n$. 
+Show that if $f$ is a polynomial of degree $\leq n$, then the interpolant $p_n$
+will be identical to $f$. Why does this explain the result in (a)?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Both $f$ and $p_n$ are interpolating polynomials of degree $\leq n$, and then we know from @exr-inpolunique that they must be equal. 
+In (a) the function already was a second degree polynomial, so that it must be equal to its interpolant as well. 
+Therefore we obtained that $p_n$ was equal to the function itself.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Suppose we have the data
+$$
+(0,y_0), \quad(1,y_1), \quad (2,y_2), \quad (3,y_3)
+$$ {#eq-intdata}
+where $y_i=f(i)$ are values of an unknown function $f$. In this exercise we will find expressions for approximations to $f$ 
+in different points by using cubic interpolation.
+
+(a) Find the line $p_1$ which interpolates the two midpoints in @eq-intdata, and use $p_1(3/2)$ as an approximation to $f(3/2)$. Show that
+$$
+p_1(3/2)=\frac{1}{2}\bigl(y_1+ y_2\bigr).
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Linear interpolant $p_1$:
+$$p_1(x)=y_1+(y_2-y_1)(x-1).$$
+This gives $p_1(3/2)=y_1 + \frac{1}{2}(y_2-y_1)=\frac{1}{2}(y_1+y_2)$.
+:::::::
+:::::
+
+(b) Find the cubic polynomial $p_3$ which interpolates the data @eq-intdata, and use $p_3(3/2)$ as an approximation to $f(3/2)$. 
+Show that
+$$p_3(3/2)=\frac{-y_0+9y_1+9y_2-y_3}{16}.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The Newton form for the polynomial interpolating  in these four points can be found by solving 
+\begin{align*}
+y_0 &= c_0 \\
+y_1 &= c_0 + c_1 \\
+y_2 &= c_0 + 2c_1 + 2c_2 \\
+y_3 &= c_0 + 3c_1 + 6c_2 + 6c_3. 
+\end{align*}
+This first gives $c_0=y_0$, then $c_1=y_1-y_0$, then 
+\begin{align*}
+c_2 &= \frac{y_2-y_0-2(y_1-y_0)}{2}=\frac{y_2-2y_1+y_0}{2} \\
+c_3 &= \frac{y_3-y_0-3(y_1-y_0)-6(y_2-2y_1+y_0)/2}{6} = \frac{y_3-3y_2+3y_1-y_0}{6},
+\end{align*}
+so that the interpolating cubic polynomial becomes
+$$
+p_3(x)=y_0+(y_1-y_0)x+\frac{y_2-2y_1+y_0}{2}x(x-1)+\frac{y_3-3y_2+3y_1-y_0}{6}x(x-1)(x-2).
+$$
+This gives finally
+\begin{align*}
+p_3(3/2) &= y_0+(y_1-y_0)\frac{3}{2}+\frac{y_2-2y_1+y_0}{2}\frac{3}{4} - \frac{y_3-3y_2+3y_1-y_0}{6}\frac{3}{8} \\
+&= \frac{16y_0+24y_1-24y_0+6y_2-12y_1+6y_0-y_3+3y_2-3y_1+y_0}{16} \\
+&= \frac{-y_0+9y_1+9y_2-y_3}{16}.
+\end{align*}
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-intpoltaylor name='Taylor series and interpolation'}
+Our basis for interpolation has been the knowledge of function values $f(x_0),...,f(x_m)$. 
+*Taylor polynomials* can be seen as an alternative to this, with this knowledge replaced by $f(a),f'(a),...,f^{(n)}(a)$. 
+Let the basis functions $\phi_i(x)$ be 
+$$
+\{1,x-a,(x-a)^2,...,(x-a)^n\}
+$$
+The polynomial we seek is then
+$$p(x)=c_0+c_1(x-a)+\cdots+c_n(x-a)^n,$$
+but now the interpolation conditions instead take the form 
+$$
+\begin{aligned}
+p(a) &= f(a) & p'(a) &= f'(a) & p''(a) &= f''(a) & \cdots & \cdots & p^{(n)}(a) &= f^{(n)}(a).
+\end{aligned}
+$$ {#eq-newintpolconds}
+Show that $c_k=f^{(k)}(a)/k!$, so that we obtain the Taylor polynomial
+$$
+f(a) + f'(a)(x-a)/1! + f''(a)(x-a)^2/2! + \cdots + f^{(n)}(a)(x-a)^n/n!
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since the k'th derivative of $(x-a)^k$ is $k!$, and all its other derivatives are zero, we have that $p^{(k)}(a)=c_kk!$
+@eq-newintpolconds thus takes the form
+\begin{align*}
+c_0 &= f(a) & c_11! &= f'(a) & c_22! &= f''(a) & \cdots & \cdots & c_nn! &= f^{(n)}(a),
+\end{align*}
+so that $c_k=f^{(k)}(a)/k!$ for all $k$. 
+:::::::
+:::::
+:::
+
+
+
+
+
+
+
+
+::: {#exr-}
+The previous exercise shows that the interpolation conditions can be values of derivatives, 
+rather than a set of function values. This exercise will show that we also can have a mix of the two. 
+
+(a) Suppose that $f$ is differentiable in $x_1$, and that $x_0$, $x_1$, and $x_2$ are distinct.
+Find out if there exists a unique cubic polynomial $p_3$ so that
+\begin{align*}
+p_3(x_0)&=f(x_0), & p_3(x_1)&=f(x_1), & p_3'(x_1)&=f'(x_1), &p_3(x_2)&=f(x_2).
+\end{align*}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let us try with a cubic polynomial on the form
+$$
+p_3(x)=c_0 + c_1(x-x_0) + c_2(x-x_0)(x-x_1) + c_3(x-x_0)(x-x_1)^2.
+$$
+We have that $p_3'(x)=c_1 + c_2(2x-x_0-x_1) + c_2(x-x_1)(3x-2x_0-x_1)$, and the interpolation conditions give
+$$
+\begin{array}{cccccc}
+f(x_0) &=& c_0 &                          &                                          & \\
+f(x_1) &=& c_0 &+ c_1(x_1-x_0)  &                                          & \\
+f'(x_1) &=&       &   c_1                & + c_2(x_1-x_0)                  &  \\
+f(x_2) &=& c_0  &+ c_1(x_2-x_0) & + c_2(x_2-x_0)(x_2-x_1) & + c_3(x_2-x_0)(x_2-x_1)^2
+\end{array}
+$$
+This gives the matrix equation
+$$
+\begin{pmatrix} f(x_0) \\ f(x_1) \\ f'(x_1) \\ f(x_2) \end{pmatrix}
+=
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+1 & x_1-x_0 & 0 & 0 \\
+0 & 1 & x_1-x_0 & 0 \\
+1 & x_2-x_0 & (x_2-x_0)(x_2-x_1) & (x_2-x_0)(x_2-x_1)^2
+\end{pmatrix}
+\begin{pmatrix} c_0 \\ c_1 \\ c_2 \\ c_3 \end{pmatrix}
+$$
+Again the coefficient matrix here is lower triangular with non-zeros on the diagonal, so that it is invertible. 
+It follows that the coefficients are unique, so that the polynomial is unique.
+:::::::
+:::::
+
+(b) Can you generalise this result to cases where some of the derivatives in the interpolation points also are known?
+Can you relate this to Taylor polynomials?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Yes, it is possible to generalise this. Suppose that $f(x_i)$, $f'(x_i)$,\dots, $f^{(k-1)}$ are known.
+We have contribution from $r_n(x)(x-x_i)$, $r_n(x)(x-x_i)^2$,\dots, $r_n(x)(x-x_i)^k$,$r_n(x)(x-x_i)^ks_n(x)$,
+where $r_n$ represents the contribution from $x_0,\dots,x_{i-1}$, $s_n$ the contribution from $x_{i+1},\dots,x_n$.
+
+The value of the derivative of $r_n(x)(x-x_i)$ in $x_i$ is $r_n(x_i)$. The derivative of $r_n(x)(x-x_i)^2)$ and so in in $x_i$ is 0.
+
+The value of derivative number $k-1$ of $r_n(x)(x-x_i)^{k-1}$ is $(k-1)!r_n(x)$, which is $\neq 0$.
+
+Again we get a triangular system with nonzeros on the diagonal.
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-}
+We approximate $f(x)=e^x$ with an interpolating polynomial $p_n$ in the points 
+$$0,1/n,2/n,...,(n-1,n),1.$$
+How large must $n$ be in order for the error $|f(x)-p_n(x)|$ to be less than $0.001$ for all $x\in[0,1]$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $f^{(n+1)}(x)=e^x$, so that $M_{n+1}=e$. @eq-interpolation-error-estimate then gives that, for all $x\in[0,1]$, we have
+$$|f(x)-p_n(x)| \leq \frac{e\cdot(1-0)^{n+1}}{(n+1)!}=\frac{e}{(n+1)!}$$
+We thus demand that $\frac{e}{(n+1)!}\leq 10^{-3}$, i.e., that $(n+1)!\geq 1000e$. This can be achieved by choosing $n\geq 6$. 
+:::::::
+:::::
+:::
+
+::: {#exr-phiernull}
+Show that $\phi(t)$ in the proof for @eq-interpolation-error-estimate fulfills
+$$ \phi(x)=\phi(x_0)=\phi(x_1)=\cdots=\phi(x_n)=0$$
+:::
+
+::: {#exr-regnutQn}
+We have seen that
+$$
+Q_n(x) = (x-x_0)(x-x_1)\cdots(x-x_n)
+$$
+is central in the Newton form, and in the proof of @eq-interpolation-error-estimate. 
+In the next chapters we will differentiate and integrate this interpolating polynomial, 
+and we will therefore need to defferentiate and integrate $Q_n$ as well. 
+
+(a) Show that $Q^{(n+1)}/x)=(n+1)!$
+(b) A special case we will consider is when the $x_i$'s are a uniform partition, i.e., $x_i-x_{i-1}=h$ for all $i$. 
+Compute $\int_{x_0}^{x_2}Q_1(x)\,dx$ and $\int_{x_0}^{x_3}Q_2(x)\,dx$ when the partition is uniform.
+
+::::: {.callout-tip title='Hint' collapse="true"}
+Integration by parts will be of help here. 
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We get
+\begin{align*}
+\int_{x_0}^{x_2} (x-x_0)(x-x_1)\,dx 
+&= [\frac{1}{2}(x-x_0)^2(x-x_1)]_{x_0}^{x_2} - \frac{1}{2}\int_{x_0}^{x_2} (x-x_0)^2\,dx \\
+&= 2h^3 - \frac{8}{6}h^3 = \frac{2}{3}h^3.
+\end{align*}
+and
+\begin{align*}
+\lefteqn{\int_{x_0}^{x_3} (x-x_0)(x-x_1)(x-x_2)\,dx} \\
+&= [\frac{1}{2}(x-x_0)^2(x-x_1)(x-x_2)]_{x_0}^{x_3} - \frac{1}{2}\int_{x_0}^{x_3} (x-x_0)^2((x-x_1) + (x-x_2))\,dx \\
+&= 9h^4 - \frac{1}{6}  [(x-x_0)^3((x-x_1) + (x-x_2))]_{x_0}^{x_3} + \frac{1}{6}\int_{x_0}^{x_3} 2(x-x_0)^3\,dx \\
+&= 9h^4 -\frac{27}{2}h^4 + \frac{1}{24}[(x-x_0)^4]_{x_0}^{x_3} \\
+&=-\frac{9}{2}h^4 + \frac{27}{8}h^4 = -\frac{9}{8}h^4
+\end{align*}
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-progtriwave}
+Fill out the code below so that it generalises the code developed in @sec-trigpol. 
+```{pyodide-python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_trig_approx(f, Nvals):
+    ...
+    
+def triangle_wave(tvals, T):
+    return np.abs(t - T/2)*4/T - 1
+    
+plt.subplots(1,1)
+plot_trig_approx(triangle_wave,[5,10,20])
+plt.legend()
+plt.show()
+```
+The input should be a function `func`, and a vector `Nvals` containing different values for $N$. 
+The function and all the interpolants should all be plotted all together. 
+Run the code for the listed code for the *triangle wave*\index{Triangle wave}, and compare the resulting plot with that of the square wave
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The code can be as follows
+```{pyodide-python}
+#| autorun: true
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_trig_approx(func, Nvals):
+    freq_s = 44100
+    freq = 440
+    T= 1/freq
+    samples_per_period = int(freq_s/freq)
+    t = np.linspace(0,T,samples_per_period).reshape((-1,1))
+    f = func(t, T) # plot points
+    plt.plot( t, f, '-k', label = 'f(t)')
+    
+    for N in Nvals:
+        M=2*N+1
+        tsp = np.linspace(0,T-T/M,M).reshape((-1,1))
+        fsp = func(tsp, T) # samples from one period
+        
+        c = np.fft.fft(fsp,axis=0)/M
+        c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
+        n = np.arange(-N,N+1).reshape((1,-1))
+        p = np.real(np.exp(2*np.pi*1j*n*t/T)@c)
+        plt.plot(t, p, label=f"p(t), M={M}.")
+    
+def triangle_wave(t, T):
+    return np.abs(t - T/2)*4/T - 1
+    
+plt.subplots(1,1)
+plot_trig_approx(triangle_wave,[5,10,20])
+plt.legend()
+plt.show()
+```
+The approximations seem closer to that of the triangle wave, when compared with the case of the square wave.
+:::::::
+:::::
+:::

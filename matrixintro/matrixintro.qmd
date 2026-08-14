@@ -1,0 +1,1158 @@
+# Vectors {#sec-vektorer}
+
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+A *vector* is a collection of numbers, also called *components*, listed in a given order. 
+Vectors will be represented with lowercase letters in boldface (i.e., $\mathbf{a}, \mathbf{b}$, e.t.c.), 
+and the components with lowercase letters (i.e., $a_1,...,a_n$, where $n$ is the number of components). 
+We also write $(a_1,a_2,...,a_n)$ for the vector $\mathbf{a}$. 
+In the start we will assume that all vectors are real (i.e., have real components, so that $a_i\in\mathbb{R}$ for alle $i$). 
+The set of real vectors with $n$ components will be denoted by $\mathbb{R}^n$. 
+Later we will also study $\mathbb{C}^n$, the set of vectors with $n$ complex components. 
+
+## Creating vectors
+When creating vectors in Python square brackets are used to indicate the start and end of the vector, 
+and comma to separate the components: 
+
+```{python}
+a = np.array([2,4,6,8,10,12,14,16])
+a
+```
+
+A vector can be defined in many different ways:
+
+```{python}
+np.linspace(0,1,6)
+```
+
+More generally `np.linspace(a,b,n)` gives the vector $\left\{ a+ \frac{k(b-a)}{n-1}\right\}_{k=0}^{n-1}$, \index{python!np.linspace}
+i.e., the vector with $n$ components in increasing order from the interval $[a,b]$, where the end points $a$ and $b$ are included, 
+and distances between neighbouring points are all equal. 
+We can also create new vectors in the following ways: \index{python!np.arange}
+
+```{python}
+np.arange(1,7)
+```
+
+```{python}
+np.arange(1,7,2)
+```
+
+Python supports a *colon-notation* which can be used to extract a set of indices into a vector:
+
+* \verb|a:b| gives the vector $(a,a+1,a+2,...)$, and 
+* \verb|a:b:h| gives the vector $(a,a+h,a+2h,...)$, 
+
+where only numbers $\leq b$ are listed. $h$ thus indicates a step length. 
+Note in particular that \verb|1:6:2| does not contain the right end point 6. 
+
+If $\mathbf{a}=(a_1,a_2,...,a_n)$, and `I` is a set of non-negative indices $<n$, then `a(I)` 
+returns a vector with the values found at the indices given by `I`:
+
+```{python}
+a[0:6]
+```
+Indices start at $0$, contrary to indexing in mathematics where they start at $1$. 
+If we want to retrieve every second index in the same range of indices we can write.
+```{python}
+a[0:6:2]
+```
+There is also a special notation to extract the last part of a vector:
+
+```{python}
+a[3:]
+```
+
+\verb|3:| here means "all indices $\geq 3$". 
+Thus, you don't need to know how long the vector is, in order to extract the last part of it! 
+Note also the special syntax for extracting the last entry in a vector:
+```{python}
+a[-1]
+```
+
+::: {#exm- name='max, min, sum, and prod'}
+One can write as follows if one needs to find the maximum, minimum, sum, or product of all components in a vector: 
+\index{python!np.max} \index{python!np.min} \index{python!np.sum} \index{python!np.prod}
+```{python}
+np.max(a)
+```
+```{python}
+np.min(a)
+```
+```{python}
+np.sum(a)
+```
+```{python}
+np.prod(a)
+```
+$\clubsuit$
+:::
+
+
+## Operations on vectors
+Vector addition- and subtraction are defined *component-wise*\index{Component-wise}. 
+This means that, if $\mathbf{a}$ and $\mathbf{b}$ both are vectors with $n$ components, then
+
+* $\mathbf{a}+\mathbf{b}=(a_1+b_1,a_2+b_2,...,a_n+b_n)$,
+* $\mathbf{a}-\mathbf{b}=(a_1-b_1,a_2-b_2,...,a_n-b_n)$.
+* $t\mathbf{a}=(ta_1,ta_2,...,ta_n)$ when $t$ is a scalar. 
+
+Vector addition thus requires two vectors with the same number of components, 
+and returns a vector with the same number of components. 
+
+It is common to draw vectors as arrows starting at the origin, and ending at the point indicated by the vector. 
+But a vector can also be drawn starting at another point - it is the direction the vector points in which defines its components. 
+@fig-opsonvectors illustrates addition and subtraction of vectors. 
+Calculating $\mathbf{a}+\mathbf{b}$ corresponds to placing the vector $\mathbf{b}$ at the end of the vector $\mathbf{a}$, 
+and reading the coordinates you then get. 
+$\mathbf{a}-\mathbf{b}$ can be visualised in two ways: 
+Either by placing the vector $-\mathbf{b}$ at the end of the vector $\mathbf{a}$ (as in @fig-aplusb), 
+or by drawing the arrow which starts in $\mathbf{b}$ and ends in $\mathbf{a}$ (as in @fig-aminusb). 
+
+::: {#fig-opsonvectors layout-ncol=2}
+
+![The sum of two vectors](aplusb.pdf){#fig-aplusb}
+
+![The difference between two vectors](aminusb.pdf){#fig-aminusb}
+
+Operations on vectors.
+:::
+
+@fig-multscalar illustrates multiplication of a vector with a scalar. 
+
+![Multiplication of a vector with a scalar](multscalar.pdf){#fig-multscalar}
+
+The *Zero-vector*, written $\mathbf{0}$, is the vector where all components are $0$, i.e., $\mathbf{0}=(0,0,...,0)$. 
+It is clear that the zero-vector satisfies $\mathbf{a}+\mathbf{0}=\mathbf{a}$, and that $0\mathbf{a}=\mathbf{0}$, for all $\mathbf{a}$.
+
+::: {#exm-}
+Let $\mathbf{a}=(1,2,3)$, $\mathbf{b}=(4,5,6)$, and $t=2$. Then 
+\begin{align*}
+\mathbf{a}+\mathbf{b}&=(1,2,3)+(4,5,6) = (1+4,2+5,3+6)=(5,7,9) \\
+\mathbf{a}-\mathbf{b} &=(1,2,3)-(4,5,6) = (1-4,2-5,3-6) = (-3,-3,-3) \\
+t\mathbf{a}           &= 2(1,2,3) = (2\cdot 1,2\cdot 2,2\cdot 3) = (2,4,6).
+\end{align*} 
+This can be verified as follows:
+
+```{python}
+a = np.array([1,2,3])
+b = np.array([4,5,6])
+t = 2
+a + b
+```
+
+```{python}
+a-b
+```
+
+```{python}
+t*a
+```
+
+Note the difference between writing `a+b`, and `sum(a)`. 
+The first computes many sums of two components. The last computes one sum of many components. $\clubsuit$
+:::
+
+One often applies an operation on all components in a vector. One can do this in a loop. 
+In order to limit the number of loops, programming languages use *vectorisation*, i.e.,
+operations defined on $\mathbb{R}$ or $\mathbb{C}$ are naturally extended to vectors by applying the operation on each component. 
+Addition and subtraction of vectors, as defined above, are clearly vectorised operations.
+
+::: {#def- name='Vectorisation'}
+Suppose $f$ is a function on $\mathbb{R}$ or $\mathbb{C}$, and that $\mathbf{a}=(a_1,a_2,...,a_n)$. 
+The *vectorisation*\index{Vectorisation} of $f$ is defined by
+$$f(\mathbf{a})=\left( f(a_1),f(a_2),...,f(a_n)\right).$$
+Vectorisation of binary functions (functions in two variables) is defined similarly. As an example the vectorisations of addition, 
+taking powers, and multiplication, are
+\begin{align*}
+\mathbf{a}+\mathbf{b}&=\left( a_1 + b_1, a_2 + b_2,..., a_n + b_n\right) \\
+\mathbf{a}^\mathbf{b}&=\left( a_1^{b_1}, a_2^{b_2},..., a_n^{b_n}\right) \\
+\mathbf{a}\mathbf{b}&=\left( a_1b_1, a_2b_2,..., a_nb_n\right).
+\end{align*}
+Here both $\mathbf{a}$ and $\mathbf{b}$ are vectors with $n$ components.
+:::
+
+Addition of a vector and a scalar is also allowed. This is computed as
+$$\mathbf{a}+t=(a_1+t,a_2+t,...,a_n+t).$$
+Note that this is not defined mathematically. 
+
+```{python}
+a+t
+```
+
+::: {#exm- name='Vectorised functions'}
+Most functions in Python are vectorised: \index{python!np.sqrt}\index{python!np.abs}\index{python!np.sin}\index{python!np.cos}
+
+```{python}
+np.sqrt(np.array([1,4,9,16]))
+```
+
+```{python}
+np.abs(np.array([-2,-1,1,2]))
+```
+
+```{python}
+np.sin(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi]))
+```
+
+```{python}
+np.cos(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi]))
+```
+
+The code below verifies that the logarithm and the exponential functions are inverse functions: \index{python!np.exp} \index{python!np.log}
+
+```{python}
+np.exp(np.log(np.array([1,2,3])))
+```
+
+```{python}
+np.log(np.exp(np.array([0,1,2])))
+```
+
+$\clubsuit$
+:::
+
+::: {#exm- name='Vectorised binary functions'}
+max and min can be used in the same way as + and -, if one instead passes two arguments: \index{python!np.maximum} \index{python!np.minimum}
+```{python}
+np.maximum(a,b)
+```
+
+```{python}
+np.minimum(a,b)
+```
+In particular we have that 
+\begin{align*}
+\lefteqn{\max\left( \left(a_1,a_2,...,a_n \right),\left(b_1,b_2,...,b_n \right)\right) } \\
+&= \left( \max(a_1,b_1),\max(a_2,b_2),...,\max(a_n,b_n) \right).
+\end{align*}
+Multiplication and taking powers are also vectorised:
+
+```{python}
+a*b
+```
+
+```{python}
+a**b
+```
+
+$\clubsuit$
+:::
+
+There are many other operations which can be applied to vectors. As an example, they can be placed after one-another:\index{python!np.block}
+```{python}
+np.block([a,b])
+```
+
+Since vector addition is vectorised, vectors inherit properties from the real numbers: 
+
+::: {#prp-regneregler1}
+We have that
+
+1. $\mathbf{a}+\mathbf{b}=\mathbf{b}+\mathbf{a}$
+2. $(\mathbf{a}+\mathbf{b})+\mathbf{c}  = \mathbf{a}+(\mathbf{b}+\mathbf{c})$
+3. $s(\mathbf{a}+\mathbf{b})=s\mathbf{a} + s\mathbf{b}$
+4. $(s+t)\mathbf{a}=s\mathbf{a} + t\mathbf{a}$,
+
+where $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are vectors, and $s$ and $t$ are scalars.
+:::
+
+In the proof, and several times later, we will use the fact that $\mathbf{a}$ and $\mathbf{b}$ 
+are equal if and only if $a_i=b_i$ for all $i$. 
+ 
+::: {.proof}
+1.-3. follow directly from the properties of vectors, and those for for real numbers. 
+Let us therefore only consider 4.. 
+
+* The left side $(s+t)\mathbf{a}$ has components $(s+t)a_i$, by the definition of scalar-vector multiplication. 
+* On the right hand side $s\mathbf{a}$ has components $sa_i$, and $t\mathbf{a}$ has components $ta_i$. 
+By the definition of vector addition, the right hand side $s\mathbf{a} + t\mathbf{a}$ therefore has components $sa_i+ta_i$. 
+
+The right- and left hand sides are therefore equal if and only if $(s+t)a_i=sa_i+ta_i$ for all $i$. But this we know holds for all real numbers. 
+:::
+
+::: {#exm-linje name='Lines'}
+Let us find an expression for the line in $\mathbb{R}^n$ which passes through two given points $\mathbf{x}_1$ and $\mathbf{x}_2$. 
+This must have direction vector $\mathbf{x}_2-\mathbf{x_1}$. Since the line should pass through $\mathbf{x}_1$, 
+the expression becomes 
+$$\mathbf{y}(t)=\mathbf{x}_1+t(\mathbf{x}_2-\mathbf{x}_1)=(1-t)\mathbf{x}_1+t\mathbf{x}_2.$$
+We also see that $\mathbf{y}(0)=\mathbf{x}_1$, and $\mathbf{y}(1)=\mathbf{x}_2$. $\clubsuit$
+:::
+
+Up to now all vectors and scalars have been real, but they may just as well have been complex. 
+From now on we will also consider complex vectors and scalars. 
+The complex number $2+3i$ can be computed as 
+```{python}
+2+3j
+```
+`1j` represents the imaginary unit $i$. `3j` gives the complex number $3i$. Using `j` alone will produce an error message, unless $j$ is defined as a variable elsewhere. 
+
+
+## Length, scalar product, and projection
+The *length*\index{Length!real} of a real vector $\mathbf{a}$ is defined as 
+$$  
+|\mathbf{a}|=\sqrt{a_1^2+a_2^2+\cdots+a_n^2}.
+$$ {#eq-lengdedef}
+This is just a generalisation of length from $\mathbb{R}^2$ and $\mathbb{R}^3$. 
+In particular we have that $|\mathbf{a}|\geq 0$, and $|\mathbf{a}|=0$ if and only if $\mathbf{a}=\mathbf{0}$.
+
+If $\mathbf{a},\mathbf{b}\in\mathbb{R}^n$ we define the *real scalar product*\index{Scalar product!real} $\mathbf{a}\cdot\mathbf{b}$ by 
+$$
+\mathbf{a}\cdot\mathbf{b}=a_1b_1+a_2b_2+\cdots+a_nb_n.
+$$ {#eq-skalarproduktdef}
+We say that $\mathbf{a}$ and $\mathbf{b}$ are *orthogonal*\index{Orthogonal} if $\mathbf{a}\cdot\mathbf{b}=0$. 
+
+::: {#exm-}
+The lengths of the vectors $\mathbf{a}=(1,-4,9)$ and $\mathbf{b}=(2,3,-6)$ are
+\begin{align*} |\mathbf{a}| &= \sqrt{1^2+(-4)^2+9^2}=\sqrt{1+16+81}=\sqrt{98}=7\sqrt{2} \\
+|\mathbf{b}| &= \sqrt{2^2+3^2+(-6)^2}=\sqrt{4+9+36} = 7. \end{align*}
+The scalar product of the two is 
+$$\mathbf{a}\cdot\mathbf{b} = (1,-4,9)\cdot(2,3,-6)=1\cdot 2 + (-4)\cdot 3 + 9\cdot(-6)=2 - 12 -54 =-64.$$
+$\clubsuit$
+:::
+
+We have the following result
+
+::: {#prp-regneregler2 name="Properties of the scalar product"}
+For all vectors $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$ in $\mathbb{R}^n$, and scalars $s$, we have that
+
+1. $\mathbf{a}\cdot\mathbf{a} = |\mathbf{a}|^2$,
+2. $\mathbf{a}\cdot\mathbf{b}=\mathbf{b}\cdot\mathbf{a}$,
+3. $\mathbf{c}\cdot(\mathbf{a}+\mathbf{b})=\mathbf{c}\cdot\mathbf{a}+\mathbf{c}\cdot\mathbf{b}$ and $(\mathbf{a}+\mathbf{b})\cdot\mathbf{c}=\mathbf{a}\cdot\mathbf{c}+\mathbf{b}\cdot\mathbf{c}$,
+4. $(s\mathbf{a})\cdot\mathbf{b}=\mathbf{a}\cdot(s\mathbf{b})=s(\mathbf{a}\cdot\mathbf{b})$
+
+:::
+
+::: {.proof}
+1.-3. follow directly from the laws of real numbers, and are given as an exercise. 4. can be proved as follows:
+\begin{align*}
+(s\mathbf{a})\cdot\mathbf{b} &= (sa_1,...,sa_n)\cdot(b_1,...,b_n) = sa_1b_1+ \cdots sa_nb_n \\
+\mathbf{a}\cdot(s\mathbf{b}) &= (a_1,...,a_n)\cdot(sb_1,...,sb_n) = sa_1b_1+ \cdots sa_nb_n \\
+s(\mathbf{a}\cdot\mathbf{b}) &= s\left( a_1b_1+\cdots + a_nb_n\right) = sa_1b_1+ \cdots sa_nb_n
+\end{align*}
+where we again used the laws of real numbers. 
+:::
+
+One can also show the other way that the scalar product is the only function in two variables ($\mathbf{a}$ and $\mathbf{b}$) 
+which satisfies 1.-3 (see @exr-scalarprodunique). 
+
+::: {#exm-plan name='Planes'}
+Let us also find an expression for the plane passing through a given point $(x_0,y_0,z_0)$, 
+and which is orthogonal to a given vector $\mathbf{n}=(a,b,c)$. 
+$(x,y,z)$ lies in this plane if and only if $(x,y,z)-(x_0,y_0,z_0)$ is orthogonal to $\mathbf{n}$, see @fig-planirommet.
+
+![A plane with a given normal vector and point.](planirommet.pdf){#fig-planirommet}
+
+This is the same as
+\begin{align*}
+0&=((x,y,z)-(x_0,y_0,z_0))\cdot \mathbf{n} \\
+  &=(x-x_0,y-y_0,z-z_0)\cdot(a,b,c) \\
+  &=a(x-x_0)+b(y-y_0)+c(z-z_0).
+\end{align*}
+The expression for the plane is therefore
+$$ax+by+cz = d,$$
+where $d=ax_0+by_0+cz_0$. $\clubsuit$
+:::
+
+ 
+Let us now define length and scalar product for complex vectors. 
+For length the definition given by @eq-lengdedef will not work, as this gives complex numbers when $\mathbf{a}$ is complex 
+(we want length to be a real number). Instead we define \index{Length!complex}
+$$ 
+|\mathbf{a}|=\sqrt{|a_1|^2+|a_2|^2+\cdots+|a_n|^2},
+$$ {#eq-lengdedef2}
+which reduces to the definition given by @eq-lengdedef when $\mathbf{a}$ is real.
+Inside the square root here we take lengths of complex numbers, so that the result becomes $\geq 0$, and $0$ only when $\mathbf{a}=\mathbf{0}$. 
+The length of a vector can be computed as follows.\index{python!np.linalg,norm}
+
+```{python}
+a=np.array([3,4])
+np.linalg.norm(a)
+```
+
+This can also be computed as follows
+
+```{python}
+np.sqrt(np.sum(np.abs(a)**2))
+```
+
+Here four operations are combined. With $\mathbf{a}=(a_1,a_2,...,a_n)$, these are, in the following order:
+
+1. $(|a_1|,|a_2|,...,|a_n|)$ (vectorised absolute value),
+2. $(|a_1|^2,|a_2|^2,...,|a_n|^2)$ (vectorised power),
+3. $|a_1|^2+|a_2|^2+\cdots+|a_n|^2$,
+4. $\sqrt{|a_1|^2+|a_2|^2+\cdots+|a_n|^2}$.
+
+The two last operations are not vectorised, as they return a scalar. 
+
+Let us now define the complex scalar product. As for the real scalar product we want 
+$$\mathbf{a}\cdot\mathbf{a}=|\mathbf{a}|^2=a_1\overline{a_1}+\cdots+a_n\overline{a_n}.$$
+It is clear that @eq-skalarproduktdef will not work for the complex case, as this will not capture the conjugation here. 
+Let us instead define \index{Scalar product!complex}
+$$
+\mathbf{a}\cdot\mathbf{b}=a_1\overline{b_1}+\cdots+a_n\overline{b_n},
+$$ {#eq-skalarproduktdef2}
+since this will be compatible with the expression of length when $\mathbf{a}=\mathbf{b}$. We have the following result.
+
+::: {#prp-}
+For all vectors $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$ in $\mathbb{C}^n$, and $s\in\mathbb{C}$, we have that
+
+1. $\mathbf{a}\cdot\mathbf{a} = |\mathbf{a}|^2$,
+2. $\mathbf{a}\cdot\mathbf{b}=\overline{\mathbf{b}\cdot\mathbf{a}}$,
+3. $\mathbf{c}\cdot(\mathbf{a}+\mathbf{b})=\mathbf{c}\cdot\mathbf{a}+\mathbf{c}\cdot\mathbf{b}$ and $(\mathbf{a}+\mathbf{b})\cdot\mathbf{c}=\mathbf{a}\cdot\mathbf{c}+\mathbf{b}\cdot\mathbf{c}$,
+4. $(s\mathbf{a})\cdot\mathbf{b}=s(\mathbf{a}\cdot\mathbf{b})$ and $\mathbf{a}\cdot(s\mathbf{b})=\overline{s}(\mathbf{a}\cdot\mathbf{b})$,
+
+when $\mathbf{a}\cdot\mathbf{b}$ is defined by @eq-skalarproduktdef2.
+:::
+
+::: {.proof}
+
+1. is clear. 
+2. follows from that $a\overline{b}=\overline{b\overline{a}}$ for all complex numbers $a$ and $b$. 
+3. follows as before. 
+4. follows from that $(sa)\overline{b}=s(a\overline{b})$ and $a\overline{sb}=\overline{s}a\overline{b}$ when $a,b,s\in\mathbb{C}$. 
+
+:::
+
+::: {#exm-}
+Consider the vectors $\mathbf{a}=(2i,1+i,3)$ and $\mathbf{b}=(1+2i,-1,2-i)$. 
+For the components we first compute 
+\begin{align*}
+|2i|^2&=4 &  |1+i|^2&=2 & |3|^2&=9 & |1+2i|^2&= 5 & |-1|^2&=1 & |2-i|^2&=5
+\end{align*}
+The lengths of $\mathbf{a}$ and $\mathbf{b}$ are thus
+\begin{align*} 
+|\mathbf{a}| &= \sqrt{|2i|^2+|1+i|^2+3^2}=\sqrt{4+2+9}=\sqrt{15} \\
+|\mathbf{b}| &= \sqrt{|1+2i|^2+(-1)^2+|2-i|^2}=\sqrt{5+1+5} = \sqrt{11} \end{align*}
+and the scalar product of the two is
+\begin{align*}
+\mathbf{a}\cdot\mathbf{b} &= (2i,1+i,3)\cdot(1+2i,-1,2-i) \\
+&=2i\left(\overline{1+2i}\right) + (1+i)\overline{-1} + 3\left(\overline{2-i}\right)\\
+&=2i(1-2i) - (1+i) + 3(2+i) \\
+&= 2i+4-1-i+6+3i=9+4i.
+\end{align*}
+You get the complex scalar product by writing `np.vdot(a,b)`\index{python!np.vdot}, but here there is a small difference:
+
+```{python}
+a = np.array([2j,1+1j,3])
+b = np.array([1+2j,-1,2-1j])
+np.vdot(a,b)
+```
+
+So here a slightly different definition is used than @eq-skalarproduktdef2. 
+`np.vdot` actually computes the complex scalar product of $\mathbf{a}$ and $\mathbf{b}$ as 
+$\overline{a_1}b_1+\cdots+\overline{a_n}b_n$, as is easily checked:\index{python!np.conj}
+
+```{python}
+np.sum(np.conj(a)*b)
+```
+These two competing definitions of the complex scalar product stem from different science traditions: 
+In the mathematics literature it is usual to conjugate the second vector, while in the physics literature it is common to conjugate the first vector. `np.vdot` thus follows the literature in physics.
+$\clubsuit$
+:::
+
+If $\mathbf{a}$ and $\mathbf{b}$ are orthogonal a simple calculation gives
+\begin{align*}
+|\mathbf{a}+\mathbf{b}|^2 &= (\mathbf{a}+\mathbf{b})\cdot(\mathbf{a}+\mathbf{b})=\mathbf{a}\cdot\mathbf{a}+\mathbf{a}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{a}+\mathbf{b}\cdot\mathbf{b}=|\mathbf{a}|^2 + |\mathbf{b}|^2,
+\end{align*}
+where we used that $\mathbf{b}\cdot\mathbf{a}=\overline{\mathbf{a}\cdot\mathbf{b}}=\overline{0}=0$.
+It follows that $|\mathbf{a}+\mathbf{b}|^2=|\mathbf{a}|^2 + |\mathbf{b}|^2$. If we in particular set
+\begin{align*}
+n&=2 &\mathbf{a}&=(a,0) & \mathbf{b}&=(0,b) & \mathbf{c}&=\mathbf{a}+\mathbf{b}=(a,b),
+\end{align*}
+this says that $c^2=a^2+b^2$, where $a,b,c$ are the lengths of $\mathbf{a},\mathbf{b},\mathbf{c}$. 
+Since $a$ and $b$ are legs, and $c$ hypotenuse in a right-angled triangle, 
+we have shown a generalisation of Pythagoras theorem to $n$ dimensions!
+
+We say that two non-zero vectors $\mathbf{a}$ and $\mathbf{b}$ are *parallel* if $\mathbf{a}=s\mathbf{b}$ for some scalar $s$. 
+Let $\mathbf{a}$ and $\mathbf{b}$ be vectors, where $\mathbf{b}\neq 0$. 
+Intuition says that the closest point to $\mathbf{a}$ on the line between $\mathbf{0}$ and $\mathbf{b}$ 
+is obtained by drawing the normal from that point down to the line (see @fig-proj). 
+The next proposition says that the point obtained by following the normal vector is unique.
+
+
+
+
+::: {#prp-projres1 name='Orthogonal decomposition theorem'}
+Suppose $\mathbf{a},\mathbf{b}$ are vectors, where $\mathbf{b}\neq 0$. 
+$\mathbf{p}=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is the unique point on 
+the line between $\mathbf{0}$ and $\mathbf{b}$ so that
+$\mathbf{a}-\mathbf{p}$ and $\mathbf{p}$ are orthogonal. 
+:::
+
+We also write $\text{proj}_\mathbf{b}(\mathbf{a})$ for $\mathbf{p}=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$, 
+and call this the *projection* \index{Projection} of $\mathbf{a}$ onto $\mathbf{b}$. 
+The decomposition 
+$$
+\mathbf{a} = \frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} + \left(\mathbf{a}-\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}\right) 
+$$ {#eq-ortdekomp}
+thus splits $\mathbf{a}$ in a sum where one vector is parallel to $\mathbf{b}$, and the other orthogonal to $\mathbf{b}$. 
+This is also called an *orthogonal decomposition*.
+
+::: {.proof}
+That $\mathbf{p}=c\mathbf{b}$ is orthogonal to $\mathbf{a}-c\mathbf{b}$ reads that
+$$
+0 = (\mathbf{a}-c\mathbf{b})\cdot \mathbf{b} = \mathbf{a}\cdot\mathbf{b} - c|\mathbf{b}|^2,
+$$
+which is equivalent to $c=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}$, so that 
+$\mathbf{p}=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$. 
+:::
+
+To see that $\mathbf{p}$ also is the unique point on the line between $\mathbf{0}$ and $\mathbf{b}$ closest to $\mathbf{a}$, for $s\in\mathbb{C}$ write
+$$
+|\mathbf{a}-s\mathbf{b}|^2 = \left| (\mathbf{a} - \mathbf{p}) + ( \mathbf{p} -s\mathbf{b} ) \right|^2
+= \left| \mathbf{a} - \mathbf{p} \right|^2 + \left| \mathbf{p} - s\mathbf{b} \right|^2
+\geq \left| \mathbf{a} - \mathbf{p} \right|^2, 
+$$
+where we used Pythagoras theorem. 
+Thus, $\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is the unique point on the line which is closest to $\mathbf{a}$. 
+This result is also called the *best approximation theorem*. 
+
+
+
+
+
+$\text{proj}_\mathbf{b}(\mathbf{a})$ can be computed as follows
+
+```{python}
+np.vdot(b,a)*b/np.linalg.norm(b**2)
+```
+
+Note that the order of $\mathbf{a}$ and $\mathbf{b}$ has been changed inside the scalar product here. 
+Do you see why? 
+
+We see that $|\text{proj}_\mathbf{b}(\mathbf{a})|=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|}$. 
+From the proof above it follows that we also can write
+$$\mathbf{a}=\left(\mathbf{a}-\text{proj}_\mathbf{b}(\mathbf{a})\right) + \text{proj}_\mathbf{b}(\mathbf{a}),$$
+where the two vectors on the right side are orthogonal. 
+Thus, by using projections we can write $\mathbf{a}$ as a sum av two vectors: 
+one orthogonal to $\mathbf{b}$, and one parallel with $\mathbf{b}$.
+This is also called an *orthogonal decomposition*.
+
+
+
+::: {#exm-}
+Let $\mathbf{a}=(10,5)$, and $\mathbf{b}=(2,4)$. Then 
+\begin{align*} |\mathbf{b}|^2&=4+16=20 & \mathbf{a}\cdot\mathbf{b}&=20+20=40,\end{align*}
+so that
+$$\text{proj}_\mathbf{b}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}= \frac{40}{20}(2,4)=(4,8).$$
+We also get 
+$$\mathbf{a}-\text{proj}_\mathbf{b}(\mathbf{a}) = (10,5)-(4,8)=(6,-3).$$
+Therefore we have that
+$$(10,5)=(4,8)+(6,-3)$$
+is an orthogonal decomposition of $(10,5)$ into a vector orthogonal to $\mathbf{b}$, and one parallel with $\mathbf{b}$.
+$\clubsuit$
+:::
+
+@fig-proj illustrates projection in $\mathbb{R}^2$. The closest point to $\mathbf{a}$ on the line through $\mathbf{b}$ and the origin
+is obtained by drawing the line orthogonal to $\mathbf{b}$. 
+
+![Projection of the vector $\mathbf{a}$ onto the vector $\mathbf{b}$ in the plane.](projab.pdf){#fig-proj}
+
+From the figure it is also clear that 
+$$\frac{\left|\text{proj}_\mathbf{b}(\mathbf{a})\right| }{|\mathbf{a}|}=\cos\theta,$$
+where $\theta$ is the angle between $\mathbf{a}$ and $\mathbf{b}$. 
+If we here insert $\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ for $\text{proj}_\mathbf{b}(\mathbf{a})$ 
+we get after some computation that 
+$\left|\mathbf{a}\cdot\mathbf{b}\right| = |\mathbf{a}||\mathbf{b}|\cos\theta$, which is a formula known to most of us.
+From this formula we can deduce several known trigonometric identities. As an example, 
+with $\mathbf{a}=(\cos\theta_1,\sin\theta_1)$, $\mathbf{b}=(\cos\theta_2,\sin\theta_2)$, we have that
+\begin{align*}
+\mathbf{a}\cdot\mathbf{b}&=\cos\theta_1\cos\theta_2+\sin\theta_1\sin\theta_2 & |\mathbf{a}|&= 1 & |\mathbf{b}| &= 1.
+\end{align*}
+Since also the angle between $\mathbf{a}$ and $\mathbf{b}$ is $\theta=\theta_2-\theta_1$, insertion in 
+$\left|\mathbf{a}\cdot\mathbf{b}\right| = |\mathbf{a}||\mathbf{b}|\cos\theta$ therefore gives 
+$$\cos(\theta_2-\theta_1)=\cos\theta_1\cos\theta_2+\sin\theta_1\sin\theta_2,$$
+so that we have deduced the known formula for the cosine of a difference of two vectors. 
+
+From $\left|\mathbf{a}\cdot\mathbf{b}\right| = |\mathbf{a}||\mathbf{b}|\cos\theta$ above it also follows that 
+$\left|\mathbf{a}\cdot\mathbf{b}\right| \leq |\mathbf{a}||\mathbf{b}|$, at least for vectors in the plane. 
+This inequality turns out to hold more generally. To see this we will use Pythagoras theorem on the orthogonal decomposition 
+given by @eq-ortdekomp, which gives
+$$
+|\mathbf{a}|^2 = 
+|\mathbf{a}-\text{proj}_\mathbf{b}(\mathbf{a})|^2 + |\text{proj}_\mathbf{b}(\mathbf{a})|^2 \geq  |\text{proj}_\mathbf{b}(\mathbf{a})|^2.
+$$ {#eq-naarlikhether}
+Taking square roots on each side we get
+$$|\mathbf{a}|\geq |\text{proj}_\mathbf{b}(\mathbf{a})| = \left|\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}\right|=\left|\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\right| |\mathbf{b}| = \frac{|\mathbf{a}\cdot\mathbf{b}|}{|\mathbf{b}|}.$$
+Multiplying up we get the following result.
+
+::: {#prp- name="Schwarz' inequality"} 
+We have that $|\mathbf{a}\cdot\mathbf{b}|\leq|\mathbf{a}||\mathbf{b}|$ 
+for all vectors $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$. \index{Schwarz' inequality}
+We have equality if and only if either $\mathbf{a}$ or $\mathbf{b}$ are parallel, or at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$. 
+:::
+
+Let us comment on how one can find the requirements for equality in Schwarz' inequality. 
+Because of @eq-naarlikhether this can occur only when $\text{proj}_\mathbf{b}(\mathbf{a})=\mathbf{a}$. 
+If $\mathbf{a},\mathbf{b}\neq\mathbf{0}$ it is clear that this is the case only when $\mathbf{a}$ and $\mathbf{b}$ are parallel. 
+Finally, equality in Schwarz' inequality when either $\mathbf{a}$ or $\mathbf{b}$ is $\mathbf{0}$ is obvious.
+
+An immediate consequence of Schwarz' inequality is the *triangle inequality*.
+
+::: {#prp- name='The triangle inequality'} 
+We have that \index{Triangle inequality} $|\mathbf{a}+\mathbf{b}|\leq|\mathbf{a}|+|\mathbf{b}|$ for all vectors $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$. 
+We have equality if and only if either $\mathbf{a}=s\mathbf{b}$ for an $s>0$, or at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$. 
+:::
+
+The obvious interpretation of the triangle inequality is that "the shortest way between two points is a straight line". 
+This we see by comparing the distance from the origin to $\mathbf{a}+\mathbf{b}$, with the distance obtained by going to 
+$\mathbf{a}+\mathbf{b}$ by first following the vector $\mathbf{a}$, and then the vector $\mathbf{b}$ (see @fig-opsonvectors (a) again). 
+
+::: {.proof}
+We have that
+\begin{align*}
+|\mathbf{a}+\mathbf{b}|^2 &= |\mathbf{a}|^2 + \mathbf{a}\cdot\mathbf{b} + \mathbf{b}\cdot\mathbf{a} + |\mathbf{b}|^2 = |\mathbf{a}|^2 + 2\Re(\mathbf{a}\cdot\mathbf{b}) + |\mathbf{b}|^2 \\
+&\leq |\mathbf{a}|^2 + 2|\mathbf{a}\cdot\mathbf{b}| + |\mathbf{b}|^2 \leq |\mathbf{a}|^2 + 2|\mathbf{a}||\mathbf{b}| + |\mathbf{b}|^2 = (|\mathbf{a}|+|\mathbf{b}|)^2, 
+\end{align*}
+where we used Schwarz' inequality. The result now follows by taking square roots. 
+
+To obtain equality we first must have equality in Schwarz' inequality, i.e., $\mathbf{a}$ and $\mathbf{b}$ are parallel, 
+or at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$. 
+If at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$, we see that we also have equality in the other inequality, 
+and then there is also equality in the triangle inequality. 
+Suppose now that $\mathbf{a}$ and $\mathbf{b}$ are parallel and both $\neq \mathbf{0}$. We have equality in 
+the other inequality if and only if $|\mathbf{a}\cdot\mathbf{b}|  = \Re(\mathbf{a}\cdot\mathbf{b})$. 
+But then $\mathbf{a}\cdot\mathbf{b}$ must be real and positive. 
+Since $\mathbf{b}=s\mathbf{a}$ we get that $\mathbf{a}\cdot\mathbf{b}=\overline{s}|\mathbf{a}|^2$. It follows that $s>0$. 
+:::
+
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+## Addition of vectors
+
+Let 
+$$
+\begin{aligned}
+\mathbf{x} &= \begin{pmatrix}3i \\ 2+i \\ 3-i \end{pmatrix} & 
+\mathbf{y} &= \begin{pmatrix} 1-2i \\ 2-3i \\ 2+4i \end{pmatrix}
+\end{aligned}.
+$$ 
+$i\mathbf{x}+3\mathbf{y}$ is then
+
+> We have that
+$$
+\begin{aligned}
+i\mathbf{x}+3\mathbf{y} &= i \begin{pmatrix} 3i \\ 2+i \\ 3-i \end{pmatrix} + 3\begin{pmatrix} 1-2i \\ 2-3i \\ 2+4i \end{pmatrix} 
+= \begin{pmatrix} -3 \\ -1+2i \\ 1+3i \end{pmatrix} + \begin{pmatrix} 3-6i \\ 6-9i \\ 6+12i\end{pmatrix} \\
+&= \begin{pmatrix} -3+3-6i \\ -1+2i+6-9i \\ 1+3i+6+12i \end{pmatrix} = \begin{pmatrix} -6i \\ 5-7i \\ 7+15i\end{pmatrix}.
+\end{aligned}
+$$
+
+1. [ ] $$\begin{pmatrix}2-5i \\ 3+4i \\ 6+14i \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} -6i \\ 6+6i \\ 6+12i \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 6i \\ 2+6i \\ 2+5i \end{pmatrix}$$
+1. [x] $$\begin{pmatrix} -6i \\ 5-7i \\ 7+15i \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 1+i \\ 3-2i \\ 6+10i \end{pmatrix}$$ 
+
+
+## Scalar product
+
+Let 
+$$
+\begin{aligned}
+\mathbf{x} &= \begin{pmatrix}1\\-2\\5\end{pmatrix} &
+\mathbf{y} &= \begin{pmatrix}-3\\2\\-5\end{pmatrix}. 
+\end{aligned}
+$$
+The scalar product $\mathbf{x}\cdot\mathbf{y}$ is then
+
+> We have that 
+$$
+\begin{pmatrix} 1 \\ -2 \\ 5 \end{pmatrix}\cdot\begin{pmatrix} -3 \\ 2 \\ -5\end{pmatrix} 
+= 1\cdot(-3) + (-2)\cdot 2 +5\cdot(-5) = -3-4-25 =-32.
+$$
+
+1. [ ] $40$
+1. [ ] $-31$
+1. [ ] $-34$
+1. [ ] $32$
+1. [x] $-32$
+
+
+
+
+## Projection
+
+Let $\mathbf{a}=(4,3,2)$ and $\mathbf{b}=(-1,-4,-1)$. Then the projection of $\mathbf{a}$ onto $\mathbf{b}$ is
+
+1. [ ] $(-1,-4,-1)$
+1. [ ] $(-2,-8,-2)$
+1. [x]  $(1,4,1)$
+1. [ ] $(2,8,2)$
+1. [ ] $(1,-1,7)$
+
+
+## Orthogonality
+
+Which of the following (sets of) vectors are orthogonal
+
+- [ ] $\mathbf{a}=(1,2)$ and $\mathbf{b}=(2,1)$
+- [x] $\mathbf{a}=(1,2)$ and $\mathbf{b}=(-2,1)$
+- [x] $\mathbf{a}=(1,2,-1)$ and $\mathbf{b}=(2,3,8)$
+- [ ] $\mathbf{a}=(1,4,8)$, $\mathbf{b}=(-4,1,0)$, and $\mathbf{c}=(0,0,1)$
+> $\mathbf{a}$ and $\mathbf{b}$ are orthogonal, and $\mathbf{b}$ and $\mathbf{c}$ are orthogonal. But $\mathbf{a}$ and $\mathbf{c}$ are not orthogonal, so that the set of three vectors is not orthogonal as a whole.
+- [ ] $\mathbf{a}=(1+i,1-i)$ and $\mathbf{b}=(-1+i,1+i)$.
+> the scalar product is $(1+i)(-1-i)+(1-i)(1-i)=-(1+i)^2+(1-i)^2=-4i\neq 0$
+
+## Orthogonal decomposition
+
+An orthogonal decomposition of $(-7,6)$ is 
+
+1. [ ] $(2,4)+(-4,2)$
+> the two vectors are orthogonal, but they do not sum to $(-7,6)$.
+1. [ ] $(3,-4)+(-3,-4)$
+> The two vectors are neither ortogonal, nor sum to $(-7,6).
+1. [ ] $(-1,6)+(6,1)$
+> the two vectors are orthogonal, but they do not sum to $(-7,6)$.
+1. [ ] $(-4,3)+(-3,3)$
+> the two vectors sum to $(-7,6)$, but the scalar product of the two is $12+9=21$, so this is not an orthogonal decomposition.
+1. [x] $(-8,2)+(1,4)$
+> the two vectors sum to $(-7,6)$, and the scalar product of the two vectors is $-8+8=0$, so this gives an orthogonal decomposition.
+
+## Length of a vector
+
+The vector $\mathbf{a}=(1+i,1-i,3+i)$ has length
+
+> The length is $\sqrt{(1+i)(1-i)+(1-i)(1+i)+(3+i)(3-i)}=\sqrt{2+2+9+1}=\sqrt{14}$.
+
+1. [ ] $4$
+1. [ ] $1$
+1. [x] $\sqrt{14}$
+1. [ ] $\sqrt{12}$
+1. [ ] $3$
+
+## Parametrisation of a line
+
+The line in $\mathbb{R}^3$ passing through the points $(1,3,0)$ and $(2,-4,1)$ also passes through the point
+
+> The direction vector of the line is $(1,-7,1)$, so that a parametrisation of the line is 
+$\mathbf{y}(t)=t(1,-7,1) + (1,3,0)=(t+1,-7t+3,t)$.
+
+- [ ] $(0,1,0)$
+> Does not have a matching value for $t$
+- [x] $(4,-18,3)$
+> Setting $t=3$ gives this point 
+- [ ] $(2,4,3)$
+> Does not have a matching value for $t$
+- [x] $(0,10,-1)$
+> Setting $t=-1$ gives this point
+- [ ] $(-1,2,-1)$
+> Does not have a matching value for $t$
+
+## Parametrisation of a plane
+
+The plane through the point $(1,2,1)$ with normal vector $(2,1,-1)$ has equation 
+
+1. [ ] $2x+y-z=2$
+1. [ ] $2x+y-z=1$
+1. [ ] $2x+y-z=4$
+1. [x] $2x+y-z=3$
+1. [ ] $2x+y-z=5$
+
+
+## Python code
+
+What will the following Python code return:
+
+~~~python
+a=np.array([1,3,-2,8,-1])
+np.max(a)-np.min(a)
+~~~
+
+1. [ ] $8$
+1. [x] $10$ 
+1. [ ] $3$
+1. [ ] $0$
+1. [ ] An error
+
+
+## Python code
+
+The Python code
+~~~python
+a=np.arange(0,20)
+a[1::2]
+~~~
+returns an array with the numbers
+
+1. [ ] $0,1,2,3,4,5,6,7,8,9$
+1. [ ] $0,2,4,6,8,10,12,14,16,18$.
+1. [x] $1,3,5,7,9,11,13,15,17,19$.
+1. [ ] $10,11,12,13,14,15,16,17,18,19$.
+1. [ ] $1,2$
+
+
+## Python code
+
+The code 
+~~~python
+2j*np.array([1j-1,1j+1,3]) - 3*np.array([2,2-1j,3+1j])
+~~~
+returns
+
+1. [ ] $$\begin{pmatrix}-7-i\\-7+5i\\-8+3i\end{pmatrix}$$
+1. [ ] $$\begin{pmatrix}-2-3i\\-6+5i\\-7+2i\end{pmatrix}$$
+1. [x] $$\begin{pmatrix}-8-2i\\-8+5i\\-9+3i\end{pmatrix}$$
+1. [ ] $$\begin{pmatrix}-7-3i\\-4+6i\\-8+2i\end{pmatrix}$$
+1. [ ] $$\begin{pmatrix}-1-i\\-7+4i\\-8+2i\end{pmatrix}$$
+
+```
+:::
+
+## Exercises {.unnumbered}
+
+::: {#exr-}
+Compute
+
+(a) $\begin{pmatrix}2 \\ 1 \\ 4\end{pmatrix} + 3\begin{pmatrix} -1 \\ -4 \\ 3\end{pmatrix}$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$
+\begin{aligned}
+\begin{pmatrix}2 \\ 1 \\ 4\end{pmatrix} + 3\begin{pmatrix} -1 \\ -4 \\ 3\end{pmatrix}
+&= \begin{pmatrix}2 \\ 1 \\ 4\end{pmatrix} + \begin{pmatrix} 3\cdot(-1) \\ 3\cdot(-4) \\ 3\cdot 3\end{pmatrix}
+= \begin{pmatrix}2 \\ 1 \\ 4\end{pmatrix} + \begin{pmatrix} -3 \\ -12 \\ 9 \end{pmatrix}
+= \begin{pmatrix} 2-3 \\ 1-12 \\ 4+9 \end{pmatrix}\\
+&= \begin{pmatrix} -1 \\ -11 \\ 13 \end{pmatrix}
+\end{aligned}
+$$
+```{python}
+np.array([2,1,4]) + 3*np.array([-1,-4,3])
+```
+:::::::
+:::::
+
+(b) $\begin{pmatrix}-i \\ -1 \\ 3\end{pmatrix} + i\begin{pmatrix} -i \\ 2 \\ 2\end{pmatrix}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$
+\begin{aligned}
+\begin{pmatrix}-i \\ -1 \\ 3\end{pmatrix} + i\begin{pmatrix} -i \\ 2 \\ 2\end{pmatrix}
+&= \begin{pmatrix}-i \\ -1 \\ 3\end{pmatrix} + \begin{pmatrix} i\cdot(-i) \\ i\cdot 2 \\ i\cdot 2\end{pmatrix}
+= \begin{pmatrix}-i \\ -1 \\ 3\end{pmatrix} + \begin{pmatrix} 1 \\ 2i \\ 2i \end{pmatrix}
+= \begin{pmatrix} -i + 1 \\ -1 + 2i \\ 3 + 2i\end{pmatrix} \\
+&= \begin{pmatrix} 1 - i \\ -1 + 2i \\ 3 + 2i\end{pmatrix}.
+\end{aligned}
+$$
+```{python}
+np.array([-1j,-1,3]) + 1j*np.array([-1j,2,2])
+```
+:::::::
+:::::
+
+{{< include ../_pythontestfield.qmd >}}
+:::
+
+::: {#exr-}
+Find 
+
+(a) a parametrisation of the line going through the two points $(1,1,1)$ and $(2,4,3)$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The line can be parametrised by
+$$\mathbf{y}(t)=(1-t)\begin{pmatrix}1\\1\\1\end{pmatrix}+t\begin{pmatrix}2\\4\\3\end{pmatrix}
+= \begin{pmatrix}1-t\\1-t\\1-t\end{pmatrix} + \begin{pmatrix} 2t \\ 4t \\ 3t\end{pmatrix}
+= \begin{pmatrix} 1+t \\ 1+3t \\ 1+2t \end{pmatrix}.
+$$
+:::::::
+:::::
+
+(b) an expression for the plane going through $(3,-1,-1)$ which is orthogonal to $(1,1,1)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The plane consists of all points $(x,y,z)$ so that $(x,y,z)-(3,-1,-1)$ is orthognal to $(1,1,1)$, meaning that 
+$$
+\begin{aligned}
+0&=\left(\begin{pmatrix}x\\y\\z\end{pmatrix}-\begin{pmatrix}3\\-1\\-1\end{pmatrix}\right)\cdot\begin{pmatrix}1\\1\\1\end{pmatrix}=\begin{pmatrix}x-3 \\ y+1 \\ z+1\end{pmatrix}\cdot\begin{pmatrix}1\\1\\1\end{pmatrix} \\
+  &= x-3+y+1+z+1=x+y+z-1.
+\end{aligned}
+$$
+The plane therefore consists of all points so that $x+y+z=1$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Compute the lengths of the vectors 
+
+(a) $(3,4,5)$ 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+\begin{align*}
+|(3,4,5)|&=\sqrt{3^2+4^2+5^2}=\sqrt{9+16+25}=\sqrt{50} = 5\sqrt{2}
+\end{align*}
+```{python}
+np.linalg.norm(np.array([3,4,5]))
+```
+:::::::
+:::::
+
+(b) $(i,-i,1,-1)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+\begin{align*}
+|(i,-i,1,-1)|&=\sqrt{|i|^2+|-i|^2+|1|^2+|-1|^2} \\
+&= \sqrt{1^2+(-1)^2+1+1} = \sqrt{4}=2.
+\end{align*}
+```{python}
+np.linalg.norm(np.array([1j,-1j,1,-1]))
+```
+:::::::
+:::::
+
+
+{{< include ../_pythontestfield.qmd >}}
+
+:::
+
+::: {#exr-}
+Compute the scalar product of
+
+(a) $(-1,2,4)$ and $(3,3,-1)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$(-1,2,4)\cdot(3,3,-1) = -1\cdot 3 +2\cdot 3 + 4\cdot(-1) = -3+6-4=-1.$$
+:::::::
+:::::
+
+(b) $(-i,2,3+i)$ and $(2-i,-4i,-2)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+\begin{align*}
+(-i,2,3+i)\cdot(2-i,-4i,-2)&=-i\cdot\overline{2-i} + 2\cdot(\overline{-4i})+(3+i)\cdot(\overline{-2}) \\
+&=-i(2+i) + 2\cdot(4i) + (3+i)\cdot(-2)\\
+&=-2i+1+8i-6-2i=-5+4i.
+\end{align*}
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+
+(a) Compute the projection of the vector $\mathbf{a}=(1,2,4)$ onto $\mathbf{b}=(2,4,2)$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We compute
+\begin{align*}
+\mathbf{a}\cdot\mathbf{b}&=(1,2,4)\cdot(2,4,2)=2+8+8=18 \\
+|\mathbf{b}|^2 &= 2^2+4^2+2^2=4+16+4=24
+\end{align*}
+We therefore get 
+$$\text{proj}_\mathbf{b}\mathbf{a}=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}=\frac{18}{24}\begin{pmatrix}2\\4\\2\end{pmatrix}
+=\begin{pmatrix} 3/2\\3\\3/2\end{pmatrix}.$$
+:::::::
+:::::
+
+(b) find an orthogonal decomposition of $\mathbf{a}$ in a vector orthogonal to $\mathbf{b}$, and one parallel with $\mathbf{b}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $\mathbf{a} - \text{proj}_\mathbf{b}\mathbf{a}=\begin{pmatrix} 1\\2\\4\end{pmatrix} - \begin{pmatrix} 3/2\\3\\3/2\end{pmatrix}=\begin{pmatrix}-1/2\\-1\\5/2\end{pmatrix}$, and we get the orthogonal decomposition
+$$\mathbf{a}=\text{proj}_\mathbf{b}\mathbf{a}+\left(\mathbf{a} - \text{proj}_\mathbf{b}\mathbf{a}\right)=\begin{pmatrix} 3/2\\3\\3/2\end{pmatrix}+\begin{pmatrix}-1/2\\-1\\5/2\end{pmatrix}$$
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Prove property 1.-3. in @prp-regneregler1 and @prp-regneregler2.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+All these properties follow from the corresponding properties for real numbers, 
+when we combine with the definition of vector addition and multiplication with scalars. We prove 1.-3. in @prp-regneregler1 first.
+
+1. $\mathbf{a}+\mathbf{b}$ has components $a_i+b_i$, and $\mathbf{b}+\mathbf{a}$ has components $b_i+a_i$. 
+Since $a_i+b_i=b_i+a_i$ (when adding numbers the order doesn't matter), all components are equal, so that 
+$\mathbf{a}+\mathbf{b}=\mathbf{b}+\mathbf{a}$. 
+2. $\mathbf{a}+\mathbf{b}$ has components $a_i+b_i$, and $(\mathbf{a}+\mathbf{b})+\mathbf{c}$ then has components $(a_i+b_i)+c_i$. 
+In the same way $\mathbf{a}+(\mathbf{b}+\mathbf{c})$ has components $a_i+(b_i+c_i)$. Since 
+$$(a_i+b_i)+c_i=a_i+(b_i+c_i)$$
+is known to hold for real numbers, it follows again that all components are equal, so that 
+$(\mathbf{a}+\mathbf{b})+\mathbf{c}=\mathbf{a}+(\mathbf{b}+\mathbf{c})$.
+3. $s(\mathbf{a}+\mathbf{b})$ has components $s(a_i+b_i)$, and $s\mathbf{a}+s\mathbf{b}$ has components $sa_i+sb_i$. 
+$s(a_i+b_i)=sa_i+sb_i$ is also known to hold real numbers, so that $s(\mathbf{a}+\mathbf{b})=s\mathbf{a}+s\mathbf{b}$.
+
+Let us now prove 1.-3. in @prp-regneregler2.
+
+1. $$\mathbf{a}\cdot\mathbf{a}=(a_1,...,a_n)\cdot(a_1,...,a_n)=a_1\cdot a_1+\cdots+ a_n\cdot a_n=a_1^2+\cdots+a_n^2= |\mathbf{a}|^2$$
+2. 
+\begin{align*}
+\mathbf{a}\cdot\mathbf{b}&=(a_1,...,a_n)\cdot(b_1,...,b_n)=a_1b_1+\cdots+a_nb_n\\
+&=b_1a_1+\cdots+b_na_n= (b_1,...,b_n)\cdot(a_1,...,a_n)=\mathbf{b}\cdot\mathbf{a}
+\end{align*}
+3. 
+\begin{align*}
+\mathbf{c}\cdot(\mathbf{a}+\mathbf{b}) &= (c_1,...,c_n)\cdot ((a_1,...,a_n)+(b_1,...,b_n)) \\
+&= (c_1,...,c_n)\cdot(a_1+b_1,...,a_n+b_n) \\
+&= c_1(a_1+b_1)+\cdots c_n(a_n+b_n) \\
+&= c_1a_1+c_1b_1+\cdots + c_na_n+c_nb_n \\
+&= c_1a_1+\cdots c_na_n + c_1b_1+\cdots + c_nb_n \\
+&=(c_1,...,c_n)\cdot(a_1,...,a_n) + (c_1,...,c_n)\cdot(b_1,...,b_n) \\
+&= \mathbf{c}\cdot\mathbf{a}+\mathbf{c}\cdot\mathbf{b}.
+\end{align*}
+The second part of 3. is proved similarly.
+
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Show that $|s\mathbf{a}|=|s||\mathbf{a}|$ when $\mathbf{a}\in\mathbb{C}^n$ and $s\in\mathbb{C}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+\begin{align*}
+|s\mathbf{a}| &= |(sa_1,...,sa_n)| =\sqrt{|sa_1|^2+\cdots +|sa_n|^2} \\
+&=\sqrt{|s|^2|a_1|^2+\cdots +|s|^2[a_n|^2} =|s|\sqrt{|a_1|^2+\cdots+|a_n|^2} = |s||\mathbf{a}|.
+\end{align*}
+:::::::
+:::::
+:::
+
+::: {#exr- name='Reverse triangle inequality'}
+Prove that $\left| |\mathbf{a}|-|\mathbf{b}| \right| \leq |\mathbf{a}-\mathbf{b}|$ for all $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$. 
+This is also called the *reverse triangle inequality*\index{Triangle inequality!reverse}.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+From the triangle inequality it follows that
+$$|\mathbf{a}|=|(\mathbf{a}-\mathbf{b})+\mathbf{b}|\leq |\mathbf{a}-\mathbf{b}| + |\mathbf{b}|.$$
+From this we get $|\mathbf{a}|-|\mathbf{b}|\leq |\mathbf{a}-\mathbf{b}|$. 
+If we let $\mathbf{a}$ and $\mathbf{b}$ swap roles we also get 
+$|\mathbf{b}|-|\mathbf{a}|\leq |\mathbf{b}-\mathbf{a}|=|\mathbf{a}-\mathbf{b}|$. 
+Both $|\mathbf{b}|-|\mathbf{a}|$ and $|\mathbf{a}|-|\mathbf{b}|$ are also $\leq |\mathbf{a}-\mathbf{b}|$. But then it follows that 
+$$\left| |\mathbf{a}|-|\mathbf{b}| \right| \leq |\mathbf{a}-\mathbf{b}|.$$
+:::::::
+:::::
+:::
+
+::: {#exr-parallellogram}
+By the *parallellogram* spanned by the vectors $\mathbf{a}$ and $\mathbf{b}$ we mean the quadrilateral with vertices $\mathbf{0}$, $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{a}+\mathbf{b}$. 
+@fig-parallellogram illustrates a parallellogram in the plane.
+
+![Parallellogram spanned by the vectors $\mathbf{a}$ and $\mathbf{b}$.](parallellogram.pdf){#fig-parallellogram}
+
+The name comes from the fact that opposite sides are parallel.
+
+(a) Explain geometrically that the parallellogram spanned by $\mathbf{a}$ and $\mathbf{b}$ can be written as the set
+$$\{  r\mathbf{a}+s\mathbf{b}:0\leq r,s \leq 1 \}.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Set $A=\{  r\mathbf{a}+s\mathbf{b}:0\leq r,s \leq 1 \}$.
+The line $r\mathbf{a} + s\mathbf{b}$, $0\leq s\leq 1$ describes a line in the parallellogram which connects points $r\mathbf{a}$ and $r\mathbf{a}+\mathbf{b}$. 
+Since this holds for all $r$ it is clear that $A$ is contained in the parallellogram. 
+
+It is also geometrically clear that, for every point in the parallellogram, there exists an $r$ so that the point lies on the line through $r\mathbf{a}$ and $r\mathbf{a}+\mathbf{b}$
+The parallellogram is therefore also contained in $A$, so that $A$ must be identical to the whole parallellogram.
+:::::::
+:::::
+
+(b) If $\mathbf{a}$ and $\mathbf{b}$ are vectors either in $\mathbb{R}^2$ or in $\mathbb{R}^3$, 
+it gives meaning to talk about the angle between the two. Let us denote this by $\theta$. 
+Prove that the area of the parallellogram spanned by $\mathbf{a}$ and $\mathbf{b}$ is given by 
+$|\mathbf{a}||\mathbf{b}|\sin\theta$ (we can assume that $0\leq\theta\leq\pi$, so that $\sin\theta\geq 0$). 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We can think of $|\mathbf{a}|$ as the base of the parallellogram, and $|\mathbf{b}|\sin\theta$ as the height. The area is given by base times height, i.e., $|\mathbf{a}||\mathbf{b}|\sin\theta$. 
+:::::::
+:::::
+:::
+
+::: {#exr- name='The parallellogram law'}
+Show that, for $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$, we have that 
+$$
+|\mathbf{a}+\mathbf{b}|^2 + |\mathbf{a}-\mathbf{b}|^2 = 2\left(|\mathbf{a}^2|+|\mathbf{b}|^2\right).
+$$
+This identity is called the *parallellogram law*. Can you think of why the law is called this?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$\mathbf{a}+\mathbf{b}$ and $\mathbf{a}-\mathbf{b}$ correspond to the diagonals in the parallelogram spanned by $\mathbf{a}$ 
+and $\mathbf{b}$. Since $\mathbf{a}$ and $\mathbf{b}$ correspond to the sides in the parallellogram, 
+the law gives us a connection between the diagonals and sides in a parallellogram. 
+This explains how this identity obtained its name.
+:::::::
+:::::
+:::
+
+::: {#exr-scalarprodunique}
+Suppose that $f$ is a real function which takes two vectors in $\mathbb{R}^n$ as parameters. Suppose that 
+
+1. $f(\mathbf{a},\mathbf{a}) = |\mathbf{a}|^2$
+2. $f(\mathbf{a},\mathbf{b})=f(\mathbf{b},\mathbf{a})$
+3. $f(\mathbf{c},\mathbf{a}+\mathbf{b})=f(\mathbf{c},\mathbf{a})+f(\mathbf{c},\mathbf{b})$ and $f(\mathbf{a}+\mathbf{b},\mathbf{c})=f(\mathbf{a}, \mathbf{c})+f(\mathbf{b},\mathbf{c})$
+
+for all vectors $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$ in $\mathbb{R}^n$. Show that 
+$$f(\mathbf{a},\mathbf{b})=\mathbf{a}\cdot\mathbf{b}$$
+for all $\mathbf{a}$, $\mathbf{b}$. 
+In particular it follows that $f(s\mathbf{a},\mathbf{b})=f(\mathbf{a},s\mathbf{b})=sf(\mathbf{a},\mathbf{b})$, 
+since we know that $(s\mathbf{a})\cdot\mathbf{b}=\mathbf{a}\cdot(s\mathbf{b})=s(\mathbf{a}\cdot\mathbf{b})$ holds.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$
+\begin{aligned}
+|\mathbf{a}+\mathbf{b}|^2 &= f(\mathbf{a}+\mathbf{b},\mathbf{a}+\mathbf{b}) = f(\mathbf{a},\mathbf{a}) + f(\mathbf{a},\mathbf{b}) + f(\mathbf{b},\mathbf{a}) + f(\mathbf{b},\mathbf{b}) \\
+&= |\mathbf{a}|^2 + 2f(\mathbf{a},\mathbf{b}) + |\mathbf{b}|^2.
+\end{aligned}
+$$
+It follows that 
+$$
+f(\mathbf{a},\mathbf{b}) = \frac{1}{2}(|\mathbf{a}+\mathbf{b}|^2-|\mathbf{a}|^2-|\mathbf{b}|^2) = \frac{1}{2}\sum_{k=1}^n (a_k+b_k)^2 - a_k^2 - b_k^2) = \sum_{k=1}^n a_kb_k.
+$$
+:::::::
+:::::
+:::
+
+::: {#exr-primenumbers}
+Consider the following code. What does the code do? Justify your answer. Consult the `numpy` documentation on the function `np.where`.
+```{pyodide-python}
+import numpy as np
+
+a = np.arange(0,100); a[0] = -1; a[1]=-1
+for k in range(2,10):
+    a[(2*k)::k] = -1
+a[np.where(a!=-1)]
+```
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The code prints out all prime numbers less than 100. 
+First the numbers themselves are filled in. Non-prime numbers are iteratively marked with $-1$, and we start by marking $0$ and $1$ as non-primes. 
+The `for`-loop marks $2k$, $3k$,..., and so on, as non-primes, since they are all divisible by $k$. 
+After the loop all non-primes have a -1-entry. The remaining entries are the primes, and are found with help of the `np.where`-command, and printed out. 
+Note that any non-prime number less than 100 must be divisible with a number less than 10. The code exploits this.
+:::::::
+:::::
+:::

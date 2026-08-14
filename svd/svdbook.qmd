@@ -1,0 +1,210 @@
+# The singular value decomposition {#sec-svd}  
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+## Main result
+
+
+{{< include svdmaintheorem.qmd >}}
+
+::: {.proof}
+Bla bla bla
+:::
+
+## Image compression based on the singular value decomposition
+
+In this section we will analyse what kind of information the SVD captures, 
+and illustrate how it provides a method for compressing images by 
+reducing storage requirements.
+
+
+
+
+
+
+
+Let $A = U \Sigma V^T$ be the SVD of the $m \times n$ matrix $A$, and let $\mathbf{u}_{j}$ and $\mathbf{v}_{j}$ be the  $j$-th column of $U$ and $V$, respectively, i.e.,
+\begin{align*}
+U &= \begin{pmatrix} \mathbf{u}_{1} & \mathbf{u}_{2} & \cdots & \mathbf{u}_{m}\end{pmatrix} &
+V &= \begin{pmatrix} \mathbf{v}_{1} & \mathbf{v}_{2} & \cdots & \mathbf{v}_n\end{pmatrix}.
+\end{align*}
+
+We start by showing that 
+$$U \Sigma =  \begin{pmatrix} \sigma_{1} \mathbf{u}_{1} & \sigma_{2}\mathbf{u}_{2}  & \cdots & \sigma_{r} \mathbf{u}_{r} & \mathbf{0} & \cdots & \mathbf{0}\end{pmatrix}$$
+where the number of zero-vectors is $n-r$.
+
+Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\mbox{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
+In the same way we get that $(U\Sigma)_{ij} = 0$ for $j > r$ (since only the $\sigma_1,...,\sigma_r$ are different from $0$). 
+Therefore we get that $\mbox{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
+
+Recall that if $B$ is an $m \times p$ matrix, and $C$ is an $p \times n$ matrix, then the matrix product $BC$ can be written as  
+$$BC = \sum_{j=1}^{p}\, \texttt{col}_{j}(B) \, \texttt{row}_{j}(C).$$
+We use this and the above to show that 
+$$A = \sum_{j=1}^r \, \sigma_j \, \mathbf{u}_{j}\mathbf{v}_{j}^T.$$ {#eq-A}
+
+Since $A=U \Sigma V^T$ we have that
+\begin{align*}
+  A &= \sum_{j=1}^{p}\, \texttt{col}_{j}(U \Sigma) \, \texttt{row}_{j}(V^T) \\
+    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\texttt{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
+\end{align*}
+
+**Comment:**  The above shows that only the $r$ first columns of $U$ and $V$ matter in the SVD $A = U \Sigma V^T$.
+Note also that all terms in the sum @eq-A are rank 1 matrices, 
+since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\texttt{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
+$\mathbf{u}$ and $\mathbf{v}$ are both nonzero. 
+Thus, a matrix of rank $r$ can be written as a sum of $r$ rank one matrices.
+
+
+
+{{< include svdpython.qmd >}}
+
+We continue using the notation from above. For $1 \leq k \leq r$ we define
+$$A^{(k)} = \sum_{j=1}^k \sigma_j \mathbf{u_j}\mathbf{v_j}^T.$$ {#eq-Ak}
+$A^{(k)}$ has rank $k$ and can thus be thought of as a rank $k$ approximation to $A$. 
+How many terms we need to include, i.e., how big $k$ must be for an acceptable approximation, 
+will of course depend on the singular values, and how quickly they tend to $0$.
+
+The following function takes an $m \times n$ matrix $A$, and $k$, as input, 
+computes the SVD of the matrix, and returns the matrix $A^{(k)}$ in @eq-Ak. 
+If $k > r =\text{rank}(A)$ the function provides a suitable error message:
+
+```{python}
+{{< include svdApprox.py >}}
+```
+
+The following code loads the Marilyn Monroe image `mm.gif` provided in this project into a matrix $A$, 
+checks that $A$ is a $256 \times 256$ matrix, and computes its rank with help of the `linalg.matrix\_rank`-function,
+and also with tolerances 0.001, 0.01, 0.1, and 1.
+
+```{python}
+{{< include code2b.py >}}
+```
+The size of the matrix is printed first, followed by the different ranks.
+
+
+The following code uses the function `svdApprox` to display the images corresponding to $A^{(k)}$ for $k = 8$ and $k=32$. 
+These are shown in @fig-2b8 and @fig-2b32
+
+```{python}
+#| label: fig-2b8
+{{< include code2c8.py >}}
+```
+
+```{python}
+#| label: fig-2b32
+{{< include code2c32.py >}}
+```
+
+
+
+Since the rank of the image matrix equals the number of nonzero singular values, 
+a low rank means that we can represent the matrix with just a few values. 
+Consider the matrix below, which also is displayed as an image. 
+
+```{python}
+{{< include code2d.py >}}
+```
+
+
+The image is constant in each column. If $v_i$ is the value in column $i$, the matrix can be written as 
+$\begin{pmatrix}1 \\ 1 \\ \vdots \\ 1\end{pmatrix}\begin{pmatrix} v_1 & v_2 & \cdots & v_n \end{pmatrix}$, which clearly is 
+a rank one matrix.
+
+
+The singular values are listed in decreasing order with the biggest first. 
+Thus, the most ''important'' information is found in the first terms in the sum in @eq-A. 
+
+The following code plots the singular values of the matrix corresponding to the Marilyn Monroe image 
+($\sigma_j$ as a function of $j$). It also
+constructs a random image of the same size, and with pixel values in the same interval as the Marilyn Monroe image. 
+The resulting plot is shown in @fig-oppg4-svar.
+
+```{python}
+#| label: fig-oppg4-svar
+{{< include code3a.py >}}
+```
+
+We see that the singular values decay much faster for the Marilyn Monroe image than for the random image. 
+An informal explanation for this is that the random image has a greater degree of unorder, more ``details'', 
+so that one needs more singular values to describe it.
+
+
+
+Every term in the sum @eq-Ak needs two vectors, in addition to one singular value. 
+To store the matrix $A^{(k)}$ we therefore only need to store the $k$ first vectors in both matrices $U$ and $V$, as well as the $k$
+first singular values. One thus needs $k(m+n+1)$ values to store a rank $k$ SVD approximation. This can have much to say for storage:
+If most of the singular values are small, we may get acceptable quality by zeroing out all singular values except the few biggest ones. 
+As an example, a $500\times 500$ image has 250 000 pixel values. 
+Storing the first $20$ singular components would require $20\times 1001\approx 20 000$ values, which amounts to about $8\%$ of the original storage.
+
+As $k$ increases the rank $k$ SVD approximation gets visually closer to the original. 
+For $k\approx 50$ the quality seems to be acceptable, for $k\approx 100$ it is near perfect.
+
+The *relative error* between the matrices $A$ and $A^{(k)}$  is defined as
+\begin{equation*}
+  e_{rel} = \frac{\| A - A^{(k)} \|}{ \|A\|},
+\end{equation*} 
+where the norm of an $m \times n$ matrix $B = [b_{i,j}]$ is defined by
+$$\| B \| = \sqrt{ \sum_{i=1}^m \sum_{j=1}^n  {b_{i,j}}^2 }.$$
+The following function computes the relative error between the two matrices `A` and `AK`. 
+
+```{python}
+{{< include relError.py >}}
+```
+
+Above we reconstructed the Marylin Monroe image from the 8 first singular components, i.e., from $A^{(8)}$. 
+Let us now try to reconstruct the same image by using all singular values \emph{except from} the 8 first singular components, 
+i.e., by using the matrix 
+$\sum_{j=9}^r \sigma_j \mathbf{u}_{j}\mathbf{v}_{j}^T$, where $r = \text{rank}(A)$. 
+
+
+The relative error when only the 8 first singular values are included is
+
+```{python}
+{{< include code4d1.py >}}
+```
+
+The relative error when the remaining singular values are included is
+
+```{python}
+{{< include code4d2.py >}}
+```
+The image looks as follows 
+```{python}
+{{< include code4d3.py >}}
+```
+
+In the first image the error is about 0.1. It is far from perfect, but you can see what it is. 
+In the other image the error is near 1 (which is the maximal we can get), and the image suffers from this. 
+
+
+
+
+Let $1 \leq k \leq r$. We show that $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for Col $A^{(k)}$.
+This shows in particular that $A^{(k)}$ has rank $k$. This basis is orthonormal. 
+
+Note first that for $1\leq s\leq k$ we have that
+$$A^{(k)}\mathbf{v}_s = \sum_{j=1}^k \sigma_j \mathbf{u_j}\mathbf{v_j}^T \mathbf{v}_s = \sigma_s \mathbf{u_s},$$
+since the $\mathbf{v}_s$ provide an orthonormal basis. 
+It follows that all $\mathbf{u_s}$ are in the column space of $A^{(k)}$, so that $\texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k) \subseteq \mbox{Col}(A^{(k)})$. 
+Since column $s$ in $A^{(k)}$ is
+$$\sum_{j=1}^k \sigma_j \mathbf{u_j}(\mathbf{v_j}^T)_s,$$
+it follows that also $\mbox{Col}(A^{(k)}) \subseteq \texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k )$. 
+Therefore $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for $\text{Col}(A^{(k)})$. 
+
+
+We have that $A^T = V \Sigma^T U^T$, which also must be a singular value decomposition of $A^T$. 
+The image corresponding to $A^T$ is not the same as the image where $A$ is rotated 90 degrees counterclockwise: 
+We get this if we in addition reverse the rows of $A^T$. 
+
+
+
+
+  
+$\{ \mathbf{v}_{1}, \, \ldots \, , \mathbf{v}_{r} \}$ is a basis for Row$(A)$= Col$(A^T)$, and this basis is orthonormal. 
+To see this, from the above and from the singular value decomposition of til $A^{(k)}$ it follows that 
+$\{ \mathbf{v}_{1}, \, \ldots \, , \mathbf{v}_{r} \}$ is a basis for Col $A^T$, 
+and therefore also a basis for Row $A$. 

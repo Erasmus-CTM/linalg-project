@@ -1,0 +1,101 @@
+---
+title: "Foils for Chapter 3 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+# Gaussian elimination
+
+- Echelon form
+- Reduced echelon form
+- Leading one
+- Augmented matrix
+- Pivot element
+- Pivot variables
+- Pivot row
+- Pivot column
+- Row equivalence
+
+---
+
+## Elementary row operations and matrices
+
+::: {#prp-smh:elemradop}
+Suppose $B$ is obtained by applying an elementary row operation to the $m\times n$-matrix $A$. 
+Then $B=EA$ where $E$ is the matrix obtained by applying the same row operation to the identity matrix $I_m$.
+:::
+
+A matrix is called *elementary* if it is obtained by applying an elementary row operation to the identity matrix: 
+$$
+\begin{aligned}
+E_1 &=\begin{pmatrix} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & \text{ corresponds to } I+2II \\
+E_2 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 3 \end{pmatrix} & \text{ corresponds to } 3III \\
+E_3 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} & \text{ corresponds to } I \leftrightarrow II
+\end{aligned}
+$$
+
+---
+
+## Reversing elementary row operations
+
+Row operations can be reversed: 
+
+\begin{align*}
+F_1 &=\begin{pmatrix} 1 & -2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & \text{ corresponds to } I-2II \\
+F_2 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1/3 \end{pmatrix} & \text{ corresponds to } III/3 \\
+F_3 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} & \text{ corresponds to } I \leftrightarrow II
+\end{align*}
+
+---
+
+$F_i$ reverses $E_i$, meaning that $F_1E_1=I_n$, $F_2E_2=I_n$, $F_3E_3=I_n$, 
+which is easily verified: 
+
+```{python}
+#| echo: true
+import numpy as np
+
+E_1 = np.array([[1,2,0],[0,1,0],[0,0,1]])
+F_1 = np.array([[1,-2,0],[0,1,0],[0,0,1]])
+E_1 @ F_1
+```
+
+---
+
+::: {#prp-}
+For every matrix $A$ we can write 
+$$C=E_k\cdots E_2E_1A$$
+where $C$ is a matrix on reduced echelon form, and where $E_1,E_2,...,E_k$ are elementary matrices.
+:::
+
+::: {#prp-}
+Assume a system is obtained from another by applying an elementary row operation. 
+Then the two systems have the same solutions. 
+:::
+
+---
+
+{{< include gaussianelimination/invmatteo.qmd >}}
+
+---
+
+## Gaussian elimination and complexity {#sec-numopsgauss}
+
+---
+
+## Simultaneous solution of systems
+
+---
+
+## Implementation of Gaussian elimination {#sec-kodegaussel}
+
+

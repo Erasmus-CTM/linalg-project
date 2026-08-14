@@ -1,0 +1,55 @@
+# Preface {.unnumbered}
+
+These notes were first written for the new first semester course MAT1105 - Linear algebra and numerical methods, 
+at the University of Oslo. The course was held the first time the fall of 2024, 
+and gives an introduction to basic mathematical thinking, linear algebra, and numerical methods. 
+In the first version of the course, linear algebra was covered by chapter 1 and 4 in the book "Flervariabel analyse med lineær algebra" by Tom Lindstrøm (in norwegian), while the two other parts of the curriculum were covered by notes on their own.
+In 2025 new notes for the linear algebra part were added, and merged with the notes on numerical analysis, even though the numerical analysis builds only loosely on linear algebra.
+
+The notes contain many proofs, but many proofs in linear algebra are quite short, and are thus suitable following the mentioned introduction to basic mathematical thinking. 
+
+The notes contain several Python programming examples, as well as an introduction to basic Python commands for linear algebra. 
+Most students at the University of Oslo take the course IN1900 - Introduction to Programming with Scientific Applications, in parallel with the notes here. 
+Linear algebra is a suitable testbed for Python programming, and the material contains many code snippets inspired by linear algebra. 
+There are few figures in these notes - the role of figures is partially replaced by short programming examples with their graphical results shown.
+It is recommended to spend some time on the programming examples. The following commands load the python packages you need.
+```{python}
+{{< include _imports.py >}}
+```
+
+The notes have been typeset with the Quarto publishing system (\href{https://quarto.org}{https://quarto.org}), and come in a pdf version, and an html version. 
+Each of these come in versions with and without solutions to the exercises.  
+The html versions have some features not found in the pdf versions: 
+
+*Each chapter has a quiz consisting of about 10 problems, and the quizzes aggregate the number of correct answers. 
+* Interactive programming examples and exercises which use pyodide - i.e., python is embedded in the browser, without the need for a server.
+For this interactive programming to work well you should avoid the Safari web browser. 
+
+Parts of this material were originally based on material written by Knut Mørken for the course MAT-INF1100, Modelling and Computations, at the University of Oslo. 
+
+These notes are maintained in english. For those of you who prefer norwegian, AI will be used to create a translation. 
+
+<!--
+This material will be published non-commercially under Creative Commons licence Attribution-NonCommercial-ShareAlike (CC BY-NC-SA). 
+I encourage people to adapt the material to their own need at their own university. 
+I hope I can get something back - that some of these adaptions may be incorporated with the main material.  
+My plan is to actively moderate the github repository.
+-->
+
+
+<!--
+quarto render foils_chap1.qmd --output-dir build-beamer
+quarto render foils_chap2.qmd --output-dir build-beamer
+-->
+
+
+
+
+
+
+
+\vspace{1.5cm}
+\rightline{\em Blindern, August 2026}
+\medskip
+\rightline{\em Øyvind Ryan}
+

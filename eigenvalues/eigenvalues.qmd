@@ -1,0 +1,957 @@
+# Eigenvalues and eigenvectors
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+In this chapter we will work with eigenvectors and eigenvalues, which we define as follows.
+
+::: {#def- name='Eigenvalues and eigenvectors'}
+Let $A$ be an $n\times n$-matrix. $\lambda$ is called an *eigenvalue*\index{Eigen!-value} of $A$ if there exists an $\mathbf{x}\neq\mathbf{0}\in\mathbb{R}^n$ which satisfies
+$A\mathbf{x}=\lambda\mathbf{x}$. $\mathbf{x}$ is then called an *eigenvector*\index{Eigen!-vector} corresponding to $\lambda$.
+:::
+
+$\lambda$ is an eigenvalue if $(A-\lambda I)\mathbf{x}=\mathbf{0}$ has a solution $\mathbf{x}\neq\mathbf{0}$, 
+which is the same as $A-\lambda I$ not being invertible, which again is the same as that 
+$$\det(A-\lambda I)=0.$$
+This is called the *characteristic equation*\index{Characteristic!equation} of $A$.
+If we use the recursive definition of the determinant this gives a polynomial of degree at most $n$ in $\lambda$, 
+called the *characteristic polynomial*\index{Characteristic!polynomial} of $A$. 
+eigenvalues can thus be computed by finding roots in polynomials. 
+In principle one can find the eigenvalues by row-reducing $A-\lambda I$, but the problem is that
+the actual row operations will depend on the concrete value of $\lambda$. 
+Therefore we will hold on to the recursive definition of the determinant for now.
+^[In practice the computer finds eigenvalues with help of another algorithm.]
+
+When the eigenvalues have been found, an eigenvector corresponding to a given $\lambda$ can be found by solving 
+the system $(A-\lambda I)\mathbf{x}=\mathbf{0}$. This can be achieved by row-reducing $A-\lambda I$. 
+Eigenvectors are not unique - if we multiply it with a scalar we get another eigenvector. 
+Sometimes one needs the general expression for the eigenvectors corresponding to a given eigenvalue.
+Other times one only needs one concrete eigenvector. It is then desirable to pick one on a form which is simplest possible - 
+typically with integer components as small as possible. Some examples will clarify this.
+
+::: {#exm-}
+Let us first consider the linear mapping $T$ which reflects about the line $y=0$ in $\mathbb{R}^2$. 
+We have that $T(\mathbf{e}_1)=\mathbf{e}_1$ and $T(\mathbf{e}_2)=-\mathbf{e}_2$ (we see already here that $\mathbf{e}_1$ and $\mathbf{e}_2$ are eigenvectors), 
+so that the matrix if $T$ is $A=\begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix}$. 
+The characteristic equation is $(1-\lambda)(-1-\lambda)=0$, so that the eigenvalues are $\lambda_1=-1$, $\lambda_2=1$. 
+
+Eigenvector for $\lambda_1=-1$:
+$$
+A+I=\begin{pmatrix} 2 & 0 \\ 0 & 0\end{pmatrix} \sim \begin{pmatrix} 1 & 0 \\ 0 & 0\end{pmatrix}
+$$
+The first row here says that an eigenvector must satisfy $x_1=0$. The general eigenvector is therefore $(0,x_2)$ with 
+$x_2$ a free variable. In particular we get the simple eigenvector $(0,1)$.
+
+Eigenvector for $\lambda_2=1$:
+$$
+A-I=\begin{pmatrix} 0 & 0 \\ 0 & -2\end{pmatrix} \sim \begin{pmatrix} 0 & 1 \\ 0 & 0\end{pmatrix}
+$$
+The first row here says that an eigenvector must satisfy $x_2 = 0$. In particular we get the eigenvector $(1,0)$. $\clubsuit$
+:::
+
+::: {#exm-biggerexample}
+Let us consider a bigger example. We set
+$$A=\begin{pmatrix} 1 & 2 & 4 \\ -3 & 6 & 7 \\ 2 & -2 & -1 \end{pmatrix}.$$
+We first get
+\begin{align*}
+\det(A-\lambda I) &= \left| \begin{array}{ccc} 1-\lambda & 2 & 4 \\ -3 & 6-\lambda & 7 \\ 2 & -2 & -1-\lambda \end{array}\right| \\
+&= (1-\lambda)\left| \begin{array}{cc} 6-\lambda & 7 \\ -2 & -1-\lambda \end{array}\right|
+ -2 \left| \begin{array}{cc} -3 & 7 \\ 2 & -1-\lambda \end{array}\right|
+ +4 \left| \begin{array}{cc} -3 & 6-\lambda \\ 2 & -2 \end{array}\right| \\
+&= (1-\lambda)(   (6-\lambda)(-1-\lambda) + 14 ) -2(3+3\lambda -14) + 4(6-12+2\lambda) \\
+&= (1-\lambda)(\lambda^2-5\lambda+8) - 2(3\lambda-11) + 4(2\lambda-6)\\
+&= -\lambda^3+5\lambda^2-8\lambda + \lambda^2-5\lambda+8 -6\lambda + 22 + 8\lambda - 24 \\
+&= -\lambda^3 + 6\lambda^2 - 11\lambda + 6
+\end{align*}
+Most of us do not remember the formula for the solution to a third degree equation, so it is not obvious how to proceed. 
+One can find the roots of a polynomial with help of the command `roots`. This takes the coefficients of the polynomial as input:
+
+```{python}
+np.roots(np.array([-1,6,-11,6]))
+```
+
+Alternatively one can find the roots by trial and error. Then we probably first will find the root $\lambda_1=1$. 
+The two other roots can be found by first applying polynomial division
+$$ \arraycolsep=0pt
+\begin{array}{rlrlrlrrl} 
+(-  &\lambda^3&    +6&\lambda^2&  -11&\lambda& +   &6.  &):(\lambda-1)=-\lambda^2+5\lambda -6\\
+ -( -&\lambda^3&    + &\lambda^2)&       &            &       &    &\\ \hline
+ &      &                   5&\lambda^2&-11   &\lambda&       &    & \\ 
+ &      &                 -(5&\lambda^2&-5    &\lambda)&      &    &\\ \hline
+ &      &                     &                &-6     &\lambda& +    &6  &  \\
+ &      &                     &                &- (-6  &\lambda&+     &6  &) \\ \hline
+ &      &                     &                &         &             &       &0 &,
+\end{array}
+$$
+so that
+$$- \lambda^3 + 24\lambda^2 - 176\lambda + 384 = (\lambda-1)(-\lambda^2+5\lambda-6),$$
+and then using the formula for the solution to the second degree equation to find the roots of $-\lambda^2+5\lambda-6=0$. 
+This gives
+$$
+\lambda = \frac{-5 \pm \sqrt{25-24}}{-2} = \frac{-5\pm 1}{-2} = \frac{5\pm 1}{2}
+$$
+so that we also get the roots $\lambda_2=2$ and $\lambda_3=3$. Let us turn to find the eigenvectors
+
+* For $\lambda_1=1$ we get
+\begin{align*}
+A-\lambda_1I &= \begin{pmatrix} 0 & 2 & 4 \\ -3 & 5 & 7 \\ 2 & -2 & -2\end{pmatrix} 
+\sim\begin{pmatrix} 1 & -1 & -1 \\ -3 & 5 & 7 \\ 0 & 1 & 2 \end{pmatrix} 
+\sim\begin{pmatrix} 1 & -1 & -1 \\ 0 & 2 & 4 \\ 0 & 1 & 2 \end{pmatrix} \\
+&\sim\begin{pmatrix} 1 & -1 & -1 \\ 0 & 1 & 2 \\ 0 & 0 & 0\end{pmatrix} 
+\sim\begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 2 \\ 0 & 0 & 0\end{pmatrix}
+\end{align*}
+The first row says that $x_1+x_3=0$, so that $x_1=-x_3$. 
+The second row says that $x_2+2x_3=0$, so that $x_2=-2x_3$
+The general eigenvector is therefore 
+$$(x_1,x_2,x_3)=\left(-x_3,-2x_3,x_3\right)=x_3\left(-1,-2,1\right)$$
+Setting $x_3=1$ we get the special eigenvector $\mathbf{v}_1=(-1,-2,1)$.
+* For $\lambda_2=2$ we get
+\begin{align*}
+A-\lambda_2I &= \begin{pmatrix} -1 & 2 & 4 \\ -3 & 4 & 7 \\ 2 & -2 & -3 \end{pmatrix} 
+\sim \begin{pmatrix} 1 & -2 & -4 \\ 0 & -2 & -5 \\ 0 & 2 & 5 \end{pmatrix}
+\sim \begin{pmatrix} 1 & -2 & -4 \\ 0 & 1 & 5/2 \\ 0 & 0 & 0\end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 5/2 \\ 0 & 0 & 0\end{pmatrix}
+\end{align*}
+Here we get the special eigenvector $\mathbf{v}_2=(-2,-5,2)$.
+* For $\lambda_3=3$ we get
+\begin{align*}
+A-\lambda_3I &= \begin{pmatrix} -2 & 2 & 4 \\ -3 & 3 & 7 \\ 2 & -2 & -4 \end{pmatrix}
+\sim \begin{pmatrix} 1 & -1 & -2 \\ -3 & 3 & 7 \\ 0 & 0 & 0\end{pmatrix}
+\sim \begin{pmatrix} 1 & -1 & -2 \\ 0 & 0 & 1 \\ 0 & 0 & 0\end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & -1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0\end{pmatrix}
+\end{align*}
+so that we get the special eigenvector $\mathbf{v}_3=(1,1,0)$.
+
+Let us verify this computation:
+
+* $\begin{pmatrix} 1 & 2 & 4 \\ -3 & 6 & 7 \\ 2 & -2 & -1\end{pmatrix} \begin{pmatrix} -1 \\ -2 \\ 1 \end{pmatrix} =
+\begin{pmatrix}  -1-4+4 \\ 3-12+7 \\ -2+4-1\end{pmatrix}
+=\begin{pmatrix} -1 \\ -2 \\ 1\end{pmatrix}$
+* $\begin{pmatrix} 1 & 2 & 4 \\ -3 & 6 & 7 \\ 2 & -2 & -1\end{pmatrix} \begin{pmatrix} -2 \\ -5 \\ 2 \end{pmatrix}  = 
+\begin{pmatrix} -2-10+8\\ 6-30+14\\ -4+10-2\end{pmatrix}
+= \begin{pmatrix} -4 \\ -10 \\ 4\end{pmatrix}
+=2\begin{pmatrix} -2 \\ -5 \\ 2 \end{pmatrix}$
+* $\begin{pmatrix} 1 & 2 & 4 \\ -3 & 6 & 7 \\ 2 & -2 & -1\end{pmatrix} \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix} = 
+\begin{pmatrix} 1+2 \\ -3+6 \\ 2-2\end{pmatrix}
+= \begin{pmatrix} 3 \\ 3 \\ 0\end{pmatrix}
+=3\begin{pmatrix} 1 \\ 1 \\ 0\end{pmatrix}$.
+
+$\clubsuit$
+:::
+
+The example above is constructed so that it can be solved without too ugly numbers. In practice 
+eigenvalues are neither integers nor fractions. In this case the computation will suffer from roundoff errors. 
+We will mostly not do calculations as above by hand - as it is too time consuming, and error-prone. 
+Instead we can use the command `np.linalg.eig`\index{python!np.linalg.eig} which takes a matrix as input, and returns two matrices:
+
+* one matrix with the eigenvectors of the input matrix as columns, 
+* one diagonal matrix where the eigenvalues of the input matrix are on the diagonal 
+(matching eigenvectors are found in the corresponding column of the first matrix).
+
+If we test `np.linalg.eig` on the example above we get
+
+```{python}
+A = np.array([[1,2,4],[-3,6,7],[2,-2,-1]])
+D, P = np.linalg.eig(A)
+D, P
+```
+
+We observe several things here. Firstly, decimal numbers are returned, not integers. 
+This is the case since a numerical algorithm is used to find the roots of the characteristic polynomial. Secondly, consider the following:
+
+```{python}
+P.T@P
+```
+
+Since $P^TP$ returns all possible scalar products between the columns in $P$, this shows two things:
+
+* the columns in $P$ are scaled so that they have length $1$,
+* the eigenvectors are not orthogonal (since there are not only zeros outside the diagonal). 
+
+If you compute the reduced echelon form of $P$ you will get the identity matrix, 
+so that the eigenvectors at least are linearly independent. 
+We will soon prove that this is the case also more generally for eigenvectors corresponding to distinct eigenvalues. 
+
+We would like to get exact expressions for eigenvalues and eigenvectors as well.
+This can be achieved by converting to symbolic variables: 
+
+```{python}
+A = sym.Matrix([[1,2,4],[-3,6,7],[2,-2,-1]])
+A.eigenvals(), A.eigenvects()
+```
+
+We see that the components in the eigenvectors are fractions, and that there are no decimal numbers. 
+We see the exact same eigenvalues we found, and if we multiply $P$ with $2$ we get the same eigenvectors. 
+
+Let us say that we have a large matrix $A$ and a vector $\mathbf{x}_0$, and that we would like to compute $A^{100}\mathbf{x}_0$. 
+A direct computation would be very demanding, 
+but imagine that we already have computed the eigenvectors $\mathbf{v}_i$ and
+the eigenvalues $\lambda_i$  of $A$, and that the eigenvectors provide a basis for $\mathbb{R}^n$. 
+Then we can find values $c_i$ so that $\mathbf{x}_0=\sum_{i=1}^n c_i\mathbf{v}_i$. From this we can compute
+$$A^{100}\mathbf{x}_0 
+=A^{100}\left( \sum_{i=1}^n c_i\mathbf{v}_i \right)
+= \sum_{i=1}^n c_iA^{100}\mathbf{v}_i
+= \sum_{i=1}^n c_i\lambda_i^{100}\mathbf{v}_i,$$
+where we used that $A\mathbf{v}_i=\lambda_i\mathbf{v}_i$, and then $A^2\mathbf{v}_i=\lambda_iA\mathbf{v}_i=\lambda_i^2\mathbf{v}_i$, and so on.
+If the eigenvalues here are $\leq 1$ we can obtain a limit value. Let us consider an example.
+
+::: {#exm-}
+We study the spread of a disease in a population, and let $x_n$ be the number of sick people after $n$ days, 
+and $y_n$ the number if healthy people after $n$ days. 
+We assume that there are 1000 people all in all, so that $x_n+y_n=1000$ for all $n$. We assume also:
+
+1. If a person is sick one day, it is a $40$\% chance that he will be sick tomorrow as well. 
+2. If a person is healthy one day, it is a $20$\% chance that he will be sick tomorrow.
+
+Let us first find a transition matrix $A$ so that 
+$\begin{pmatrix} x_{n+1} \\ y_{n+1} \end{pmatrix}=A\begin{pmatrix} x_n \\ y_n \end{pmatrix}$. 
+
+* The number of sick people one day is $40\%$ of those sick the day before, plus $20\%$ of those healthy the day before. 
+This gives that $x_{n+1}=0.4x_n+0.2y_n$. 
+* The remaining $0.6x_n + 0.8y_n$ is the number of healthy people one day.
+
+This gives that $A=\begin{pmatrix} 0.4 & 0.2 \\ 0.6 & 0.8 \end{pmatrix}$. 
+Let us find the eigenvalues and eigenvectors of $A$:
+$$
+\det(A-\lambda I) = \left| \begin{array}{cc} 0.4-\lambda & 0.2 \\ 0.6 & 0.8-\lambda\end{array}\right|
+= (0.4-\lambda)(0.8-\lambda)-0.12 = \lambda^2 - 1.2\lambda + 0.2.
+$$
+The roots of this polynomial are $\lambda=\frac{1.2\pm\sqrt{1.44-0.8}}{2}=0.6\pm 0.4$, so that the eigenvalues are 
+$\lambda_1=0.2$ and $\lambda_2=1$.
+
+* For $\lambda_1=0.2$ we get
+\begin{align*}
+A-0.2I = \begin{pmatrix} 0.2 & 0.2 \\ 0.6 & 0.6\end{pmatrix} \sim \begin{pmatrix} 1 & 1 \\ 0 & 0\end{pmatrix}
+\end{align*}
+We get a general eigenvector by setting $x_1=-x_2$. If we set $x_2=1$ we get the particular eigenvector $\mathbf{v}_1=(-1,1)$.
+* For $\lambda_2=1$ we get
+\begin{align*}
+A-I = \begin{pmatrix} -0.6 & 0.2 \\ 0.6 & -0.2\end{pmatrix} \sim \begin{pmatrix} 1 & -1/3 \\ 0 & 0\end{pmatrix}
+\end{align*}
+We get a general eigenvector by setting $x_1=x_2/3$. If we set $x_2=3$ we get the particular eigenvector $\mathbf{v}_2=(1,3)$.
+
+Let now $\mathbf{x}_0=\begin{pmatrix} 0 \\ 1000\end{pmatrix}$ be the initial state where everyone is healthy. . 
+Let us find the limit $\lim_{n\to\infty} \mathbf{x}_n$. 
+We now express $\mathbf{x}_0$ in terms of $\mathbf{v}_1$ and $\mathbf{v}_2$:
+\begin{align*}
+\begin{pmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \mathbf{x}_0 \end{pmatrix}
+= \begin{pmatrix} -1 & 1 & 0 \\ 1 & 3 & 1000 \end{pmatrix} \sim \begin{pmatrix} 1 & 3 & 1000 \\ 0 & 4 & 1000 \\  \end{pmatrix}
+\sim \begin{pmatrix} 1 & 0 & 250 \\ 0 & 1 & 250 \\  \end{pmatrix},
+\end{align*}
+so that $\mathbf{x}_0=250\mathbf{v}_1 + 250\mathbf{v}_2$. Finally we get
+$$
+\mathbf{x}_n = A^n\mathbf{x}_0 = 250\cdot 0.2^n\mathbf{v}_1 + 250\cdot 1^n\mathbf{v}_2 = 250\begin{pmatrix} 1 - 0.2^n\\ 3 + 0.2^n\end{pmatrix}.
+$$
+It follows that $\lim_{n\to\infty} \mathbf{x}_n = (250,750)$. This is an *equilibrium*\index{Equilibrium}, meaning that 
+$$
+A\begin{pmatrix} 250 \\ 750\end{pmatrix} = \begin{pmatrix} 0.4 & 0.2 \\ 0.6 & 0.8 \end{pmatrix}\begin{pmatrix} 250 \\ 750\end{pmatrix}
+= \begin{pmatrix} 100 + 150 \\ 150 + 600 \end{pmatrix} = \begin{pmatrix} 250 \\ 750\end{pmatrix}.
+$$
+$\clubsuit$
+:::
+
+The matrices in the examples above had distinct eigenvalues, and it turned out that $\mathbb{R}^n$ had a basis of eigenvectors. 
+This turns out to hold more generally:
+
+::: {#prp-}
+Let $\mathbf{v}_1,...,\mathbf{v}_k$ be eigenvectors corresponding to distinct eigenvalues. Then $\mathbf{v}_1,...,\mathbf{v}_k$ are linearly independent. 
+:::
+
+::: {.proof}
+Suppose for contradiction that $\mathbf{v}_1,...,\mathbf{v}_k$ are linearly dependent. \index{Proof by contradiction!Eigenvectors for distinct eigenvalues are linearly independent}
+Then there is a linear independence relation 
+$$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_k\mathbf{v}_k=\mathbf{0}.$$
+But then there is such a relation  with as few non-zeros as possible, let us say $r\geq 2$ non-zeros. 
+By rearranging the vectors we can assume that the $r$ first vectors have coefficients different from 0, i.e., 
+$$c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_r\mathbf{v}_r=\mathbf{0},$$
+where all $c_1,...,c_r$ are $\neq 0$. Multiplying this relation with $-\lambda_1$ we obtain
+$$
+-c_1\lambda_1\mathbf{v}_1 -c_2\lambda_1\mathbf{v}_2 - \cdots - c_r\lambda_1\mathbf{v}_r=\mathbf{0},
+$$ {#eq-leggsammen1}
+We also have that
+$$
+A(c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_r\mathbf{v}_r) 
+= c_1\lambda_1\mathbf{v}_1 + c_2\lambda_2\mathbf{v}_2 + \cdots + c_r\lambda_r\mathbf{v}_r
+= \mathbf{0}
+$$ {#eq-leggsammen2}
+If we add @eq-leggsammen1 and @eq-leggsammen2 we get
+$$
+c_2(\lambda_2-\lambda_1)\mathbf{v}_2 + c_3(\lambda_3-\lambda_1)\mathbf{v}_3 + \cdots + c_r(\lambda_r-\lambda_1)\mathbf{v}_r = \mathbf{0}.
+$$
+This gives us an even shorter linear dependence relation, which is a contradiction. $\mathbf{v}_1,...,\mathbf{v}_k$ must thus be linearly independent.
+:::
+
+If a matrix does not have distinct eigenvalues two things can happen:
+
+1. $\mathbb{R}^n$ does not have a basis of eigenvectors for $A$.
+2. $\mathbb{R}^n$ has a basis of eigenvectors for $A$.
+
+Let us show that both of these can occur. 
+
+::: {#exm-ikkediagonaliserbar}
+Consider $A=\begin{pmatrix} 1 & -2 \\ 2 & -3\end{pmatrix}$. Then 
+$$
+\det(A-\lambda I) = \left| \begin{array}{cc} 1-\lambda & -2 \\ 2 & -3-\lambda\end{array} \right|
+= (1-\lambda)(-3-\lambda)+4 
+= \lambda^2 +2\lambda+1=(\lambda+1)^2).
+$$
+$\lambda=-1$ is therefore the only eigenvalue. The eigenvectors for this can be found by row reduction:
+$$
+A+I = \begin{pmatrix} 2 & -2 \\ 2 & -2\end{pmatrix} \sim \begin{pmatrix} 1 & -1 \\ 0 & 0 \end{pmatrix},
+$$
+so that $\mathbf{v}=(1,1)$ is a particular eigenvector. This does not span $\mathbb{R}^2$, so that 1. above is not the case.
+$\clubsuit$
+:::
+
+::: {#exm-}
+Let us set $A=I_2$. The characteristic polynomial is now $(1-\lambda)^2$, so that $\lambda=1$ is the only eigenvalue. 
+Since $A-I=0$, both $x_1$ and $x_2$ are free variables, so that all vectors are eigenvectors. 
+In particular $\{\mathbf{e}_1,\mathbf{e}_2\}$ is a basis of eigenvectors, so that 2. above is the case.
+$\clubsuit$
+:::
+
+A matrix can also have complex eigenvalues and eigenvectors:
+
+::: {#exm-diagonalisering}
+Consider $A=\begin{pmatrix} 2 & -8 \\ 2 & 2 \end{pmatrix}$. Then
+$$
+\det(A-\lambda I) 
+=  \left| \begin{array}{cc} 2-\lambda & -8 \\ 2 & 2-\lambda\end{array} \right|
+= (2-\lambda)^2+16,
+$$
+which is $0$ when $2-\lambda=\pm 4i$, i.e., when $\lambda=2\pm 4i$. 
+ 
+Let us find an eigenvector for $\lambda_1=2+4i$. We have that 
+$$
+A-(2+4i)I=\begin{pmatrix} -4i & -8 \\ 2 & -4i\end{pmatrix}
+\sim \begin{pmatrix} 1 & -2i \\ 0 & 0 \end{pmatrix}. 
+$$
+This gives the particular eigenvector $\mathbf{v}_1=(2i,1)$.
+
+Let us find an eigenvector for $\lambda_1=2-4i$. We have that 
+$$
+A-(2-4i)I=\begin{pmatrix} 4i & -8 \\ 2 & 4i\end{pmatrix}
+\sim \begin{pmatrix} 1 & 2i \\ 0 & 0 \end{pmatrix}. 
+$$
+This gives the particular eigenvector $\mathbf{v}_1=(-2i,1)$. $\clubsuit$
+:::
+
+In the example above we saw that the eigenvalues and eigenvectors were conjugates of one-another. 
+This is actually the case for all real matrices. To see this, suppose $\lambda$ is an eigenvalue with corresponding eigenvector 
+$\mathbf{x}$. Then
+$$
+A\overline{\mathbf{x}}=\overline{A}\overline{\mathbf{x}}=\overline{A\mathbf{x}}=\overline{\lambda\mathbf{x}}=\overline{\lambda}\overline{\mathbf{x}}.
+$$
+This shows that $\overline{\lambda}$ also is an eigenvalue, with corresponding eigenvector $\overline{\mathbf{x}}$. 
+
+::: {#exm-}
+Let us find the eigenvalues of the rotation matrix $A=\begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}$:
+$$
+\det(A-\lambda I) 
+= \left| \begin{array}{cc} \cos\theta-\lambda & -\sin\theta \\ \sin\theta & \cos\theta-\lambda\end{array} \right|
+= (\cos\theta-\lambda)^2 +\sin^2\theta,
+$$
+which is $0$ when $\lambda=\cos\theta\pm i\sin\theta$. We then find the eigenvector corresponding to 
+$\lambda=\cos\theta+i\sin\theta$ using row reduction:
+$$
+A-(\cos\theta+i\sin\theta)I 
+= \begin{pmatrix} -i\sin\theta & -\sin\theta \\ \sin\theta & -i\sin\theta \end{pmatrix}
+\sim \begin{pmatrix} 1 & -i \\ 0 & 0 \end{pmatrix},
+$$
+so that the corresponding eigenvector is $(i,1)$. Since rotation matrices are real it follows that also $\lambda=(-i,1)$ 
+is an eigenvector corresponding to $\cos\theta-i\sin\theta$. $\clubsuit$
+:::
+
+
+
+## Diagonalisation
+Suppose that the $n\times n$-matrix $A$ is real, and has eigenvectors $\mathbf{p}_1,\mathbf{p}_2,...,\mathbf{p}_k$ with corresponding eigenvalues $\lambda_1,\lambda_2,...\lambda_k$. 
+Since $A\mathbf{p}_i=\lambda_i\mathbf{p}_i$ for $i=1,...,k$ we have that 
+\begin{align*}
+A\begin{pmatrix} \mathbf{p}_1 & \mathbf{p}_2 & \cdots & \mathbf{p}_k \end{pmatrix} 
+&= \begin{pmatrix} A\mathbf{p}_1 & A\mathbf{p}_2 & \cdots A\mathbf{p}_k \end{pmatrix} \\
+&= \begin{pmatrix} \lambda_1\mathbf{p}_1 & \lambda_2\mathbf{p}_2 & \cdots & \lambda_k\mathbf{p}_k \end{pmatrix} \\
+&=\begin{pmatrix} \mathbf{p}_1 & \mathbf{p}_2 & \cdots & \mathbf{p}_k \end{pmatrix}
+\begin{pmatrix} 
+\lambda_1 & 0 & \cdots & 0 \\
+0 & \lambda_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \lambda_k
+\end{pmatrix}.
+\end{align*}
+We can also write this as $AP=PD$,
+where $P=\begin{pmatrix} \mathbf{p}_1 & \mathbf{p}_2 & \cdots & \mathbf{p}_k \end{pmatrix}$, and $D$ is the $k\times k$ diagonal matrix with $\lambda_1,\lambda_2,...\lambda_k$ on the diagonal. 
+If $A$ has $n$ linearly independent eigenvectors, the matrix $P$ is an invertible $n\times n$-matrix. If we multiply with $P^{-1}$ to the right on both sides we get that  
+$$A=PDP^{-1}.$$
+Matrices that can be factored like this (with $D$ diagonal) are called *diagonalisable*\index{Diagonalisable}. 
+From this it is clear that matrices that have $n$ linearly independent eigenvectors are diagonalisable. 
+The other way, if $A=PDP^{-1}$, we can write $AP=PD$, which says that $\{\mathbf{p}_i\}_{i=1}^n$ are linearly independent eigenvectors for $A$, with $\{\lambda_i\}_{i=1}^n$ 
+as corresponding eigenvalues. We have therefore proved the following:
+
+::: {#prp-}
+A matrix $A$ is diagonalisable if and only if $\mathbb{C}^n$ has a basis consisting of eigenvectors for $A$.
+:::
+
+While $A$ is supposed to be real, in a diagonalisation we must allow for $P$ and $D$ to be complex - since real matrices can have complex eigenvalues, 
+and complex eigenvalues give rise to complex eigenvectors. 
+This is why we wrote $\mathbb{C}^n$ above, and not $\mathbb{R}^n$.
+
+Why is it desirable for a matrix to be diagonalisable? 
+First of all, powers of a diagonalisable matrix are easily computed, since $A^k=PD^kP^{-1}$ (it is less work to compute $D^k$ than $A^k$ for large matrices). 
+More generally it is easy to show that 
+$$
+p(A)=P
+\begin{pmatrix} 
+p(\lambda_1) & 0                     & \cdots & 0 \\
+0                     & p(\lambda_2) & \cdots & 0 \\
+\vdots             & \vdots             & \ddots & \vdots \\
+0                     &   0                  & \cdots & p(\lambda_n)  
+\end{pmatrix}
+P^{-1}
+$$
+for ethvert polynom $p$. 
+
+We also say that the matrices $A$ and $D$ are *similar* if $A=PDP^{-1}$ for some invertible matrix $P$. This definition covers square matrices in general - regardless of whether they are diagonal or not. 
+As an example, from @prp-ta_and_tb_similar it follows that the matrices $[T]_{\mathcal{A}}$ and $[T]_{\mathcal{B}}$ of linear transformations relative to any bases are similar. 
+Since $A\mathbf{p}_i=\lambda_i\mathbf{p}_i$ it follows that the matrix of $T(\mathbf{x})=A\mathbf{x}$ relative to a basis of eigenvectors is the diagonal matrix with the diagonal elements being the eigenvalues.
+
+
+::: {#exm-}
+In @exm-ikkediagonaliserbar we saw that the matrix $A=\begin{pmatrix} 1 & -2 \\ 2 & -3\end{pmatrix}$ did not have a basis of eigenvectors. 
+It is therefore not diagonalisable. $\clubsuit$
+:::
+
+::: {#exm-}
+In @exm-diagonalisering we found that the matrix $A=\begin{pmatrix} 2 & -8 \\ 2 & 2 \end{pmatrix}$ had eigenvalues $\lambda_1=2+4i$ and $\lambda_2=2-4i$ 
+with corresponding eigenvectors $\mathbf{p}_1=(2i,1)$ and $\mathbf{p}_2=(-2i,1)$. We can thus set $P=\begin{pmatrix} 2i & -2i \\ 1 & 1 \end{pmatrix}$. We compute 
+$$P^{-1}=\frac{1}{2i+2i}\begin{pmatrix} 1 & 2i \\ -1 & 2i \end{pmatrix}=\frac{1}{4}\begin{pmatrix} -i & 2 \\ i & 2 \end{pmatrix}.$$
+A diagonalisation of $A$ is thus
+\begin{align*}
+A = PDP^{-1} = \frac{1}{4}\begin{pmatrix} 2i & -2i \\ 1 & 1 \end{pmatrix}\begin{pmatrix} 2+4i & 0 \\ 0 & 2-4i\end{pmatrix}\begin{pmatrix} -i & 2 \\ i & 2 \end{pmatrix}.
+\end{align*}
+If we write $2+4i$ on polar form $re^{i\theta}$ then we get $(2+4i)^k=r^ke^{ik\theta}$ and $(2-4i)^k=r^ke^{-ik\theta}$. This gives 
+$$
+A^k=PD^kP^{-1}= \frac{r^k}{4}\begin{pmatrix} 2i & -2i \\ 1 & 1 \end{pmatrix}\begin{pmatrix} e^{ik\theta} & 0 \\ 0 & e^{-ik\theta} \end{pmatrix}\begin{pmatrix} -i & 2 \\ i & 2 \end{pmatrix}.
+$$
+$\clubsuit$
+:::
+
+@exr-cramer explains how we can obtain an invertible matrix $P$ so that both $P$ and $P^{-1}$ 
+have integer entries only. If we let $D$ be a diagonal matrix with integer entries, 
+$A=PDP^{-1}$ will also have integer entries, with eigenvectors and -values also being integers. 
+@exr-cramer thus gives a recipe for constructing eigenvector examples with nice numbers in them. 
+@exm-biggerexample was constructed following this recipe.
+
+
+
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+
+## Eigenvectors of a mirroring operations
+
+The mapping which mirrors all points in the plane about the $y$-axis has
+
+1. [x] $$\begin{pmatrix} 1 \\ 0 \end{pmatrix}$$ as an eigenvector with -1 as a corresponding eigenvalue, and $$\begin{pmatrix} 0 \\ 1 \end{pmatrix}$$ as an eigenvector with 1 as a corresponding eigenvalue.
+2. [ ] $$\begin{pmatrix} 1 \\ 0 \end{pmatrix}$$ as an eigenvector with 1 as a corresponding eigenvalue, and $$\begin{pmatrix} 0 \\ 1 \end{pmatrix}$$ as an eigenvector with -1 as a corresponding eigenvalue.
+3. [ ] $$\begin{pmatrix} 1 \\ 1 \end{pmatrix}$$ as an eigenvector with -1 as a corresponding eigenvalue, and $$\begin{pmatrix} 1 \\ -1 \end{pmatrix}$$ as an eigenvector with as a corresponding eigenvalue.
+
+
+
+## Eigenvalues of an elementary matrix.
+
+Let $A$ be the elementary $n\times n$-matrix obtained by adding row $i$ to row $j$ ($i\neq j$). 
+The eigenvalues of $A$ are
+
+1. [x] all 1
+2. [ ] all 0 or 1
+3. [ ] all positive
+
+## Eigenvectors of an elementary matrix.
+
+Let $A$ be the same matrix as in the previous question. Then
+
+1. [x] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_i$.
+2. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_j$.
+3. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$.
+
+
+## A matrix with distinct eigenvalues
+
+Suppose the $n\times n$-matrix $A$ has $n$ distinct eigenvalues, and that one of them is zero. 
+Which of the following claims is false?
+
+1. [x] $A$ is invertible
+2. [ ] $A$ is not invertible
+3. [ ] the determinant of $A$ is zero.
+
+
+## A matrix with distinct eigenvalues
+
+Suppose the $n\times n$-matrix $A$ has $n$ distinct eigenvalues, where all of them are nonzero. 
+Which of the following claims is false?
+
+1. [ ] $A$ is invertible
+2. [x] $A$ is not invertible
+3. [ ] the determinant of $A$ is different from zero.
+
+
+
+
+
+## Eigenvalues of a $3\times 3$-matrix
+
+The eigenvalues of the matrix  
+$$\begin{pmatrix} 1 & 1 & 2 \\ 0 & 2 & 0 \\ 2 & 1 & 1 \end{pmatrix}$$
+are
+
+> We have
+$$
+\begin{aligned}
+\det(\lambda I-A) &= \left| \begin{array}{ccc} \lambda -1 & -1 & -2 \\ 0 & \lambda - 2 & 0 \\ -2 & -1 & \lambda-1\end{array}\right| \\
+&= (\lambda -2) \left| \begin{array}{cc} \lambda-1 & -2 \\ -2 & \lambda-1 \end{array}\right| \\
+&= (\lambda-2)((\lambda-1)^2-4) = (\lambda-2)(\lambda-3)(\lambda+1)
+\end{aligned}
+$$
+where we expanded the determinant along the second row. The eigenvalues are thus $-1$, $2$, and $3$. 
+
+1. [ ] $2$ , $3$}
+2. [ ] $1$, $2$, and $-3$
+3. [x] $-1$, $2$, and $3$
+4. [ ] $1$, $2$
+5. [ ] $2$
+
+
+
+## Eigenvectors of a $2\times 2$-matrix.
+
+The matrix 
+$$
+A=\begin{pmatrix}0.8 & 0.7 \\ 0.2 & 0.3 \end{pmatrix}
+$$
+has 
+
+1. [ ] eigenvectors $(1,3)$ and $(4,1)$
+2. [ ] not two linearly independent eigenvectors
+3. [ ] eigenvectors $(1,2)$ and $(2,1)$
+4. [ ] eigenvectors $(1,1)$ and $(7,-2)$
+5. [x] eigenvectors $(-1,1)$ and $(7,2)$
+
+```
+:::
+
+
+
+## Exercises {.unnumbered}
+
+
+
+
+::: {#exr-}
+Find eigenvalues and eigenvectors for the matrix 
+
+(a) $A=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 3 & 1 \\ 0 & 1 & 3\end{pmatrix}$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have 
+$$
+\det(A-\lambda I)= (1-\lambda) \left| \begin{array}{cc} 3-\lambda & 1 \\ 1 & 3-\lambda \end{array} \right|
+= (1-\lambda)((3-\lambda)^2 -1)
+$$
+where we expanded the determinant along the first row. Since $(1-\lambda)$ was a factor here we need not apply 
+polynomial division. We also need not multiply out $(3-\lambda)^2 -1$, since this can be zero only when $\lambda=3\pm 1$. 
+The eigenvalues are therefore $\lambda_1=1$, $\lambda_2=2$, $\lambda_3=4$. 
+
+Eigenvector for $\lambda_1=1$:
+$$A-I_3 = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 2 & 1 \\ 0 & 1 & 2 \end{pmatrix}  
+\sim \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \end{pmatrix}, $$
+so that $(1,0,0)$ is a particular eigenvector.
+
+Eigenvector for $\lambda_2=2$:
+$$A-2I_3 = \begin{pmatrix} -1 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & 1 & 1\end{pmatrix}  
+\sim \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & 0 & 0 \end{pmatrix}, $$
+so that $(0,-1,1)$ is a particular eigenvector.
+
+Eigenvector for $\lambda_3=4$:
+$$A-4I_3 = \begin{pmatrix} -3 & 0 & 0 \\ 0 & -1 & 1 \\ 0 & 1 & -1\end{pmatrix}  
+\sim \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & -1 \\ 0 & 0 & 0 \end{pmatrix}, $$
+so that $(0,1,1)$ is a particular eigenvector.
+
+```{python}
+A = sym.Matrix([[1,0,0],[0,3,1],[0,1,3]])
+A.eigenvals(), A.eigenvects()
+```
+:::::::
+:::::
+
+(b) $A=\begin{pmatrix} 0 & -4 \\ 1 & 0 \end{pmatrix}$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have $\det(A-\lambda I)=\lambda^2+4$, and this is $0$ for $\lambda=\pm 2i$. 
+
+Eigenvector for $\lambda_1=2i$: 
+$$
+A-2iI_2 = \begin{pmatrix} -2i & -4 \\ 1 & -2i \end{pmatrix} \sim \begin{pmatrix} 1 & -2i \\ 0 & 0 \end{pmatrix},
+$$
+so that $(2i,1)$ is a particular eigenvector. But then $(-2i,1)$ is a particular eigenvector for $\lambda_2=-2i$. 
+
+```{python}
+A = sym.Matrix([[0,-4],[1,0]])
+A.eigenvals(), A.eigenvects()
+```
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-}
+Define $A=\begin{pmatrix} 0.7 & 0.6 \\ 0.3 & 0.4 \end{pmatrix}$.
+
+(a) Find the eigenvectors and eigenvalues of $A$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The characteristic polynomial is 
+$$(0.7-\lambda)(0.4-\lambda)-0.3\cdot 0.6 = \lambda^2-1.1\lambda+0.1,$$
+which has roots $\lambda=\frac{1.1\pm\sqrt{1.21-0.4}}{2}=\frac{1.1\pm 0.9}{2}$, so that $\lambda_1=0.1$, $\lambda_2=1$.
+
+Eigenvalue for $\lambda_1=0.1$:
+$$ A-0.1I_2= \begin{pmatrix} 0.6 & 0.6 \\ 0.3 & 0.3 \end{pmatrix} \sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix},$$
+so that $(-x_2,x_2)$ is a general eigenvector. A particular eigenvector is $\mathbf{v}_1=(-1,1)$.
+
+Eigenvalue for $\lambda_2=1$:
+$$ A-I_2= \begin{pmatrix} -0.3 & 0.6 \\ 0.3 & -0.6 \end{pmatrix} \sim \begin{pmatrix} 1 & -2 \\ 0 & 0 \end{pmatrix},$$
+so that $(2x_2,x_2)$ is a general eigenvector. A particular eigenvector is $\mathbf{v}_2=(2,1)$.
+```{python}
+A = sym.Matrix([[7,6],[3,4]])/10
+A.eigenvals(), A.eigenvects()
+```
+:::::::
+:::::
+
+(b) Write the vector $\mathbf{x}_0=(1,5)$ as a sum of eigenvectors, and compute the limit $\lim_{n\to\infty} A^n\mathbf{x}_0$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We row reduce
+$$
+\begin{pmatrix} -1 & 1 & 1 \\  1 & 1 & 5 & \end{pmatrix} \sim \begin{pmatrix} 1 & 1 & 5 \\ 0 & 2 & 6\end{pmatrix}
+\sim \begin{pmatrix} 1 & 0 & 2 \\ 0 & 1 & 3 \end{pmatrix}, 
+$$
+so that $\mathbf{x}_0=2\mathbf{v}_1+3\mathbf{v}_2$. This gives
+$$
+\lim_{n\to\infty} A^n\mathbf{x}_0 = \lim_{n\to\infty} (2A^n\mathbf{v}_1 +3A^n\mathbf{v}_2) 
+= \lim_{n\to\infty} (2\cdot 0.1^n\mathbf{v}_1 +3\mathbf{v}_2)
+= 3\mathbf{v}_2 = (3,3).
+$$
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+Find eigenvalues and eigenvectors for $A=\begin{pmatrix} 6 & 2 \\ 0 & 6\end{pmatrix}$. 
+Is there a basis for $\mathbb{R}^2$ consisting of eigenvectors for $A$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $\det(A-\lambda I_2)=(6-\lambda)^2$, so that $\lambda=6$ is the only eigenvalue. 
+
+We find the eigenvectors: 
+$$A-6I_2 = \begin{pmatrix} 0 & 2 \\ 0 & 0\end{pmatrix} \sim \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix},$$
+so that $(1,0)$ is a particular eigenvector. This vector spans a space of dimension one, so that 
+there is no basis for $\mathbb{R}^2$ consisting of eigenvectors for $A$.
+
+```{python}
+A = sym.Matrix([[6,2],[0,6]])
+A.eigenvals(), A.eigenvects()
+```
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-}
+Let $A$ be the matrix $A=\begin{pmatrix} 0.7 & 0.8 \\ 0.3 & 0.2 \end{pmatrix}$.
+
+(a) Find the eigenvalues and eigenvectors of $A$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$
+\det(\lambda I -A) = (\lambda-0.7)(\lambda-0.2)-0.24
+= \lambda^2-0.9\lambda-0.1.
+$$
+This is $0$ when $\lambda=\frac{0.9\pm 1.1}{2}$.
+The eigenvalues are thus $\lambda_1=-0.1$ and $\lambda_2=1$.
+
+Eigenvector for $\lambda_1=-0.1$: 
+$$
+-0.1I-A = \begin{pmatrix} -0.8 & -0.8 \\ -0.3 & -0.3\end{pmatrix}
+\sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix}.
+$$
+$\mathbf{v}_1=\begin{pmatrix} -1 \\ 1 \end{pmatrix}$ is a particular eigenvector.
+
+Eigenvector for $\lambda_2=1$:
+$$
+I-A = \begin{pmatrix} 0.3 & -0.8 \\ -0.3 & 0.8\end{pmatrix}
+\sim \begin{pmatrix} 1 & -8/3 \\ 0 & 0 \end{pmatrix}
+$$
+$\mathbf{v}_2=\begin{pmatrix} 8 \\ 3 \end{pmatrix}$ is a particular eigenvector.
+
+```{python}
+A = sym.Matrix([[7,8],[3,2]])/10
+A.eigenvals(), A.eigenvects()
+```
+:::::::
+:::::
+
+(b) Write down a diagonalisation of the matrix $A$. Does $A$ have an orthonormal basis of eigenvectors?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+A matrix $A$ is diagonalisable if it can be written on the form
+$A=PDP^{-1}$, where $D$ is diagonal and $P$ is invertible. 
+$P$ then has the eigenvectors as columns, and $D$ has the eigenvalues on the diagonal. 
+
+We know that eigenvectors corresponding to different eigenvalues are linearly independent. Since the two eigenvalues here are different, we have two linearly independent eigenvectors. $P$ can then be obtained by inserting the two eigenvectors as columns, and the corresponding eigenvalues on the diagonal in $D$. We therefore have $A=PDP^{-1}$ with
+$P=\begin{pmatrix} -1 & 8 \\ 1 & 3 \end{pmatrix}$ and 
+$D=\begin{pmatrix} -0.1 & 0 \\ 0 & 1 \end{pmatrix}$, and
+$$
+P^{-1} = \frac{1}{\det(P)}\begin{pmatrix}3 & -8 \\ -1 & -1 \end{pmatrix}
+= \frac{1}{11}\begin{pmatrix}-3 & 8 \\ 1 & 1 \end{pmatrix}.
+$$
+
+It is easily checked that the eigenvectors $(-1,1)$ and $(8,3)$ are not orthogonal, so that we do not have an orthonormal basis of eigenvectors. Here one could also argue as follows:  
+If $A$ has an orthonormal basis of eigenvectors, it can be written on the form $A=PDP^T$, where $P$ has 
+eigenvectors as columns. But then $A$ symmetric since
+$$A^T=(PDP^T)^T = PD^TP^T=PDP^T=A.$$
+The matrix here was not symmetric, and can then not have an orthonormal basis of eigenvectors. 
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-}
+Suppose both $\mathbf{x}_1$ and $\mathbf{x}_2$ are eigenvectors for $A$, for the same eigenvalue $\lambda$. 
+Show that $\mathbf{x}_1+\mathbf{x}_2$ also is an eigenvector for $A$ with eigenvalue $\lambda$. 
+We also know that $c\mathbf{x}_1$ is an eigenvector for $A$ with eigenvalue $\lambda$. 
+From this it follows that all eigenvectors for $A$ corresponding to $\lambda$ is a subspace of $\mathbb{R}^n$. 
+This subspace is also called an *eigenspace*\index{Eigen!-space}.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $A(\mathbf{x}_1+\mathbf{x}_2)=A\mathbf{x}_1+A\mathbf{x}_2=\lambda\mathbf{x}_1+\lambda\mathbf{x}_2=\lambda(\mathbf{x}_1+\mathbf{x}_2).$
+This proves the claim.
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+Let $A$ be a square matrix. Show that $A$ and $A^T$ have the same eigenvalues.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$\det(A-\lambda I_n)=\det(A-\lambda I_n)^T=\det(A^T-\lambda I_n)$.
+This shows that $A$ and $A^T$ have the same characteristic polynomial, so that they also have the same eigenvalues.
+:::::::
+:::::
+:::
+
+::: {#exr-nilpoteig0 name='Nilpotent matrices have 0 as the only eigenvalue'}
+Recall from @exr-nilpotnotinv that a square matrix $A$ is called nilpotent if $A^k=0$ for some $k$. 
+Show that all eigenvalues in a nilpotent matrix are 0. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Assume that $A\mathbf{x}=\lambda\mathbf{x}$. Applying $A$ several times gives $\mathbf{0}=A^k\mathbf{x}=\lambda^k\mathbf{x}$. It follows that $\lambda^k=0$, so that $\lambda=0$ also.
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-exr-nilpotnotdiag name='Nilpotent matrices are not diagonalisable'}
+Prove that a nonzero nilpotent matrix is not diagonalisable. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Assume for contradiction that there exists a nilpotent matrix $A$ that is nonzero and diagonalisable. Then $A=PDP^{-1}$ for some diagonal matrix $D$ and invertible matrix $P$. 
+We have that $D^k=P^{-1}A^kP$. Since $A^k=0$ for some $k$ this implies that $D^k=0$. Since $D$ is diagonal this implies that $D=0$, which is a contradiction. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Show that the rank of a diagonalisable matrix equals the number of nonzero eigenvalues (counted with multiplicity). Show also that $A^k$ has the same rank as $A$ for all $k$ when $A$ is diagonalisable. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $A=PDP^{-1}$ be diagonalisable. 
+Multiplication with $P^{-1}$ to the right does not change the column space, so that $\text{rank}(DP^{-1})=\text{rank}(D)$. 
+Similarly, multiplication with $P$ to the left does not change the dimension of the column space, so that 
+$$\text{rank}(A)=\text{rank}(PDP^{-1})=\text{rank}(Dp^{-1})=\text{rank(D},$$
+and $\text{rank(D}$ clearly equals the number of nonzero eigenvalues counted with multiplicity.
+
+The second statement follows from that $A^k=PD^kP^{-1}$, and from that $D$ and $D^k$ have the same positions of zeros on the diagonal.
+
+:::::::
+::::: 
+:::
+
+
+
+
+::: {#exr-}
+Let $A$ be an invertible matrix with eigenvalues $\lambda_i$. Show that $A^{-1}$ has the eigenvalue $1/\lambda_i$. 
+Explain also that $A$ and $A^{-1}$ have the same eigenvectors.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that 
+$$\det(A)\det(A^{-1}-\lambda I_n)=\det(I_n-\lambda A)=(-\lambda)^n\det(A-\frac{1}{\lambda}I_n).$$
+From this it follows that $\lambda$ is an eigenvalue of $A^{-1}$ if and only if $\frac{1}{\lambda}$ is an eigenvalue of $A$. 
+If we apply $A^{-1}$ to each side in $A\mathbf{x}=\lambda\mathbf{x}$ we get that $\mathbf{x}=\lambda A^{-1}\mathbf{x}$, so that $A^{-1}\mathbf{x}=\frac{1}{\lambda}\mathbf{x}$, 
+so that $A$ and $A^{-1}$ have the same eigenvectors. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Suppose that $\mathbf{v}$ is an eigenvector for both $A$ and $B$. Show that $\mathbf{v}$ is an eigenvector for $A+B$. 
+What is the corresponding eigenvalue?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Suppose $A\mathbf{v}=\lambda_1\mathbf{v}$ and $B\mathbf{v}=\lambda_2\mathbf{v}$. Then 
+$$
+(A+B)\mathbf{v}=A\mathbf{v}+B\mathbf{v}=\lambda_1\mathbf{v}+\lambda_2\mathbf{v} =(\lambda_1+\lambda_2)\mathbf{v}.
+$$
+$\mathbf{v}$ is therefore also an eigenvector for $A+B$, with $\lambda_1+\lambda_2$ as corresponding eigenvalue.
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-qk}
+Suppose that $A$ is diagonalisable, so that we can write $A=PDP^{-1}$. Since 
+$$PD=\begin{pmatrix} \lambda_1\mathbf{p}_1 & \lambda_2\mathbf{p}_2 & \cdots & \lambda_n\mathbf{p}_n \end{pmatrix}$$
+the outer form for matrix multiplication gives
+$$
+PDP^{-1} = \sum_{k=1}^n \lambda_k P_{:k} (P^{-1})_{k:}.
+$$ {#eq-projsumdiag}
+This splits $A$ into a sum of simpler matrices $Q_k=P_{:k} (P^{-1})_{k:}$. We can thus write $A=\sum_{k=1}^n \lambda_k Q_k$. 
+In this exercise we will look at the matrices $Q_k$ more closely.
+
+(a) Show that $Q_k^2=Q_k$. Matrices satisfying this are also called *idempotent*\index{Matrix!idempotent}. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$
+Q_k^2
+=P_{:k} (P^{-1})_{k:}P_{:k} (P^{-1})_{k:}
+=P_{:k} (P^{-1}P)_{kk} (P^{-1})_{k:}
+=P_{:k} (P^{-1})_{k:} = Q_k
+$$
+We here used that $(P^{-1})_{k:}P_{:k}=(P^{-1}P)_{kk}=1$. 
+:::::::
+:::::
+
+(b) Show that $Q_rQ_s=0$ when $r\neq s$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $Q_rQ_s=P_{:r} (P^{-1})_{r:} P_{:s} (P^{-1})_{s:}=P_{:r}(P^{-1}P)_{rs}(P^{-1})_{s:}=0$ 
+when $r\neq s$, since $P^{-1}P=I$ has zeros outside the diagonal. 
+:::::::
+:::::
+
+(c) Show that $p(A)$ can be written as a linear combination of $\{Q_k\}_{k=1}^n$, when $p$ is a polynomial.
+
+(d) Show that $Q_k$ can be written as a polynomial in $A$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+It is clear that
+$$
+p(A)=P
+\begin{pmatrix} 
+p(\lambda_1) & 0                     & \cdots & 0 \\
+0                     & p(\lambda_2) & \cdots & 0 \\
+\vdots             & \vdots             & \ddots & \vdots \\
+0                     &   0                  & \cdots & p(\lambda_n)  
+\end{pmatrix}
+P^{-1}
+$$
+for all polynomials $p$. Choose now a polynomial $p$ which is $1$ in $\lambda_i$, and $0$ in the other eigenvalues. Then we get that $p(A)=\lambda_i\sum Q_k$.
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+We shall consider matrices where the column sums all are $1$. A general such $2\times 2$-matrix can be written 
+$A=\begin{pmatrix} d & e \\ 1-d & 1-e \end{pmatrix}$.
+
+(a) Show that the eigenvalues of $A$ are $d-e$ and $1$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We compute
+\begin{align*} 
+\det(A-\lambda I) &= \left| \begin{array}{ccc} d-\lambda & e \\ 1-d & 1-e-\lambda \end{array} \right|
+= (d-\lambda)(1-e-\lambda) - e(1-d) \\
+&= \lambda^2 - (d-e+1)\lambda + d-e.
+\end{align*}
+This is $0$ for 
+\begin{align*}
+\lambda &= \frac{d-e+1\pm\sqrt{(d-e+1)^2 - 4(d-e)}}{2} = \frac{d-e+1\pm\sqrt{(d-e-1)^2}}{2} \\
+&=\frac{d-e+1\pm(d-e-1)}{2},
+\end{align*}
+which gives $\lambda_1=d-e$, $\lambda_2=1$.
+:::::::
+:::::
+
+(b) Find the eigenvectors of $A$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have
+\begin{align*}
+A-(d-e)I_2 &= \begin{pmatrix} e & e \\ 1-d & 1-d\end{pmatrix} \sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix} 
+\end{align*}
+We therefore have $x_1=-x_2$, so that $(-1,1)$ is a particular eigenvector.
+\begin{align*}
+A - I_2       &= \begin{pmatrix} d-1 & e \\ 1-d & -e\end{pmatrix} \sim \begin{pmatrix} 1 & \frac{e}{d-1} \end{pmatrix}
+\end{align*}
+A general eigenvector is $x_2\begin{pmatrix} - \frac{e}{d-1} \\ 1\end{pmatrix}$. If we set $x_2=1-d$ we get the particular eigenvector 
+$\begin{pmatrix} e \\ 1-d \end{pmatrix}$.
+:::::::
+:::::
+:::

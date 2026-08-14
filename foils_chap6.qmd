@@ -1,0 +1,155 @@
+---
+title: "Foils for Chapter 6 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+
+
+# Determinants
+
+::: {#def- name='Determinant'}
+The *determinant* of an $n\times n$-matrix $A$ is defined recursively as follows: 
+
+1. The determinant of a $1\times 1$-matrix $A$ is defined as $a_{11}$.
+2. The determinant of an $n\times n$-matrix $A$ is defined in terms of determinants of $(n-1)\times(n-1)$-submatrices of $A$ as
+
+:::
+
+---
+
+$$
+\begin{aligned}
+\left| \begin{array}{cccc} 
+a_{11} & a_{12} & \cdots & a_{1n} \\ 
+a_{21} & a_{22} & \cdots & a_{2n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{nn}
+\end{array}\right|
+=&
+a_{11}
+\left| \begin{array}{cccc} 
+a_{22} & a_{23} & \cdots & a_{2n} \\ 
+a_{32} & a_{33} & \cdots & a_{3n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n2} & a_{n3} & \cdots & a_{nn}
+\end{array}\right| \\
+&- a_{12}
+\left| \begin{array}{cccc} 
+a_{21} & a_{23} & \cdots & a_{2n} \\ 
+a_{31} & a_{33} & \cdots & a_{3n} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n3} & \cdots & a_{nn}
+\end{array}\right| +\cdots + \\
+&(-1)^{n+1} a_{1n}
+\left| \begin{array}{cccc} 
+a_{21} & a_{22} & \cdots & a_{2(n-1)} \\ 
+a_{31} & a_{32} & \cdots & a_{3(n-1)} \\ 
+\vdots & \vdots & \vdots & \vdots \\
+a_{n1} & a_{n2} & \cdots & a_{n(n-1)}
+\end{array}\right|
+\end{aligned}
+$$
+
+---
+
+Note
+
+- Row $1$ of $A$ has been left out in all submatrices.
+- In the first submatrix column $1$ of $A$ has also been left out, in the second column $2$ of $A$ has been left out, and so on. 
+
+---
+
+
+## Properties of the determinant
+
+Let $A$ be a square matrix
+
+- $\det(A)=0$ if $A$ has a row with zeros only, or a column with zeros only
+- If $A$ is triangular then $\det(A)$ equals the product of the diagonal elements. 
+- If $B$ is obtained from a simple row interchange in $A$, then $\det(B)=-\det(A)$. 
+- If $B$ is obtained by multiplying a row in $A$ with $s$, then $\det(B)=s\det(A)$. 
+- If $B$ is obtained by adding $s$ times row $i$ to row $j$ in $A$, then $\det(B)=\det(A)$. 
+
+It follows that $\det(A)=0$ if $A$ has two identical rows, and, if $E$ is an elementary matrix, 
+$$
+\det(E)=
+\begin{cases} 
+-1 \text{ if $E$ is a row interchange.} \\ 
+s \text{ if $E$ multiplies a row with $s$.} \\ 
+1 \text{ if $E$ adds a multiple of one row to another.}
+\end{cases}
+$$
+
+---
+
+## Main properties
+
+- $\det(A)=\det(A^T)$.
+- $\det(AB)=\det(A)\det(B)$.
+- Determinants can be expanded along any row: For all $1\leq i\leq n$ we have that 
+$$ \det(A)=\sum_{j=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
+- Determinants can be expanded along any column: For all $1\leq j\leq n$ we have that 
+$$\det(A)=\sum_{i=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
+
+---
+
+Alternating sign matrix for the determinant:
+$$
+\begin{pmatrix} 
++ & - & + & - & \cdots \\
+- & + & - & + & \cdots \\
++ & - & + & - & \cdots \\
+- & + & - & + & \cdots \\
+\vdots & \vdots & \vdots & \vdots & \ddots
+\end{pmatrix}
+$$
+
+
+---
+
+{{< include determinants/invmatteo.qmd >}}
+
+---
+
+## Magnification factors for matrices
+
+---
+
+## The vector product
+
+$$\left( x_2y_3-x_3y_2, - (x_1y_3-x_3y_1),x_1y_2-x_2y_1\right)$$
+is called the *vector product* of $\mathbf{x}$ and $\mathbf{y}$. 
+Also written as $\mathbf{x}\times\mathbf{y}$. 
+
+- $\mathbf{x}\times\mathbf{y}$ is orthogonal to both $\mathbf{x}$ and $\mathbf{y}$. 
+- $|\mathbf{x}\times\mathbf{y}|$ equals the area of the parallellogram spanned by $\mathbf{x}$ and $\mathbf{y}$. 
+- The direction of $\mathbf{x}\times\mathbf{y}$ satisfies the *right hand rule*.
+
+---
+
+## Geometrical interpretation of the determinant.
+
+If we define
+$$
+\mathbf{b}=\left( \det(A^{(11)}),-\det(A^{(12)}),\det(A^{(13)}),...,(-1)^{n+1}\det(A^{(1n)}) \right),
+$$
+then the definition of the determinant can be written as the scalar product 
+$\mathbf{a}_1\cdot \mathbf{b}$ ($\mathbf{a}_i$ is here row $i$ in $A$). 
+We can show that
+
+- $\mathbf{b}$ is orthogonal to all $\mathbf{a}_2,...,\mathbf{a}_n$, 
+- $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$,
+- $|\mathbf{a}_1\cdot\mathbf{b}|=V(AB)=|\det(A)|$.
+
+$\mathbf{b}$ is thus a generalisation of the vector product. 
+
+---

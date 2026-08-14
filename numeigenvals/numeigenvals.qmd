@@ -1,0 +1,452 @@
+# Numerical methods for finding eigenvalues and eigenvectors
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+Eigenvectors and eigenvalues are core mathematical objects with many applications. 
+Usually we can't find them symbolically, however, so that we must rely on numerical methods. 
+Many such methods exist, some of which find both eigenvalues and eigenvectors. 
+Others may only find the eigenvalues, or perhaps only one particular eigenvalue, such as the biggest or smallest one. 
+In this chapter we will encounter some of these methods.  
+
+One obvious way to find eigenvalues of a matrix would be to plot the characteristic polynomial, and zoom in to find its zeros. 
+Let us test this approach on the $4\times 4$-matrix
+$A=\left(\begin{array}{cccc} 1 & 2 & 3 & 4 \\ 2 & 1 & 2 & 3 \\ 3 & 2 & 1 & 2 \\ 4 & 3 & 2 & 1 \end{array} \right)$,  
+where we start by plotting the characteristic polynomial of $A$ over $[-4,10]$ (the second line). 
+```{python}
+{{< include code5b.py >}}
+```
+We see that there is a zero in $[8,10]$, so that we can restrict the plot to this interval.
+The next plot reveals that a zero can be found in the interval $[8.75,9.25]$. 
+Continuing in this way you will find a zero close to $9.09$. 
+
+This method clearly has its limitations. First of all, it has to be repeated for all the other zeros as well. 
+Secondly, for large matrices we encounter polynomials of very high degree, so that the plot values easily become very large.
+
+
+
+
+
+
+
+## Jacobi's method
+We start with the *Jacobi method*, which can be used to find all eigenvectors and eigenvalues of a symmetric matrix numerically. 
+It does so by constructing orthogonal matrices $P_1,P_2,...$, and successively applying similarity transformations
+$$
+\begin{aligned}
+  A_1 &= A \\
+  A_2 &= P_1^TA_1P_1 \\
+  A_3 &= P_2^TA_2P_2 \\
+  \vdots &  \vdots \\
+  A_{k+1} &= P_k^TA_kP_k
+\end{aligned}
+$$ {#eq-simsetup}
+We first note that all these matrices are symmetric: Set $B=P^TAP$ with $A$ symmetric and $P$ orthogonal. We compute
+$$B^T=(P^TAP)^T=P^TA^T(P^T)^T=P^TAP=B,$$
+so that $B$ also is symmetric. 
+
+We also note that all matrices $A_i$ have the same eigenvalues. To see why, 
+if $\textbf{v}$ is an eigenvector for $A_k$ with eigenvalue $\lambda$, then the last equation above gives
+$$A_{k+1}(P_k)^T\textbf{v}=(P_k)^TA_k\textbf{v}=\lambda (P_k)^T\textbf{v},$$
+so that $(P_k)^T\textbf{v}$ is an eigenvector for $A_{k+1}$, also with eigenvalue $\lambda$. Since $A_k$ and $A_{k+1}$ have the 
+same eigenvalues, all of the $A_k$ have the same eigenvalues. 
+If $\textbf{v}$ is an eigenvector of $A_1=A$, then in particular $(P_1)^T\textbf{v}$ will be an eigenvector of $A_2$. 
+By repeating this procedure $(P_2)^T(P_1)^T\textbf{v}$ will be an eigenvector for $A_3$, and more generally 
+$$
+  (P_k)^T\cdots(P_1)^T\textbf{v} = (P_1\cdots P_k)^T\textbf{v}
+$$
+will be an eigenvector for $A_{k+1}$. Thus, if $P$ is a matrix consisting of orthonormal eigenvectors for $A$ (so that $A=PDP^T$), $(P_1\cdots P_k)^TP$ is a matrix consisting of orthonormal eigenvectors of $A_{k+1}$. 
+It follows that $A_{k+1}=(P_1\cdots P_k)^TPDP^T(P_1\cdots P_k)$, so that 
+$$
+A=PDP^T=(P_1\cdots P_k)A_{k+1}(P_1\cdots P_k)^T
+$$
+The idea is now to choose the $P_i$ so that the matrices $A_i$ get closer to zero outside the diagonal. We will later see that we can achieve this. 
+In other words, if $A_k=D_k+E_k$, where $D_k$ is the diagonal part of $A_k$, and $E_k$ its off-diagonal part, we can achieve that $E_k\to 0$. 
+It follows that $(P_1\cdots P_k)D_{k+1}(P_1\cdots P_k)^T\to A$, 
+and by continuity of the eigenvalues that the diagonal elements in $D_k$ converge to the eigenvalues of $A$. 
+We will not go into similar arguments for the convergence of $P_1\cdots P_k$ to a matrix with eigenvectors as columns.
+
+After each transformation $A_{k+1} = P_k^TA_kP_k$ we will therefore compute
+$$\text{off}(A) = \sqrt{\sum_{i\neq j}^n a_{ij}^2},$$
+and if this value is less than a given tolerance, $A$ is considered 'diagonal enough', and the algorithm terminates. 
+
+
+
+
+The matrices $P_k$ will have the following form:
+$$
+P_k =
+\begin{pmatrix}
+  1      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 0 \\
+  0      & 1      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cos\theta  & \cdots       & \sin\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & -\sin\theta & \cdots       & \cos\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  0      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 1
+\end{pmatrix}
+$$ {#eq-s_matrisen}
+where $(P_k)_{rr} = (P_k)_{ss} = \cos\theta$, $(P_k)_{rs} = -(P_k)_{sr} = \sin\theta$, $(P_k)_{ii} = 1$ (for $i\neq r,s$) and $0$ else. $P_k$ is orthogonal with
+$$
+(P_k)^{-1} = (P_k)^T =
+\begin{pmatrix}
+  1      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 0 \\
+  0      & 1      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cos\theta  & \cdots       & -\sin\theta & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \sin\theta  & \cdots       & \cos\theta  & \cdots & \cdots & \cdots \\
+  \cdots & \cdots & \cdots & \cdots      & \cdots       & \cdots      & \cdots & \cdots & \cdots \\
+  0      & 0      & \cdots & \cdots      & \cdots       & \cdots      & \cdots & 0      & 1
+\end{pmatrix}
+$$ {#eq-s_matrisen2}
+To see this, let $C$ be the product of the matrices given by @eq-s_matrisen and @eq-s_matrisen2. 
+Since the rows/columns coincide with the rows/columns of the identity matrix outside row/column $r$ and $s$, 
+it is clear that $c_{kl}=I_{kl}$
+when $k\neq r,s$, $l\neq r,s$ ($I$ is the identity matrix). 
+If $k\neq r,s$ we also see that $c_{kr}=c_{rk}=c_{ks}=c_{sk}=0$, since columns $r,s$ are the only ones which have elements in row $r$ and $s$. 
+Further we see that 
+\begin{eqnarray*}
+  c_{rs} &=& -\cos\theta\sin\theta + \sin\theta\cos\theta = 0\\
+  c_{sr} &=& -\sin\theta\cos\theta + \cos\theta\sin\theta = 0\\
+  c_{rr} &=& \cos\theta\cos\theta + \sin\theta\sin\theta = 1\\
+  c_{ss} &=& (-\sin\theta)(-\sin\theta) + \cos\theta\cos\theta = 1.
+\end{eqnarray*}
+It is therefore clear that $C=I$, so that the two matrices are inverses of one-another. 
+
+
+
+
+
+
+If $n=2$ the matrix $P$ corresponds to a rotation with angle $\theta$ in the plane. 
+The $P_k$ therefore have inherited the name *rotation matrices*, since they can be viewed as a rotation when we limit ourselves 
+to the plane spanned by two variables $x_r$ and $x_s$, while all other variables are kept fixed. 
+
+Let us go through the steps needed to implement Jacobi's method. 
+The function below takes the position $(r,s)$, the angle $\theta$, and the dimension $n$ as arguments, and returns the matrix $P_k$ in @eq-s_matrisen.
+```{python}
+{{< include P_k.py >}}
+```
+The next functions take a real $n\times n$-matrix $A$ as input. 
+The first returns $\text{off}(A)$:
+```{python}
+{{< include off.py >}}
+```
+The next returns the position $(r,s)$ of the element outside the diagonal with biggest absolute value. The `np.max`-function is used:
+```{python}
+{{< include offabsmaks.py >}}
+```
+
+
+
+The quantity $\sqrt{\sum_{i,j} a_{ij}^2}$ is called the *Frobenius norm* of $A$, and is written $\|A\|_F$.
+We will have use for the fact that, if $P$ is orthogonal and $B=PA$, $A$ and $B$ have the same Frobenius norm. We say that the Frobenius norm is *invariant* under orthogonal transformations. 
+Since $(PA)_{:,i}=PA_{:,i}$, it is enough to show this invariance when $A$ and $B$ are column vectors. Since the Frobenius norm equals the euclidean norm for column vectors we get
+$$
+| P\mathbf{a}|^2 = (P\mathbf{a})^TP\mathbf{a}=\mathbf{a}^TP^TP\mathbf{a}=\mathbf{a}^T\mathbf{a} =|\mathbf{a}|^2.
+$$
+The same can be shown when $A$ is multiplied with an orthogonal matrix to the left. 
+
+By restricting $B=P^TAP$ to row/columns $r$ and $s$, and using that $A$ and $B$ have the same Frobenius norm, we get that 
+$$a_{rr}^2 + a_{rs}^2 + a_{sr}^2 + a_{ss}^2 = b_{rr}^2 + b_{rs}^2 + b_{sr}^2 + b_{ss}^2,$$
+which can also be written as 
+$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^1-2a_{rs}^2.$$ {#eq-newrel}
+
+
+We need to compute the components in the matrix $P$. Applying the definition of matrix multiplication,
+and using that $P$ has nonzero elements only in position $r$ and $s$ in row/column $r$ and $s$, it is clear that
+
+* If $i,j$ are both different from $r$ and $s$, we have that $b_{ij}=a_{ij}$. 
+* For component $(r,s)$ we get
+\begin{eqnarray*}
+  b_{rs} &=& (P^T)_{rr}a_{rr}P_{rs} + (P^T)_{rr}a_{rs}P_{ss} + (P^T)_{rs}a_{sr}P_{rs} + (P^T)_{rs}a_{ss}P_{ss} \\
+         &=& \cos\theta a_{rr}\sin\theta + \cos\theta a_{rs}\cos\theta -\sin\theta a_{sr}\sin\theta - \sin\theta a_{ss}\cos\theta \\
+         &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + \cos^2\theta a_{rs} - \sin^2\theta a_{sr} \\
+         &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta - \sin^2\theta)a_{sr},
+\end{eqnarray*}
+where we have used that $A$ is symmetric. Since $B$ is symmetric it follows that
+$$b_{rs} = b_{sr} = \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta-\sin^2\theta)a_{rs}.$$
+
+
+From the first point above it follows that $\sum_{i\neq r,s} a_{ii}^2 = \sum_{i\neq r,s} b_{ii}^2$. 
+Adding $a_{rr}^2+a_{ss}^2+b_{rr}^2+b_{ss}^2$ to both sides gives
+$$\sum_{i=1}^n a_{ii}^2 + b_{rr}^2 + b_{ss}^2 = \sum_{i=1}^n b_{ii}^2 + a_{rr}^2 + a_{ss}^2,$$
+which can be written as
+$$\|A\|_F^2 - \text{off}(A)^2 + b_{rr}^2 + b_{ss}^2 = \|B\|_F^2 - \text{off}(B)^2 + a_{rr}^2 + a_{ss}^2.$$
+Since $\|A\|_F=\|B\|_F$ this can be written as
+$$
+\text{off}(B)^2 = \text{off}(A)^2 + a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2 = \text{off}(A)^2 + 2b_{rs}^1 - 2a_{rs}^2,$$
+where we used @eq-newrel. Thus, the off-diagonal contribution $\text{off}(B)$ only changes due to the $(r,s)$ and $(s,r)$ components, 
+and is smallest when $r,s$ are chosen so that $|a_{rs}|$ is as big as possible, and when $\theta$ is chosen so that $b_{rs}=0$,
+The new value is then $\text{off}(B)^2 = \text{off}(A)^2 - 2a_{rs}^2$.
+
+We have that $b_{rs}=0$ when 
+$$\sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta-\sin^2\theta)a_{rs} = 0$$
+This can be rewritten to $\frac{1}{2}\sin(2\theta)(a_{rr}-a_{ss}) + \cos(2\theta) a_{rs} = 0$,
+which also can be written 
+$$\tan(2\theta)=\frac{2a_{rs}}{a_{ss}-a_{rr}}.$$ {#eq-losdenne}
+
+
+
+Since there are $n(n-1)$ off-diagonal entries, each of which are less than $|a_{rs}|$ in absolute value, 
+we have that $\text{off}(A)^2 \leq n(n-1)a_{rs}^2$. From this it follows that 
+$-2a_{rs}^2\leq - \frac{2}{n(n-1)}\text{off}(A)^2$, so that 
+$$
+\text{off}(B)^2 = \text{off}(A)^2 - 2a_{rs}^2 \leq \text{off}(A)^2 - \frac{2}{n(n-1)}\text{off}(A)^2
+= \left(1- \frac{2}{n(n-1)}\right)\text{off}(A)^2.
+$$
+From this it follows that the off-diagonal contribution converges to zero, and we argued that this guaranteed convergence to the actual eigenvalues in Jacobi's method. 
+
+
+
+
+The following function returns an approximation to the eigenvalues and the eigenvectors of a given matrix 
+with help of Jacobi's method. 
+```{python}
+{{< include eig_jacobi.py >}}
+```
+Inside the loop $r,s$ are first found as the off-diagonal entry with largest absolute value, $\theta$ is found from @eq-losdenne, and the matrix $P_k$ is computed. 
+The variable `A` is updated to $A_2$, $A_3$, and so on, while the variable `P` is updated to $P_1$, $P_1P_2$, $P_1P_2P_3$, and so on. 
+The code stops when $\text{off}(A_k)$ gets smaller than the given tolerance.
+To test this we create a random $6\times 6$ matrix $A$. $A+A^T$ is then a symmetric matrix:
+```{python}
+A = np.random.rand(6,6)
+A = A+A.T
+```
+Our method gives the following approximation to the eigenvalues:
+```{python}
+D, P = eig_jacobi(A)
+np.diag(D)
+```
+We first verify that the columns in $P$ are eigenvectors. This is the same as testing that 
+$PDP^T$ is an orthogonal diagonalisation of $A$:
+```{python}
+A - P @ D @ P.T
+```
+It is seen that $A-PDP^T$ is not exactly zero, but very close to zero. This is due to roundoff errors on the computer. 
+We then test that we get the same eigenvalues as returned by `np.linalg.eig`:
+```{python}
+D, P = np.linalg.eig(A)
+D
+```
+We see that `eig_jacobi` and `np.linalg.eig` give approximately the same values, 
+but they are listed in a different order. On a computer we have no control over 
+the order eigenvalues are listed - the algorithm decides this along the way.
+
+The matrix $A$ may be very large, and the function $P_k$ allocates a matrix of the same size. 
+The following function implements multiplication with $P_k$ to the right, and avoids this problem simply by 
+re-computing columns $r$ and $s$ (these are the only two columns in $A$ and $AP_k$ which differ). 
+```{python}
+{{< include mult_Pk_right.py >}}
+```
+<!--
+D, P = eig_jacobi_2(A)
+np.diag(D)
+
+A - P @ D @ P.T
+-->
+
+
+
+
+
+
+## The QR method
+The QR-method is a method for finding eigenvalues which is very similar to Jacobi's method. Again we start with a symmetric matrix $A$, and apply similarity transformations as in the setup in @eq-simsetup (so that all matrices have the same eigenvalues), 
+In Jacobi's method the similarity transformations were plane rotations, but in the QR-method they are given by the QR-factorisation: If $A_k=Q_kR_k$ is a QR-factorisation of $A_k$, we set $A_{k+1}=Q_k^TA_kQ_k$. 
+We now get $A_{k+1}=Q_k^TQ_kR_kQ^k=R_kQ_k$. We can test this code on the same matrix $A$ as before, with small modifications to `eig_jacobi` above:
+
+```{python}
+def eig_qr(A):
+    tol=10**(-4)
+    n = np.shape(A)[0]
+    P = np.eye(n)
+    while off(A) > tol:
+        Q, R = np.linalg.qr(A)
+        A = R @ Q
+        P = P @ Q
+    return A, P
+```    
+The function `np.linalg.qr()` to used to find the $QR$ factorisation here. 
+
+```{python}
+D, P = eig_qr(A)
+np.diag(D)
+```
+
+```{python}
+A - P @ D @ P.T
+```
+
+```{python}
+D, P = np.linalg.eig(A)
+D
+```
+
+We will not prove that the QR-method converges towards the eigenvalues/eigenvectors. 
+
+
+
+
+
+
+
+
+## The power method and the companion matrix
+As we have noted, finding roots in polynomials (i.e., eigenvalues) can be difficult
+It turns out that this problem can be turned around: We can use linear algebra to find the roots of the characteristic polynomial. 
+In fact, most software find eigenvalues using this approach, rather than finding them directly as roots in a polynomial!
+
+
+Given the polynomial 
+$$ p(t)=a_0+a_1t+\cdots + a_{n-1}t^{n-1}+t^n,$$
+we define the companion matrix $C(p)$ by
+$$
+C(p)
+=
+\left(\begin{array}{rrrrr} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{array}\right).
+$$
+
+
+
+Let us find the characteristic polynomial of $C(p)$. We have that
+$$
+C(p) - \lambda I
+=
+\left(\begin{array}{rrrrr} 
+  -\lambda & 1 & 0 & \cdots & 0 \\ 
+  0 & -\lambda & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} - \lambda I
+\end{array}\right).
+$$
+When expanding the determinant along the last row we get the minors 
+$$1,-\lambda,\lambda^2,...,(-1)^{n-1}\lambda^{n-1},$$
+so that the determinant is
+\begin{align*}
+\lefteqn{ \sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} } \\
+&= (-1)^n \sum_{k=1}^{n-1} a_{k-1} \lambda^{k-1}    +   (-1)^n\lambda^n (a_{n-1}\lambda^{n-1} +\lambda^n)  \\
+&= (-1)^n \sum_{k=1}^n a_{k-1} \lambda^{k-1} + (-1)^n\lambda^n \\
+&= (-1)^n p(\lambda).
+\end{align*}
+Since $\det(C(p)-\lambda I)=(-1)^n p(\lambda)$ it follows that the roots of $p$ are the eigenvalues of $C(p)$. 
+
+
+
+A matrix is invertible if and only if $\lambda=0$ is not an eigenvalue, 
+and $\lambda=0$ is a root in $(-1)^n p(\lambda)$ if and only if $a_0=0$. 
+Thus, $C(p)$ is invertible if and only if $a_0\neq 0$. 
+We can also verify that
+$$
+\begin{pmatrix} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{pmatrix}\
+\begin{pmatrix}
+    -\frac{a_1}{a_0} & -\frac{a_2}{a_0} & \cdots & -\frac{a_{n-1}}{a_0} & -\frac{1}{a_0}\\ 
+    1 & 0 & \cdots & 0 & 0 \\ 
+    0 & 1 & \cdots & 0 & 0 \\ 
+    \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+    0 & 0 & \cdots & 1 & 0 
+  \end{pmatrix}=I_n$$
+component by component, so that
+$$
+  C(p)^{-1} 
+  = 
+  \left(\begin{array}{rrrrr}  
+    -\frac{a_1}{a_0} & -\frac{a_2}{a_0} & \cdots & -\frac{a_{n-1}}{a_0} & -\frac{1}{a_0}\\ 
+    1 & 0 & \cdots & 0 & 0 \\ 
+    0 & 1 & \cdots & 0 & 0 \\ 
+    \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+    0 & 0 & \cdots & 1 & 0 
+  \end{array}\right).
+$$
+
+
+
+
+
+
+
+Suppose that $\lambda$ is a root in $p(t)$, i.e., an eigenvalue for $C(p)$. We have that
+\begin{align*}
+\lefteqn{
+\left(\begin{array}{rrrrr} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{array}\right)
+\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} } \\
+&= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ -a_0-a_1\lambda-a_2\lambda^2 - \cdots - a_{n-1}\lambda^{n-1} \end{pmatrix}
+= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n-p(\lambda) \end{pmatrix}
+= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n \end{pmatrix} \\
+&= \lambda \begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} 
+\end{align*}
+Thus, $(1,\lambda,\lambda^2,...,\lambda^{n-1})$ is a corresponding eigenvector for $C(p)$
+
+
+
+
+
+In the following we shall let $\lambda_1,...,\lambda_n$ be the roots in $p(t)$, repeated with multiplicity. Define the Vandermonde matrix 
+$$\mathbf{V} 
+= 
+\begin{pmatrix} 
+1 & 1 & \cdots & 1 \\ 
+\lambda_1 & \lambda_2 & \cdots & \lambda_n \\ 
+\vdots & \vdots & \vdots & \vdots \\ 
+\lambda_1^{n-1} & \lambda_2^{n-1} & \cdots & \lambda_n^{n-1}
+\end{pmatrix}.$$
+We have learned that $V$ is invertible if and only if the $\lambda_i$ are distinct (i.e., all eigenvalues have multiplicity one). 
+Let $D$ be the diagonal matrix with $\lambda_1,...,\lambda_n$ on the diagonal. We then have that
+$$C(p)=VDV^{-1},$$
+so that $C(p)$ is diagonalisable, with $V$ diagonalising it.
+
+We can also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
+
+The following function takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
+```{python}
+{{< include C.py >}}
+```
+The function `np.poly(A)` is used to find the characteristic polynomial of $A$. 
+
+
+$C(A)$ and $A$ have the same eigenvalues, since they by definition have the same characteristic polynomial. 
+Aided by Exercise 3, $C(A)$ can be constructed without actually knowing the eigenvalues. 
+Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix.  
+This makes it computationally easier to use the power method (and other methods!), which enables us to find the unknown eigenvalues. 
+
+
+
+The function `power_impl` below takes a matrix $A$ and an integer $n$ as input, computes $C(A)$, 
+performs $n$ iterations of the power method, and returns the corresponding estimate for the biggest eigenvalue.
+The function sets the vector having $1$ in all components as initial vector for the power method:
+```{python}
+{{< include power_impl.py >}}
+```
+
+```{python}
+mu, x = power_impl(C(A),10)
+mu
+```
+
+```{python}
+D, P = np.linalg.eig(A)
+D
+```
+```

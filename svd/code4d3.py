@@ -1,0 +1,1 @@
+plt.imshow(AK2)

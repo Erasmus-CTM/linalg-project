@@ -1,0 +1,6 @@
+U,S1,V = np.linalg.svd(A)
+plt.plot(S1)
+B = (255*np.random.rand(256,256)).round()
+U,S2,V = np.linalg.svd(B)
+plt.plot(S2)
+plt.legend(['Marilyn Monroe image','Random image'])

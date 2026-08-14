@@ -1,0 +1,1239 @@
+# Numerican integration {#sec-integration}
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+In numerical differentiation known function values are used to find approximations to the derivative.
+In *numerical integration* the same information is used to find approximations to the *integral*. These methods are useful when the function is only known at isolated points, or when it is difficult or impossible to compute the integral by hand.
+
+In @sec-differentiation we explained a general algorithm for deriving methods of numerical differentiation.
+The corresponding algorithm for numerical integration is as follows:
+
+* Find the polynomial interpolating the function in a suitable set of points, 
+* use the integral of this polynomial as an approximation to the integral of the function.
+* analyse the truncation error in a way similar to that of numerical differentiation.
+
+We start this chapter by revisiting the definition of the integral (@sec-defint).
+Then we look at the simplest method for numerical integration, the midpoint method (@sec-midpoint).
+In @sec-othermethods we will then formulate the general algorithm stated above in more detail, and look at some important special cases.
+
+
+## Definition of the integral {#sec-defint}
+The integral of a function $f\colon[a,b]\to\mathbb{R}$ is interpreted as the area under the graph, where the positive values of $f$ 
+have a positive contribution to the area, and the negative values have a negative contribution (see @fig-integralarea). 
+The standard notation for the integral is
+$$
+\int_a^b f(x)\, dx.
+$$
+Before we continue we must introduce a concept which we will use several times in our definition of the integral.
+
+![The area under the graph of a function.](integralarea.pdf){#fig-integralarea}
+
+::: {#def- name='Partition'}
+Let $a$ and $b$ be two real numbers with $a<b$. A *partition* of $[a,b]$ is a collection of numbers $\{x_0,x_1,\dots,x_n\}$ so that
+$$
+a=x_0<x_1<x_2\cdots<x_{n-1}<x_n=b.
+$$
+The partition is said to be *uniform* if $x_i-x_{i-1}=(b-a)/n$ for $i=1$, \dots, $n$. 
+The distance between the points, $h=(b-a)/n$, is then called the *step length* of the partition.
+:::
+
+If $\Pi=\{x_0,x_1,\dots,x_n\}$ is a partition, we let the *size* of the partition be $|\Pi| = \max_{i=1,\dots,n}|x_i-x_{i-1}|$, 
+i.e. the largest distance between neighbouring points. If $\Pi$ is uniform, $|\Pi|=(b-a)/n$.
+
+
+To define the integral one uses so-called *Riemann sums*, which are approximations to the area under the graph.
+We choose a partition $\Pi = \{x_0,x_1,\dots,x_n\}$ of $[a,b]$, and find the maximum and minimum of $f$ on each sub-interval 
+$[x_{i-1},x_i]$,
+$$
+m_i=\min_{x\in[x_{i-1},x_i]} f(x), \qquad M_i=\max_{x\in[x_{i-1},x_i]} f(x) \qquad \text{for } i=1,2,\dots,n.
+$$
+The min and the max here may or may not exist. Continuity of $f$ will secure this, however. 
+Approximations to the integral can be obtained from two different piecewise constant functions, 
+both being constant on each sub-interval $[x_{i-1},x_i)$:
+The first equals $m_i$ on this sub-interval, the second equals $M_i$ (see @fig-integraldef). 
+We sum up the areas under the two, and end up with the two approximations
+$$
+\underline{I}(\Pi)=\sum_{i=1}^{n} m_i(x_i-x_{i-1}), \qquad \overline{I}(\Pi)=\sum_{i=1}^n M_i (x_i-x_{i-1}).
+$$ {#eq-ulstepdef}
+The first approximation is in general too small, the second too large. 
+The integral is obtained by letting the size of the partition go to zero. 
+
+
+::: {#fig-integraldef layout-ncol=2}
+
+![](integrallower1.pdf)
+![](integrallower2.pdf)
+
+![](integralupper1.pdf)
+![](integralupper2.pdf)
+
+Inscribed (left) and circumscribed (right) piecewise constant functions for a partition (top) and a finer partition (bottom).
+:::
+
+::: {#def-integral name='The integral'}
+Let $f$ be a function defined on the interval $[a,b]$. If 
+$$
+\sup_{\Pi}\underline{I}(\Pi) \text{ and } \inf_{\Pi} \overline{I}(\Pi)
+$$
+exist (where the infimum and supremum are taken over all partitions of $[a,b]$) and are equal, we say that $f$ is *integrable*, 
+and we define the integral of $f$ over $[a,b]$,  $\int_a^b f(x)\, dx$, as the common value of the two. 
+:::
+
+The construction of the integral is illustrated @fig-integraldef, 
+where we see how the piecewise constant approximations become better as the partitions get finer.
+It turns out that the following holds
+
+::: {#thm-contintg}
+Any continuous function is integrable. 
+:::
+
+::: {.proof}
+Let $\Pi_n=\{x_0,\dots,x_n\}$ be partitions of $[a,b]$ so that the size of the partitions go to 0, the size of a partition being 
+the largest distance between neighbouring points $x_{i-1}$ and $x_i$. We have that 
+$$\underline{I}(\Pi_n)\leq  \int_a^b f(x)\,dx \leq \overline{I}(\Pi_n).$$ {#eq-help2prove}
+Assume that $\epsilon$ is given. 
+Since $f$ is continuous on $[a,b]$, it is also uniformly continuous on $[a,b]$. 
+Due to this, and since the size of the partitions goes to 0, 
+there exists an $N$ so that, for $n\geq N$, $|f(x)-f(y)|\leq\epsilon/(b-a)$ for $x,y$ in the same sub-interval of $\Pi_n$. 
+In particular this means that $M_i-m_i\leq \epsilon/(b-a)$, and we get
+$$\overline{I}(\Pi_n)-\underline{I}(\Pi_n)=\sum_{i=1}^n (M_i-m_i)(x_i-x_{i-1})\leq \frac{\epsilon}{b-a}(x_i-x_{i-1})=\frac{\epsilon}{b-a}(b-a)=\epsilon.$$ 
+The result now follows from @eq-help2prove.
+:::
+
+The integral has a property which is very useful when it comes to numerical computation:
+
+::: {#thm-fundnumint}
+Let $f\colon [a,b]\to\mathbb{R}$ be continuous, let $\Pi_n=\{x_0,\dots,x_n\}$ be a partition of $[a,b]$, and let $t_i$ be a number in $[x_{i-1},x_i]$ for every $i=1$, \dots, $n$. Then the sum
+$$
+\sum_{i=1}^n f(t_i)(x_i-x_{i-1})
+$$ {#eq-fundnumint}
+will converge to $\int_a^b f(x)\,dx$ as the "size" of the $\Pi_n$ goes to 0.
+:::
+
+Thus, in general we can derive methods for numerical integration by splitting $[a,b]$ in small sub-intervals, 
+and add together contributions from each sub-interval. 
+
+::: {.proof}
+We have that 
+$$\underline{I}(\Pi_n) \leq \sum_{i=1}^n f(t_i)(x_i-x_{i-1}) \leq \overline{I}(\Pi_n)$$
+The result follows by combining this with @eq-help2prove.
+:::
+
+
+Different choices for the $t_i$ in @thm-fundnumint give rise to various methods for approximating the integral.
+We could for instance choose $t_i$ as the maximum or the minimum on each sub-interval,
+but the problem with this is that it can be both hard and time-consuming to find maxima and minima, even for a computer.
+We could also choose $t_i$ equal to one of the end points $x_{i-1}$ or $x_i$, but it turns out that better choices exist, 
+as we will see.
+
+
+## The midpoint method {#sec-midpoint}
+An even better choice for the $t_i$ turns out to be the midpoint $t_i=(x_i+x_{i-1})/2$ on each sub-interval.
+With this choice @eq-fundnumint gives the approximation
+$$
+I\approx \sum_{i=1}^n f\bigl((x_i+x_{i-1})/2\bigr)(x_i-x_{i-1}).
+$$ {#eq-midpointint}
+
+::: {#def- name='The midpoint method'}
+Let $f$ be a function which is integrable on the interval $[a,b]$, and let $\{x_i\}_{i=0}^n$ be a partition of $[a,b]$.
+The *midpoint method* approximates the integral of $f$ with
+$$
+\int_a^b f(x)\, dx\approx I_\text{mid}(h)=h\sum_{i=1}^n f(x_{i-1/2}),
+$$ {#eq-midpointdef}
+where $x_{i-1/2}=(x_{i-1}+x_i)/2=a+(i-1/2)h$.
+:::
+
+We can think of this as a constant approximation on each sub-interval, where the constant is the value in the midpoint. 
+The method is illustrated in @fig-midpoint for the cases with one and five sub-intervals.
+
+::: {#fig-midpoint layout-ncol=2}
+
+![](midapp1.pdf){#fig-midapp1}
+
+![](midapp5.pdf){#fig-midapp5}
+
+The midpoint method with one sub-interval (@fig-midapp1), and five sub-intervals (@fig-midapp5)}.
+:::
+An implementation of the midpoint method can be as follows.
+
+```{python}
+def midpointn(f, a, b, n):
+    h = (b - a)/n
+    return h*sum( f(a + h/2 + np.arange(0,n)*h))
+```
+
+
+
+The midpoint method gives only an approximation, and will produce a small error. 
+As in @sec-differentiation we shall estimate how large this error can be. 
+This can be done in two steps. First we analyse the error in the case of only one sub-interval. This is called the *local error*.
+Then we find an estimate for the general case with many sub-intervals. This is called the *global error*.
+
+
+### The local error
+The error in the midpoint method with one sub-interval only is
+$$
+E = \int_a^b f(x)\, dx-f(m)(b-a),
+$$ {#eq-midpointerr}
+where $m=(a+b)/2$. If we use a Taylor expansion of $f$ around the midpoint $m$ we get
+$$
+f(x)=f(m)+(x-m)f'(m)+\frac{(x-m)^2}{2}f''(\xi),\\
+$$
+where $\xi$ is a number between $m$ and $x$, which depends on $x$. Integrating this we get
+\begin{align*}
+\int_a^b f(x)\, dx&=\int_a^b\Bigl(f(m)+(x-m)f'(m)+\frac{(x-m)^2}{2}f''(\xi)\Bigr)\, dx\\
+    &=f(m)(b-a)+\frac{f'(m)}{2}\bigl[(x-m)^2\bigr]_a^b+\frac{1}{2}\int_a^b (x-m)^2 f''(\xi)\, dx\\
+    &=f(m)(b-a)+\frac{1}{2}\int_a^b (x-m)^2 f''(\xi)\, dx,
+\end{align*}
+where the term in the middle was $0$. This leads us to the expression
+$$
+|E| = \left|\int_a^b f(x)\, dx-f(m)(b-a)\right|=\frac{1}{2}\left|\int_a^b (x-m)^2 f''(\xi)\, dx\right|.
+$$
+Some more calculations give
+\begin{align*}
+|E| &= \frac{1}{2}\left|\int_a^b(x-m)^2 f''(\xi)\, dx\right| \le \frac{1}{2}\int_a^b\left| (x-m)^2 f''(\xi)\right|\, dx\\
+&= \frac{1}{2}\int_a^b (x-m)^2 \left|f''(\xi)\right|\, dx\\
+ &\le \frac{M_2}{2}\int_a^b(x-m)^2\, dx\\[3pt]
+ &=\frac{M_2}{2}\frac{1}{3}\left[(x-m)^3\right]_a^b\\[3pt]
+ &=\frac{M_2}{6}\bigl((b-m)^3-(a-m)^3\bigr)\\
+ &=\frac{M_2}{24}(b-a)^3,
+\end{align*}
+where $M_2=\max_{x\in[a,b]}\bigl| f''(x)\bigr|$.
+The inequality on the first line holds because, when we move the absolute value inside the integral, the function we integrate becomes non-negative everywhere.
+This means that areas where the integrand originally was negative, now become positive, so that the second integral is larger than the first.
+
+The equality on the second line holds since $(x-m)^2$ is never negative, and the inequality on the third line holds since we replace $\left|f''(\xi)\right|$ with its maximum on the interval $[a,b]$.
+On the fourth line we simply compute the integral of $(x-m)^2$. Then we insert the limits. The last line follows from that $(b-m)^3=-(a-m)^3=(b-a)^3/8$.
+We have thus proved the following lemma.
+
+::: {#lem-midpointlocalerr}
+Let $f\colon[a,b]\to\mathbb{R}$ be a continuous function, with continuous first- and second order derivatives. The error in the midpoint method with one sub-interval is then bounded by
+$$
+\left|\int_a^b f(x)\, dx-f(m)(b-a)\right|\le\frac{M_2}{24}(b-a)^3,
+$$
+where $m=(a+b)/2$.
+:::
+
+The important thing in @lem-midpointlocalerr is the factor $(b-a)^3$.
+This implies that, if we halve the with of the intervals, the error in the method will be reduced with a factor of $8$.
+
+
+
+
+### The global error
+Let us now see consider the error resulting from adding together contributions from many sub-intervals. 
+$[a,b]$ is partitioned into $n$ sub-intervals, all with width $h=(b-a)/n$. With
+\begin{align*}
+I&=\int_a^b f(x)\, dx=\sum_{i=1}^n \int_{x_{i-1}}^{x_i} f(x)\, dx, & I_\text{mid}(h)&=\sum_{i=1}^n f(x_{i-1/2})h,
+\end{align*}
+the total error in the midpoint method is
+$$
+I-I_\text{mid}(h)=\sum_{i=1}^n \Biggl(\int_{x_{i-1}}^{x_i} f(x)\, dx-f(x_{i-1/2})h\Biggr),
+$$
+where the expression inside the parenthesis is the local error on the interval $[x_{i-1},x_i]$. We therefore have
+$$
+\begin{split}
+\left|I-I_\text{mid}(h)\right|&=\left|\sum_{i=1}^n \left(\int_{x_{i-1}}^{x_i} f(x)\, dx-f(x_{i-1/2})h\right)\right|\notag\\
+&\le \sum_{i=1}^n\left|\int_{x_{i-1}}^{x_i} f(x)\, dx-f(x_{i-1/2})h\right|\notag\\
+&\le \sum_{i=1}^n \frac{h^3}{24}M_2^{(i)}
+\end{split}
+$$ {#eq-localsum}
+where $M_2^{(i)} = \max_{x\in[x_{i-1},x_i]} \bigl|f''(x)\bigr|$. In the first inequality the triangle inequality was applied, while we in the second inequality have used @lem-midpointlocalerr.
+We can simplify @eq-localsum further by using the maximum over the entire $[a,b]$, instead of over $[x_{i-1},x_i]$: For all $i$ we have that
+$$
+M_2^{(i)}=\max_{x\in[x_{i-1},x_i]}\left|f''(x)\right|\le \max_{x\in[a,b]}\left|f''(x)\right|=M_2,
+$$
+so that @eq-localsum simplifies to
+$$
+|I-I_\text{mid}(h)| \leq \sum_{i=1}^n \frac{h^3}{24}M^{(i)}\le \sum_{i=1}^n \frac{h^3}{24}M_2=\frac{h^3}{24}nM_2.
+$$ {#eq-globalstep}
+Since $h=(b-a)/n$, we get $hn=b-a$. Inserting this in @eq-globalstep, we get the following estimate for the global error.
+
+::: {#thm-midgloberr}
+Suppose that $f\colon[a,b]\to\mathbb{R}$ and its first two derivatives are continuous. Then the error in the midpoint method is bounded by
+$$
+|I-I_\text{mid}(h)| \le (b-a)\frac{h^2}{24}M_2.
+$$ {#eq-midpointglobalerr}
+:::
+
+
+
+### The step length
+We want to approximate the integral, and let us say we want the error in the approximation to be smaller than some $\epsilon>0$. We can use the error estimate in @eq-midpointglobalerr by requiring that
+$$
+(b-a)\frac{h^2}{24}\max_{x\in[a,b]}M_2 \le \epsilon
+$$
+which easily can be solved for $h$,
+$$
+h\le\sqrt{\frac{24\epsilon}{(b-a)M_2}}.
+$$
+If we can compute or estimate $M_2$, the maximal value of the second derivative, we can insert this in the expression above, and find an upper bound for $h$ which guarantees the error in the integral becomes less than $\epsilon$.
+
+
+
+
+## General method for deriving numerical integration methods {#sec-othermethods}
+There also exist many other methods for numerical integration. 
+The following algorithm for deriving approximations to $I=\int_a^b f(x)\, dx$ is a direct parallel to that of numerical differentiation. 
+
+1. Let $n,k\geq 1$. Split the interval $[a,b]$ into $nk$ equally large sub-intervals
+$$
+a=x_0<x_1<x_2<\cdots < x_{nk-1}<x_{nk}=b.
+$$
+Set $h=(b-a)/n$.
+2. For each sub-interval $J_i=[x_{(i-1)k},x_{ik}]$, find the polynomial $p_{k,i}$ of degree $k$ which interpolates $f$ in the $k+1$ points $\bigl\{x_{(i-1)k},\dots,x_{ik}\bigr\}$.
+3. Use $\int_{J_i} p_{k,i}(x)\,dx$ as an approximation to $\int_{J_i} f(x)\,dx$, and add these together to obtain
+$$
+I(h) = \sum_{i=1}^n \int_{J_i} p_{k,i}(x)\,dx.
+$$
+
+This algorithm is also called the *Newton--Cotes method*. With help of the analysis in @sec-app we can estimate the error in this method:
+
+::: {#thm-}
+Let $n,k\geq 1$ and let $f\colon[a,b]\to\mathbb{R}$ be a function with $k+1$ continuous derivatives. Then the error in the Newton--Cotes method of order $k$ with step length $h=(b-a)/n$ satisfies
+$$
+    |I-I(h)| \leq \frac{(b-a)M_{k+1}}{(k+1)!} h^{k+1}.
+$$ {#eq-newton-cotes-feil}
+
+:::
+
+::: {.proof}
+Choose a sub-interval $J_i$, and let $p_{k,i}$ be the polynomial of degree $\leq k$ interpolating $f$ in the points $x_{ik},\dots,x_{(i+1)k}$ (as describes in the general algorithm of numerical integration). From @thm-interpolasjonsfeil we know that for $x\in J_i$
+$$
+|f(x)-p_{k,i}(x)| \leq \frac{M_{k+1}}{(k+1)!}\bigl(x_{(i+1)k}-x_{ik}\bigr)^{k+1} = \frac{M_{k+1}}{(k+1)!}h^{k+1}.
+$$
+Therefore
+\begin{align*}
+|I-I(h)| &= \Biggl|\int_a^b f(x)\,dx - \sum_{i=1}^n \int_{J_i} p_{k,i}(x)\,dx\Biggr|
+= \Biggl|\sum_{i=1}^n \int_{J_i} f(x)-p_{k,i}(x)\,dx\Biggr| \\
+&\leq \sum_{i=1}^n \int_{J_i} |f(x)-p_{k,i}(x)|\,dx \\
+&\leq \sum_{i=1}^n \int_{J_i} \frac{M_{k+1}}{(k+1)!}h^{k+1}\,dx \\
+&= \frac{M_{k+1}}{(k+1)!}\sum_{i=1}^n h^{k+2} \\
+&= \frac{M_{k+1}}{(k+1)!}nh^{k+2}.
+\end{align*}
+(From the first to the second line we use the triangle inequality, then we inserted the error estimate for the interpolant, and then we integrated the constant $M_{k+1}/(k+1)!h^{k+1}$.)
+If we now insert $h=(b-a)/n$ we get @eq-newton-cotes-feil.
+:::
+
+From the error estimate @eq-newton-cotes-feil we see that, to decrease the error, we can increase $k$, decrease $h$ (i.e., increasing $n$), or a combination of the two. 
+What combination is the most effective depends on how large the factor $M_{k+1}$ is for different $k$. 
+
+In the next sections we will consider the cases $k=1$, which gives the trapezoidal rule, 
+and the case $k=2$, which gives Simpson's method. 
+
+## The trapezoidal rule
+We know that the line which interpolates $f$ in the two points $x_{i-1}$ and $x_i$ is
+$$
+p_{1,i}(x)=f(x_{i-1}) + \frac{f(x_i)-f(x_{i-1})}{x_i-x_{i-1}}(x-x_{i-1}).
+$$
+If we apply this in the general algorithm we get *the trapezoidal rule*; as we see from @fig-trapezoiddef the approximation in each sub-interval $J_i$ is a trapezoid. 
+We then get the approximation
+$$
+\int_{x_{i-1}}^{x_i} p_{1,i}(x)\,dx= \frac{f(x_{i-1})+f(x_i)}{2}h.
+$$
+Adding the contributions from all sub-intervals we get the approximation
+$$
+I_\text{trap}(h)=\sum_{i=1}^n \frac{f(x_{i-1})+f(x_i)}{2}h.
+$$
+Since $x_i$ is both the end of one interval and the beginning of the next for $i\neq 0,n$, this can be written as
+$$
+I_\text{trap}(h)=h\left(  \frac{f(a)+f(b)}{2} + \sum_{i=1}^{n-1} f(x_i) \right).
+$$ {#eq-trapezoid0}
+
+
+
+
+::: {#fig-trapezoiddef layout-ncol=2}
+
+![](trapapp1.pdf){#fig-trapapp1}
+
+![](trapapp5.pdf){#fig-trapapp5}
+
+The trapezoidal rule with one sub-interval (@fig-trapapp1), and 5 sub-intervals (@fig-trapapp5)}.
+:::
+
+
+If we apply @thm-interpolasjonsfeil with $k=1$ we get the following error estimate.
+
+::: {#thm- name='Error estimate for the trapezoidal rule'}
+Let $f\colon[a,b]\to\mathbb{R}$ be a two times continuously differentiable function. The error in the trapezoidal rule with step length $h$ is then bounded by
+$$
+|I-I_\text{trap}(h)| \le \frac{(b-a)M_2}{2}h^2.
+$$ {#eq-trapglobalerr}
+:::
+
+
+With some more computation one can show that  the trapezoidal rule has an error at most $\frac{(b-a)M_2}{12}h^2$, i.e., six times lower than the right hand side in @eq-trapglobalerr
+(see @exr-trapezoidal_estimate). The error estimate given by @eq-trapglobalerr is thus an *over-estimate*. The constant factor $\frac16$ is not particularly important; the important thing in @eq-trapglobalerr is
+
+* the factor $h^2$, which means that if we for instance halve $h$, the error will be reduced by a factor of $1/4$.
+* the factor $M_2$, i.e., the error estimate depends on the seconds derivative.
+
+An implementation of the trapezoidal rule can be as follows.
+
+```{python}
+def trapezoidaln(f, a, b, n):
+    h = (b - a)/n
+    return h*( (f(a) + f(b))/2 + sum( f(a + np.arange(1,n)*h)))
+```
+
+
+## Simpson's method
+For $k=2$ we approximate with a quadratic polynomial on each sub-interval $J_i$.
+The method in this case is called *Simpson's method*, and is illustrated in @fig-simpdef.
+
+::: {#fig-simpdef layout-ncol=2}
+
+![](simpapp1.pdf){#fig-simpapp1}
+
+![](simpapp3.pdf){#fig-simpapp3}
+
+Simpson's method with one sub-interval (@fig-simpapp1), and three sub-intervals (@fig-simpapp3)}.
+:::
+
+In @exr-simpson you will be asked to show that the Newton form of the polynomial interpolating 
+$f$ in $a$, $m=(a+b)/2$, and $b$ is
+$$p_2(x)=f(a) + \frac{f(m)-f(a)}{h}(x-a) + \frac{f(a) - 2f(m)+f(b)}{2h^2}(x-a)(x-m),$$
+where $h=(b-a)/2$, and that
+$$\int_a^b p_2(x)\,dx = \frac{h}{3}  \left(  f(a) + 4f(m) + f(b) \right).$$
+This is Simpson's method with one sub-interval. If we add together contributions from all sub-intervals we get
+$$
+I_\text{Simp}(h)=\frac{h}{3} \Biggl(f(a)+f(b)+2 \sum_{i=1}^{n-1} f(x_{2i}) + 4\sum_{i=1}^n f(x_{2i-1})\Biggr),
+$$ {#eq-simpsonssum}
+where now $h=(b-a)/(2n)$
+If we insert $k=2$ in @thm-interpolasjonsfeil, we get the following error estimate for this method.
+
+
+::: {#thm- name="Error estimate for Simpson's method"}
+Let $f\colon[a,b]\to\mathbb{R}$ be a four times continuously differentiable function. The error in Simpson's method 
+with step length $h$ is then bounded by
+$$|I-I_\text{Simp}(h)| \le \frac{(b-a)M_3}{6}h^3.$$ {#eq-simpglobalerr}
+:::
+
+Simpson's method is much used. Since it is based on quadratic polynomials, it must be exact for such polynomials.
+It is in fact exact for all cubic polynomials also (see @exr-simpson_exact_third).
+There are sharper error estimates for Simpson's method than this (see @exr-proofsimpson, 
+which goes a bit outside the curriculum). 
+
+An implementation of Simpson's method can be as follows
+
+```{python}
+def simpsonn(f, a, b, n):
+    h = (b - a)/(2*n)
+    return h*( f(a) + f(b) + 2*sum( f(a+2*h*np.arange(1,n) ))  \
+                    + 4*sum( f(a+h+2*h*np.arange(0,n))))/3
+```
+
+ 
+
+In @tbl-intmethods we have listed errors in the approximations to $\int_0^1 \cos\,dx=\sin 1\approx0.8414709848$ 
+obtained by the three methods we have considered. 
+The interval $[0,1]$ has been split into $2^k$ sub-intervals of equal length, for $k=1$, $2$, \dots, 10, 
+
+
+::: {#tbl-intmethods}
+```{python}
+#| echo: false
+a, b = 0, 1
+f = np.cos
+exact = np.sin(1)
+nvals = 2**(np.arange(1,11))
+approx1 = [midpointn(f, a, b, n) for n in nvals] 
+approx2 = [trapezoidaln(f, a, b, n) for n in nvals] 
+approx3 = [simpsonn(f, a, b, n) for n in nvals] 
+df = pd.DataFrame({
+          'n': nvals,
+          'Midpoint': np.abs(exact - approx1),
+          'Trapezoidal': np.abs(exact - approx2),
+          'Simpson': np.abs(exact - approx3)})
+df.index=[''] *len(df)
+df
+```
+Truncation errors for three of the methods we have considered, for different numbers of sub-intervals. 
+:::
+
+
+Each time $h$ is halved we see that
+
+* For the midpoint method the error is reduced about a factor of $4$. This confirms what we derived in in @thm-midgloberr.
+* For the trapezoidal rule the error is also reduced about a factor of 4, but the error is actually twice as big when compared to the midpoint method (even if we now use two function values in each sub-interval to estimate the integral!). 
+This can also be seen from the error estimate in @eq-trapglobalerr, since $1/12$ is twice as big as $1/24$ in @eq-midpointglobalerr. 
+* For Simpson's method, the error is reduced by a factor of about $16$. 
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+
+## Exactness of the midpoint method.
+
+The midpoint method is exact for all polynomials of degree one.
+
+1. [x] True
+2. [ ] False
+
+## Exactness of the midpoint method.
+
+The midpoint method is exact for all polynomials of degree two.
+
+1. [ ] True
+2. [x] False
+
+## Global and local error in the midpoint method
+
+The global error in the midpoint method is of order one less than the local error.
+
+1. [x] True
+2. [ ] False
+
+## Reducing the step length in the midpoint method.
+
+When reducing the step length $h$ in the midpoint method with a factor of 3, the error is reduced by a factor of about 9.
+
+1. [x] True
+2. [ ] False
+
+
+
+## Midpoint method with two sub-intervals.
+
+We use the midpoint method with two subintervals to find an approximation to the integral
+$$
+\int_0^1 x^2 \, dx.
+$$
+What do we get?
+
+> $I_\text{mid} = \frac{1}{2}f(1/4) + \frac{1}{2}f(3/4) = \frac{1}{2}\frac{1}{16} + \frac{1}{2}\frac{9}{16} = \frac{1}{2}\frac{10}{16} = \frac{5}{16}$.
+
+1. [x] 5/16
+2. [ ] 11/4 
+3. [ ] 4/9
+4. [ ] 2/5
+
+
+## Comparison of errors in the midpoint method and the trapezoidal rule.
+
+The trapezoidal rule is usually more accurate than the midpoint method.
+
+> The midpoint method has an error bounded by $(b-a)h^2M_2/24$, while the best estimate we found for the trapezoidal rule was $(b-a)h^2M_2/12$. 
+
+1. [ ] True
+2. [x] False
+     
+
+
+
+## Function evaluations for the trapezoidal rule.
+
+Since every evaluation point in the trapezoidal rule occurs as the end point in two different sub-intervals, 
+we must evaluate the function we integrate twice in every point. 
+
+> Instead of computing the same function value $f(x_i)$ twice we can write $2f(x_i)$, since everything will be summed together.
+    
+1. [ ] True
+2. [x] False
+     
+      
+
+## The number of points in Simpson's method
+
+Simpson's method requires us to use an odd number of points.
+
+> For an interval three partition points are needed. For every interval we add two more partition points, so that the total number of point always is odd.
+
+1. [x] True
+2. [ ] False
+
+
+
+## Exactness of Simpson's method
+
+Simpson's method is exact for polynomials of degree three or lower.
+
+> but this builds on @exr-proofsimpson. If we only use the estimate from @eq-simpglobalerr, we cannot conclude this.
+
+1. [x] True
+2. [ ] False
+
+
+
+## Trapezoidal rule with two sub-intervals.
+
+We use the trapezoidal rule with two sub-intervals to approximate the integral
+$$
+\int_0^1 x^2 \, dx.
+$$
+What is the result?
+
+> $I_{\text{trap}} = \frac{1}{2}\left(\frac{f(0)+f(1)}{2} + f\left(\frac{1}{2}\right)\right) = \frac{1}{2}\left(\frac{0+1}{2} +\frac{1}{4}\right) = \frac{3}{8}$.
+
+1. [ ] 1/2
+2. [x] 3/8 
+3. [ ] 5/9
+4. [ ] 3/5
+
+
+## Accuracy of the methods {.quiz-multiple}
+
+Which of the trapezoidal rule, the midpoint method, and Simpson's method, are most accurate for linear polynomials? 
+
+- [x] The trapezoidal rule.
+- [x] Simpson's method.
+- [x] The midpoint method.
+- [x] All are exact.
+
+
+## Exactness of Simpson's method
+
+We use Simpson's method to compute approximations to $\int_a^b f(x) \, dx$. Then the result is always exact if $f(x)$ is
+
+> This follows from @eq-simpglobalerr. 
+
+1. [ ] a trigonometric function.
+2. [ ] a logarithmic function.
+3. [x] a quadratic polynomial.
+4. [ ] on the form $g(x)/h(x)$ where $f$ and $g$ are quadratic polynomials.
+
+## Which claims are true?
+
+We have that
+
+1. [ ] The midpoint method is more accurate than Simpson's method.
+2. [ ] The midpoint method and the trapezoidal rule always give the same error.
+3. [ ] The midpoint method is exact only if $f(x) = c$ for a constant $c$.
+4. [x] The midpoint method is exact if $f(x)$ is an arbitrary line in the plane.
+```
+:::
+
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-}
+In this exercise we will use the definition of the integral on the function $f(x)=e^{x}$ on the interval $[0,1]$.
+
+(a) Write and run a program that computes $\underline{I}$ and $\overline{I}$ for a uniform partition of 10 sub-intervals 
+(let the method take take the number of sub-intervals as argument). 
+What is the error from the exact value $I=e-1 = 1.718281828$ of the integral?
+
+::::: {.callout-tip title='Hint' collapse="true"}
+Instead of a `for`-loop here you can use the `sum`-command when you add together the contribution from the sub-intervals.
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+On each sub-interval $f$ assumes its smallest value in the left end point, its largest value in the right end point. 
+Here we can use the `sum`-command the following way to find $\underline{I}(\Pi)$ and $\overline{I}(\Pi)$. 
+
+```{python}
+#| lst-cap: "Computation of the upper/lower-integral"
+def int_vals(n):
+    l = (1/n)*np.sum(np.exp(   np.arange(0,n)/n ))
+    u = (1/n)*np.sum(np.exp( np.arange(1,n+1)/n ))
+    l_err = np.abs(l-(np.exp(1)-1))
+    u_err = np.abs(u-(np.exp(1)-1))
+    return l,u,l_err,u_err
+```
+
+Running the code you get 
+```{python}
+l,u,l_err,u_err=int_vals(10)
+```
+
+:::::::
+:::::
+
+
+(b) Write a program which finds how many sub-intervals that are needed to compute $\underline{I}$ with an error less than 
+$3\times 10^{-3}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We run the following code
+```{python}
+n = 1
+l,u,l_err,u_err=int_vals(n)
+while l_err > 3*10**(-3):
+    n += 1
+    l,u,l_err,u_err = int_vals(n)
+n
+```
+
+:::::::
+:::::
+:::
+
+
+
+
+
+::: {#exr-sinmidpoint}
+Find an approximation to
+$$
+\int_{0}^{\pi/2}\frac{\sin x}{1+x^{2}}\,dx=0.526978557614\ldots
+$$
+using the midpoint method with 6 sub-intervals.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The interval $[0,\pi/2]$ is here split into the intervals
+\begin{multline*}
+[0,\pi/12], \ [\pi/12,2\pi/12], \ [2\pi/12,3\pi/12], \ [3\pi/12,4\pi/12],\\
+[4\pi/12,5\pi/12],\ [5\pi/12,6\pi/12].
+\end{multline*}
+The midpoints on these intervals are $\pi/24$, $3\pi/24$, $5\pi/24$, $7\pi/24$, $9\pi/24$, $11\pi/24$. 
+With $h=\pi/12$ the midpoint method gives
+\begin{align*}
+I_\text{mid} &= \frac{\pi}{12}\left( f(\pi/24) + f(3\pi/24) + f(5\pi/24) + f(7\pi/24) + f(9\pi/24) + f(11\pi/24) \right) \\
+&=
+\frac{\pi}{12}\left(\frac{\sin(\pi/24)}{1+(\pi/24)^2}+\frac{\sin(3\pi/24)}{1+(3\pi/24)^2}+\frac{\sin(5\pi/24)}{1+(5\pi/24)^2}+\frac{\sin(7\pi/24)}{1+(7\pi/24)^2}\right.\\
+&\left.+\frac{\sin(9\pi/24)}{1+(9\pi/24)^2}+\frac{\sin(11\pi/24)}{1+(11\pi/24)^2}\right)\\
+&\approx 0.530624.
+\end{align*}
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-estimateh}
+
+(a) Test the midpoint method with 10 sub-intervals on the integral
+$$\int_0^1 e^x\, dx=e-1.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code solves the exercise.
+```{python}
+midpointn(np.exp,0,1,10)
+```
+:::::::
+:::::
+
+(b) Find a value $h$ which guarantees that the absolute error is less than $10^{-10}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+From @thm-midgloberr we know that the error is bounded by 
+$(b-a)\frac{h^2}{24}\max_{x\in[a,b]}\left|f''(x)\right|$. Since $f''(x)=e^x$,
+$\max_{x\in[0,1]}\left|f''(x)\right|=e$, so that this is $\frac{eh^2}{24}$. We therefore must have that $\frac{eh^2}{24}<10^{-10}$, so that
+$h<\sqrt{\frac{24}{e}}10^{-5}\approx 2.97\times 10^{-5}$.
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-}
+Repeat the previous exercise, but instead with the integral
+$$
+ \int_2^6 \ln x\, dx=\ln (11664) - 4.
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Approximation with 10 sub-intervals: $5.36648$ (with 6 digits). $h\le 4.89\times 10^{-5}$.
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-}
+Repeat @exr-sinmidpoint and @exr-estimateh for the trapezoidal rule.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Code which solves @exr-sinmidpoint are as follows:
+```{python}
+trapezoidaln(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6)
+```
+Code which solves @exr-estimateh:
+```{python}
+trapezoidaln(np.exp,0,1,10)
+```
+The error is bounded by
+$$
+(b-a)\frac{h^2}{12}\max_{x\in[0,1]} |f''(x)| = \frac{h^2}{12}e.
+$$
+We have that $\frac{h^2}{12}e\leq 10^{-10}$ when $h\leq \sqrt{12/e}\times10^{-5}\approx 2.1\times 10^{-5}$.
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+How many function evaluations are needed to compute the integral
+$$\int_0^1\frac{dx}{1+2x}$$
+with error less than $10^{-10}$ for
+
+(a) the trapezoidal rule,
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since the error in the trapezoidal rule is bounded by
+$$(b-a)\frac{h^2}{12}\max_{x\in[a,b]}|f''(x)|,$$
+and since
+$f''(x)=\frac{8}{(1+2x)^3}$ (which has maximum absolute value for $x=0$), we need to choose $h$ so that
+$$
+(b-a)\frac{h^2}{12}\max_{x\in[a,b]}|f''(x)| = 8\frac{h^2}{12} \leq10^{-10},
+$$
+which gives that $h\leq 10^{-5}\sqrt{3/2}$. The number of function evaluations is then
+$\approx 1/h=10^5/\sqrt{2/3}\approx 81649.66$, which means that at least $81650$ evaluations are needed.
+:::::::
+:::::
+
+(b) The midpoint method,
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since the error in the midpoint method is bounded by
+$$(b-a)\frac{h^2}{24}\max_{x\in[a,b]}|f''(x)|,$$
+we get as in (a) that
+$$
+(b-a)\frac{h^2}{24}\max_{x\in[a,b]}|f''(x)| = 2\frac{h^2}{6} \leq10^{-10},
+$$
+which gives that $h\leq 10^{-5}\sqrt{3}$. The number of function evaluations is thus
+about $1/h=10^5/\sqrt{3}\approx 57735.03$. In other words, at least $57736$ evaluations are needed.
+:::::::
+:::::
+
+(c) and Simpson's method?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since the error in Simpson's method is bounded by
+$$(b-a)\frac{h^4}{180}\max_{x\in[a,b]}|f^{(iv)}(x)|,$$
+and since
+$f^{(iv)}(x)=\frac{384}{(1+2x)^5}$ (which has maximum absolute value for $x=0$), we need to choose $h$ so that
+$$
+(b-a)\frac{h^4}{180}\max_{x\in[a,b]}|f^{(iv)}(x)| = 384\frac{h^4}{180} \leq 10^{-10},
+$$
+which means that $h$ is bounded by $h\leq (180\cdot 10^{-10}/384)^{1/4}$. The number of function evaluations is then
+$\approx 1/h=(180\cdot 10^{-10}/384)^{-1/4}\approx 382.17$, which means that at least $383$ evaluations are needed.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Repeat @exr-sinmidpoint and @exr-estimateh with Simpson's method.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$h\le 1.8\times 10^{-2}$
+
+Code which solves @exr-sinmidpoint:
+```{python}
+simpsonn(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6)
+```
+Code which solves @exr-estimateh:  
+```{python}
+simpsonn(np.exp,0,1,10)
+```
+:::::::
+:::::
+:::
+
+::: {#exr-}
+We want to write a method for numerical integration on the form
+$$
+\int_a^b f(x)\, dx \approx w_1 f(a) + w_2 f((a+b)/2)+w_3 f(b),
+$$
+where the $w_i$ are to be decided.
+Show that, if the method is exact for the three polynomials $f(x)=x^i$ for $i=0,1,2$, then the method coincides with Simpson's method.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $\int_a^b f(x)\, dx = w_1 f(a) + w_2 f((a+b)/2)+w_3 f(b)$ for $f(x)=x^i$ for $i=0,1,2$, then this also holds for the polynomial $p_2$ which interpolates $f$ in $a$, $(a+b)/2$, and $b$.
+We therefore get
+$$\int_a^b p_2(x)\, dx = w_1 p_2(a) + w_2 p_2((a+b)/2)+w_3 p_2(b) = w_1 f(a) + w_2 f((a+b)/2)+w_3 f(b).$$
+We have also shown that the first equals
+$\frac{b-a}{6}(f(a) + 4f((a+b)/2) + f(b))$, so that
+$$
+w_1 f(a) + w_2 f((a+b)/2)+w_3 f(b) = \frac{b-a}{6}(f(a) + 4f((a+b)/2) + f(b)).
+$$
+By setting $f(a)=1$, $f((a+b)/2)=f(b)=0$ we see that $w_1=\frac{b-a}{6}$, and similarly for $w_2$, $w_3$.
+It follows that the method coincides with Simpson's method.
+:::::::
+:::::
+:::
+
+
+
+
+::: {#exr-trapezoidal_estimate}
+Let $m=\frac{a+b}{2}$ be the midpoint of the interval $[a,b]$, and consider the following application of integration by parts:
+\begin{align*}
+-\int_a^b (x-m)f'(x)\,dx &= -\left[ (x-m)f(x)  \right]_a^b + \int_a^b f(x)\,dx  \\
+&= -\frac{b-a}{2}f(b) - \frac{b-a}{2}f(a) + \int_a^b f(x)\,dx \\
+&= \int_a^b f(x)\,dx - (b-a) \frac{f(a)+f(b)}{2}.
+\end{align*}
+This shows that the local error in the trapezoidal rule can be written as
+$$ L=-\int_a^b (x-m)f'(x)\,dx.$$ {#eq-expr:locerr}
+
+(a) Apply integration by parts to @eq-expr:locerr to show that
+$$L = \int_a^b \left( C +\frac{1}{2}(x-m)^2 \right) f''(x)\,dx.$$ {#eq-locerr2}
+where $C$ is a constant (we will get back to how we can choose $C$).
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Integration by parts on @eq-expr:locerr with constant $C$ in the anti-derivative of $x-m$ gives
+\begin{align*}
+L &= - \left[  \left( C +\frac{1}{2}(x-m)^2 \right) f'(x)\right]_a^b + \int_a^b \left( C +\frac{1}{2}(x-m)^2 \right) f''(x)\,dx \\
+   &= \int_a^b \left( C +\frac{1}{2}(x-m)^2 \right) f''(x)\,dx.
+\end{align*}
+which shows @eq-locerr2.
+:::::::
+:::::
+
+(b) Show that, with $C=-(b-a)^2/8$, we have that $C +\frac{1}{2}(x-m)^2\leq 0$ for $x\in[a,b]$.
+Show also that, with this choice of $C$, it follows from @eq-locerr2 that $|L|\leq\frac{M_2(b-a)^3}{12}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+For $x\in[a,b]$ we have that $\frac{1}{2}(x-m)^2\leq \frac{1}{8}(b-a)^2=-C$, so that $-C -\frac{1}{2}(x-m)^2\geq 0$ for such $x$.
+Taking absolute values in @eq-locerr2 with this choice of $C$ gives
+\begin{align*}
+|L| &= \left|   \int_a^b \left( \frac{1}{2}(x-m)^2 - (b-a)^2/8\right) f''(x)\,dx   \right| \\
+&\leq \int_a^b \left| \frac{1}{2}(x-m)^2 - (b-a)^2/8\right| |f''(x)|\,dx \\
+&\leq \int_a^b \left( (b-a)^2/8 - \frac{1}{2}(x-m)^2 \right) M_2\,dx \\
+&= M_2 \left[  x(b-a)^2/8 - \frac{1}{6}(x-m)^3 \right]_a^b \\
+&= M_2\left( (b-a)^3/8 - \frac{1}{48} (b-a)^3 - \frac{1}{48} (b-a)^3\right) \\
+&= M_2\left( \frac{1}{8} - \frac{1}{24}\right)(b-a)^3 = \frac{M_2(b-a)^3}{12}.
+\end{align*}
+:::::::
+:::::
+
+(c) Use (b) to show that the global error in the trapezoidal rule is $\leq (b-a) \frac{h^2}{12}M_2$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+As for the midpoint method we get the global error by summing the local errors (replace $b-a$ with $h$, and $nh$ with $b-a$):
+$$\sum_{k=1}^n \frac{M_2h^3}{12} = n\frac{M_2h^3}{12} = (b-a) \frac{h^2}{12}M_2.$$
+This is what we needed to show.
+:::::::
+:::::
+:::
+
+To simplify notation in the next exercises we define $m=a+h$, and $b=a+2h$. We also define
+$$q(x)=(x-a)(x-m)(x-b),$$
+and $p_2(x)$ as the quadratic polynomial interpolating $f$ in $a$, $m$, and $b$.
+
+
+
+::: {#exr-simpson_exact_third}
+In this exercise we will look at different ways of proving that Simpson's method is exact for all cubic polynomials.
+
+(a) Verify that Simpson's method is exact for $f(x)=x^i$ for $i=0$, 1, 2, 3.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+It is enough to verify that Simpson's method is exact on each sub-interval. The integrals become
+\begin{align*}
+\int_{a-h}^{a+h} x^3dx &= \frac{1}{4}((a+h)^4-(a-h)^4) = 2a^3h + 2ah^3 \\
+\int_{a-h}^{a+h} x^2dx &= \frac{1}{3}((a+h)^3-(a-h)^3) = \frac{1}{3}(6a^2h+2h^3) = \frac{h}{3}(6a^2+2h^2)\\
+\int_{a-h}^{a+h} xdx   &= \frac{1}{2}((a+h)^2-(a-h)^2) = \frac{1}{2}4ah = 2ah\\
+\int_{a-h}^{a+h} dx    &= 2h.
+\end{align*}
+we also get that the method becomes
+\begin{align*}
+\frac{h}{3}((a-h)^3+4a^3+(a+h)^3) &= \frac{h}{3}(6a^3 + 6ah^2) = 2a^3h + 2ah^3\\
+\frac{h}{3}((a-h)^2+4a^2+(a+h)^2) &= \frac{h}{3}(6a^2 + 2h^2) \\
+\frac{h}{3}((a-h)+4a+(a+h)) &= 2ah\\
+\frac{h}{3}(1+4+1) &= 2h.
+\end{align*}
+This shows that Simpson's method is exact for the given polynomials.
+:::::::
+:::::
+
+(b) Use (a) to show that Simpson's method is exact for any cubic polynomial.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+For $f(x)=bx^3+cx^2+dx+e$ the integral becomes
+$$\int_{a-h}^{a+h} f(x)dx = b\int_{a-h}^{a+h} x^3dx+c\int_{a-h}^{a+h} x^2dx+d\int_{a-h}^{a+h} xdx+e\int_{a-h}^{a+h} 1dx.$$
+The method now becomes
+\begin{align*}
+\lefteqn{\frac{h}{3}(f(a-h)+4f(a)+f(a+h))}\\
+&=b\frac{h}{3}((a-h)^3+4a^3+(a+h)^3)+c\frac{h}{3}((a-h)^2+4a^2+(a+h)^2)\\
+&+d\frac{h}{3}((a-h)+4a+(a+h))+e\frac{h}{3}(1+4+1)
+\end{align*}
+Equality follows now from that we have equality for $x^3$, $x^2$, $x$, and $1$.
+:::::::
+:::::
+
+(c) Could you come to the same conclusion as in (b) by considering the error estimate given by @eq-simpglobalerr?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $f^{(4)}(x)=0$ for all $x$ for any cubic polynomial, it follows directly from the error estimate that the method is exact for such functions.
+:::::::
+:::::
+
+(d) Explain that $q$ is anti-symmetric about $m$, and that, if $f$ is a cubic polynomial, then $f-p_2$ is a multiple of $q$.
+Why does exactness of Simpson's method for cubic polynomer follow from this?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+\begin{align*}
+q(m-y) &= (h-y)(-y)(-h-y) \\
+q(m+y)&= (h+y)y(-h+y) = -(h-y)(-y)(-h-y),
+\end{align*}
+so that $q(m-y)=-q(m+y)$. It follows that $q$ is anti-symmetric about $m$, so that $\int_a^b q(x)\,dx =0$.
+Suppose now that $f$ is a cubic polynomial. The Newton forms are
+\begin{align*}
+p_2(x) &= c_0 + c_1(x-a) + c_2(x-a)(x-m) \\
+f(x)      &= c_0 + c_1(x-a)  + c_2(x-a)(x-m) + c_3(x-a)(x-m)(x-b)
+\end{align*}
+Since $\int_a^b (x-a)(x-m)(x-b)\,dx=\int_a^bq(x)\,dx=0$ it follows that $\int_a^b f(x)\,dx=\int_a^b p_2(x)$,
+so that Simpson's method is exact for all cubic polynomer.
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-proofsimpson name="A sharper error estimate for Simpson's method"}
+In this exercise we will prove a sharper error estimate than @eq-simpglobalerr for Simpson's method. We let
+$$E=\int_a^b f(x)\,dx - \int_a^b p_2(x)\,dx$$
+be the error in Simpson's method with one sub-interval.
+
+(a) Show that $\int_a^b xq(x)=- \frac{1}{120} (b-a)^5$, and that $(xq(x))^{(4)} = 4!$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Integration by parts three times gives
+\begin{align*}
+\int_a^b xq(x) &= \int_a^b x(x-a)(x-m)(x-b)\,dx = -\frac{1}{2}\int_a^b (x-a)^2(x-m)(x-b)\,dx \\
+&= \frac{1}{6}\int_a^b (x-a)^3(x-b)\,dx \\
+&= - \frac{1}{24} \int_a^b (x-a)^4\,dx \\
+&= - \frac{1}{120} (b-a)^5,
+\end{align*}
+which proves the first part. That $(xq(x))^{(4)} = 4!$ follows by using the rule for differentiating a product four times.
+:::::::
+:::::
+
+(b) Consider the continuous function
+$$\phi(x) = f(x)-p_2(x)-kq(x) - \frac{E}{\int_a^b xq(x)\,dx}xq(x),$$
+Show that
+$$
+\phi^{(4)}(x) = f^{(4)}(x) + 120\frac{4!E}{(b-a)^5},
+$$ {#eq-phi4der}
+and that $\int_a^b \phi(x)\,dx=0$. Finally, explain that $\phi(a)=\phi(m)=\phi(b)=0$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $p_2^{(4)}(x)=q^{(4)}(x)=0$. Insertion of $(xq(x))^{(4)}=4!$, and $\int_a^b xq(x)\,dx=- \frac{1}{120} (b-a)^5$ from (a), proves the first part.
+For the second part, we know from before that $\int_a^b q(x)\,dx = 0$.
+Integration of $\phi$ from $a$ to $b$ therefore gives
+$$\int_a^b f(x)\,dx - \int_a^b p_2(x)\,dx - E=E-E=0.$$
+The last part follows from that $f$ and $p_2$ agree on $a$, $m$, and $b$, and from that $q(a)=q(m)=q(b)=0$.
+:::::::
+:::::
+
+(c) Show that there exists a $k$ so that $\int_a^m\phi(x)\,dx=0$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$\int_a^m\phi(x)\,dx=0$ is the same as
+$$0 = \int_a^m f(x)\,dx - \int_a^m p_2(x)\,dx- k\int_a^m q(x)\,dx - \frac{E}{\int_a^b xq(x)\,dx}\int_a^m xq(x)\,dx,$$
+which can be solved for $k$ by dividing with $\int_a^m q(x)\,dx\neq 0$ (which is $\neq 0$ since $q$ does not how a sign change on $(a,m)$).
+:::::::
+:::::
+
+For the last part of the exercise we let $k$ be defined as in (c).
+
+(d) Show that $\phi$ has at least five different zeros in $[a,b]$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $\int_a^b \phi(x)\,dx=\int_a^m\phi(x)\,dx=0$, we must have that $\int_m^b\phi(x)\,dx=0$.
+Since $\phi$ is continuous, there is a $u\in(a,m)$ so that $\phi(u)=0$, and a $v\in(m,b)$ so that $\phi(v)=0$.
+$\phi$ therefore has at least five different zeros in $[a,b]$, since we also proved that $\phi(a)=\phi(m)=\phi(b)=0$.
+:::::::
+:::::
+
+(e) Rolles theorem says that, for a continuous, differentiable function defined on $[a,b]$ so that $\phi(a)=\phi(b)=0$, there exists a point $c\in(a,b)$ so that $\phi'(c)=0$.
+Use Rolles theorem to show that there exists a $\xi\in(a,b)$ so that $\phi^{(4)}(\xi)=0$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+You an argument as follows
+
+1. If you apply Rolles theorem on the four intervals $(a,u)$, $(u,m)$, $(m,v)$, and $(v,b)$, we get four points
+$a_1<a_2<a_3<a_4$, where all $\phi'(a_i)=0$.
+2. If you apply Rolles teorem again, but now on the three inetrvals $(a_1,a_2)$, $(a_2,a_3)$, and $(a_3,a_4)$, we get three points
+$b_1<b_2<b_3$, where all $\phi''(b_i)=0$.
+3. If you apply Rolles teorem a third time, now on the two intervals $(b_1,b_2)$, $(b_2,b_3)$, we get two points
+$c_1<c_2$ so that $\phi'''(c_1)=\phi'''(c_2)=0$.
+4. If you apply Rolles teorem a fourth and final time we get a $\xi\in(c_1,c_2)$ so that $\phi^{(4)}(\xi)=0$,
+
+:::::::
+:::::
+
+(f) Explain that, with $\xi$ as in (e), we get that $E=-f^{(4)}(\xi)(b-a)^5/2880$.
+It follows that the error for one interval is $\leq M_4(b-a)^5/2880$. 
+Since we have contribution from $n$ such, we get the upper bound
+$$nM_4(2h)^5/2880 = (b-a)M_4(2h)^4/2880 = M_4(b-a)h^4/180$$
+for the error. This is considerably better than the global error estimate given in @eq-simpglobalerr.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Evaluation of @eq-phi4der in $\xi$ gives
+$$0 =  f^{(4)}(\xi) + 120\frac{4!E}{(b-a)^5},$$
+so that $E=-f^{(4)}(\xi)(b-a)^5/2880$. An upper bound for the error on one interval is therefore $M_4(b-a)^5/2880$.
+:::::::
+:::::
+:::
+
+::: {#exr-simpson}
+
+(a) Show that the Newton form of the polynomial interpolating $f$ in $a$, $m=(a+b)/2$, and $b$ is
+$$p_2(x)=f(a) + \frac{f(m)-f(a)}{h}(x-a) + \frac{f(a) - 2f(m)+f(b)}{2h^2}(x-a)(x-m),$$
+where $h=(b-a)/2$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The Newton form is obtained by solving the equations
+\begin{align*}
+f(a)  &= c_0 \\
+f(m) &= c_0 + c_1h \\
+f(b)  &= c_0 + 2c_1h + 2c_2h^2.
+\end{align*}
+We get $c_0=f(a)$, $c_1=\frac{f(m)-f(a)}{h}$, $c_2=\frac{f(a)-2f(m)+f(b)}{2h^2}$. The interpolating polynomial is thus
+$$
+p_2(x)=f(a) + \frac{f(m)-f(a)}{h}(x-a) + \frac{f(a) - 2f(m)+f(b)}{2h^2}(x-a)(x-m).
+$$
+:::::::
+:::::
+
+(b) Show that $\int_a^b p_2(x)\,dx=\frac{h}{3}  \left(  f(a) + 4f(m) + f(b) \right)$.
+
+::::: {.callout-tip title='Hint' collapse="true"}
+Compute $\int_a^b (x-a)(x-m)\,dx$ first, see @exr-regnutQn. 
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Here it can be of help to first compute $\int_a^b (x-a)(x-m)\,dx$ by means of integration by parts:
+$$
+\int_a^b (x-a)(x-m)\,dx 
+= [\frac{1}{2}(x-a)^2(x-m)]_a^b - \frac{1}{2}\int_a^b (x-a)^2\,dx
+= 2h^3 - \frac{4}{3}h^3 = \frac{2}{3}h^3.
+$$
+Integrating $p_2(x)$ gives
+\begin{align*}
+\lefteqn{\left[ f(a)(x-a) + \frac{f(m)-f(a)}{2h}(x-a)^2  \right]_a^b  + \frac{f(a)-2f(m)+f(b)}{2h^2}\frac{2}{3}h^3} \\
+&= 2f(a)h + 2(f(m)-f(a))h  + \frac{f(a)-2f(m)+f(b)}{h}\frac{1}{3}h \\
+&= h\left( 2f(m) + \frac{1}{3}(f(a)-2f(m)+f(b)) \right) \\
+&= \frac{h}{3}  \left(  6f(m) + f(a)-2f(m)+f(b) \right) \\
+&= \frac{h}{3}  \left(  f(a) + 4f(m) + f(b) \right).
+\end{align*}
+:::::::
+:::::
+:::
+
+
+
+
+
+::: {#exr-}
+On the interval $[x_{i-1},x_i]$ the trapezoidal rule uses only the function values $f(x_{i-1})$ and $f(x_i)$. 
+On the next interval the function values $f(x_i)$ and $f(x_{i+1})$ are used. All function values, except the first and last, therefore occur twice in the sum to the right in @eq-trapezoid0.
+Function evaluations can be costly - they can for example stem from sensors which are expensive to use.
+Rewrite @eq-trapezoid0 in such a way that we repeat repeating function evaluations.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We can rewrite this as follows.
+$$I_\text{trap}(h)=h\Biggl(\frac{f(a)+f(b)}{2}+\sum_{i=1}^{n-1} f(x_i)\Biggr).$$
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-}
+Suppose we know  $n+1$ function values $\{f(a+kh)\}_{k=0}^n$. Show that
+$$
+\int_a^{a+nh} p_n(x)\,dx 
+=
+hn\left( f(a) + \begin{pmatrix} \frac{n}{2} & \frac{n^2}{3} & \cdots & \frac{n^n}{n+1}\end{pmatrix}
+\begin{pmatrix} h^1p_n^{(1)}(a)/1!  \\ h^2p_n^{(2)}(a)/2! \\ \vdots \\ h^np_n^{(n)}(a)/n!\end{pmatrix} \right)
+$$
+Also show that, for $n=2$ and $n=3$, we get in particular 
+\begin{align*}
+\int_a^{a+2h} p_n(x)\,dx &= \frac{h}{3}( f(a)+4f(a+h)+f(a+2h)) \\
+\int_a^{a+3h} p_n(x)\,dx &= \frac{3h}{8}( f(a)+3f(a+h)+3f(a+2h)+f(a+3h) ).
+\end{align*}
+
+::::: {.callout-tip title='Hint' collapse="true"}
+@thm-derivert-approksimasjon gives us an expression for 
+$\begin{pmatrix} h^1p_n^{(1)}(a)/1!  \\ h^2p_n^{(2)}(a)/2! \\ \vdots \\ h^np_n^{(n)}(a)/n!\end{pmatrix}$.
+:::::
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+\begin{align*}
+\int_a^{a+nh} p_n(x)\,dx  &= \int_a^{a+nh} \sum_{k=0}^n \frac{p_n^{(k)}(a)}{k!}(x-a)^k\,dx = \left[ \sum_{k=0}^n \frac{p_n^{(k)}(a)}{(k+1)!}(x-a)^{k+1} \right]_a^{a+nh} \\
+&= \sum_{k=0}^n \frac{p_n^{(k)}(a)}{(k+1)!}(nh)^{k+1} \\
+&= 
+hn\left( f(a) + \begin{pmatrix} \frac{n}{2} & \frac{n^2}{3} & \cdots & \frac{n^n}{n+1}\end{pmatrix}
+\begin{pmatrix} h^1p_n^{(1)}(a)/1!  \\ h^2p_n^{(2)}(a)/2! \\ \vdots \\ h^np_n^{(n)}(a)/n!\end{pmatrix} \right)
+\end{align*}
+which is the expression we wanted. For $n=2$ @thm-derivert-approksimasjon gives
+$$
+\begin{pmatrix} h^1p_2^{(1)}(a)/1!  \\ h^2p_2^{(2)}(a)/2! \end{pmatrix} 
+= \begin{pmatrix} 1 & 1 \\ 2 & 4\end{pmatrix}^{-1}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix}
+= \begin{pmatrix} 2 & -1/2 \\ -1 & 1/2 \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix}
+$$
+Inserting this is the expression above we get
+\begin{align*}
+\lefteqn{2h\left( f(a) + \begin{pmatrix} 1 & \frac{4}{3} \end{pmatrix}\begin{pmatrix} 2 & -1/2 \\ -1 & 1/2 \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix} \right) } \\
+&= 2h\left( f(a) + \begin{pmatrix} \frac{2}{3} & \frac{1}{6} \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix}  \right) \\
+&= 2h\left( \left(1-\frac{2}{3}-\frac{1}{6}\right)f(a) + \frac{2}{3}f(a+h) + \frac{1}{6}f(a+2h) \right) \\
+&= \frac{h}{3}(f(a)+4f(a+h)+f(a+2h)).
+\end{align*}
+For $n=3$ @thm-derivert-approksimasjon gives
+\begin{align*}
+\begin{pmatrix} h^1p_3^{(1)}(a)/1!  \\ h^2p_3^{(2)}(a)/2! \\ h^3p_3^{(3)}(a)/3!\end{pmatrix} 
+&= \begin{pmatrix} 1 & 1 & 1\\ 2 & 4 & 8 \\ 3 & 9 & 27\end{pmatrix}^{-1}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h) - f(a) \end{pmatrix} \\
+&= \begin{pmatrix} 3   & -3/2 &   1/3 \\ -5/2  &  2   & -1/2 \\ 1/2   & -1/2 &  1/6 \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h) - f(a) \end{pmatrix}
+\end{align*}
+Inserting this is the expression we get
+\begin{align*} 
+\lefteqn{3h\left( f(a) + \begin{pmatrix} \frac{3}{2} & 3 & \frac{27}{4} \end{pmatrix}
+\begin{pmatrix} 3   & -3/2 &   1/3 \\ -5/2  &  2   & -1/2\\ 1/2  & -1/2  &  1/6\end{pmatrix}
+\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h)-f(a) \end{pmatrix}\right) } \\
+&=  3h\left(f(a) + \begin{pmatrix} \frac{3}{8}    & \frac{3}{8} &  \frac{1}{8} \end{pmatrix} \begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h)-f(a) \end{pmatrix}\right) \\
+&= 3h\left( \left((1-\frac{3}{8}-\frac{3}{8}-\frac{1}{8}\right)f(a) + \frac{3}{8}f(a+h) + \frac{3}{8} f(a+2h) + \frac{1}{8}f(a+3h) \right) \\
+&= \frac{3h}{8}(f(a)+3f(a+h)+3f(a+2h)+f(a+3h)).
+\end{align*}
+:::::::
+:::::
+:::
+
+
+
+
+
+
+
+

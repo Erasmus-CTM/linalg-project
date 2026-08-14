@@ -1,0 +1,1 @@
+B = (255*np.random.rand(256,256)).round()

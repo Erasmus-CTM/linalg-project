@@ -1,0 +1,20 @@
+%\usepackage{tikz} %pakke for tikzpicture
+%\usetikzlibrary{calc} %utregning med koordinater
+%\usetikzlibrary{positioning} %nodeposisjoner
+%\usepackage{amsmath} %\mathbf
+\begin{tikzpicture}
+  \begin{scope}[scale = 4]
+    \def\xaxislen{1}
+    \def\yaxislen{1}
+    \draw[-latex, thick] (0,0)--(\xaxislen,0);
+    \draw[-latex, thick] (0,0)--(0,\yaxislen);
+    \coordinate (a) at ({.7*\xaxislen}, {.1*\yaxislen});
+    \coordinate (b) at ({.3*\xaxislen}, {.5*\yaxislen});
+    \draw[dashed,color = blue] (a)--($(a)+(b)$);
+    \draw[dashed,color = blue] (b)--($(a)+(b)$);
+    \draw[-latex,color = blue] (0,0)--(a) node[below, right, color=black]{$\mathbf{a}$};
+    \draw[-latex,color = blue] (0,0)--(b) node[below = .5em, right, color=black]{$\mathbf{b}$};
+    \draw[-latex,color = blue] (0,0)--($(a)+(b)$) node[below = .5em, right, color=black]{%
+      $\mathbf{a} + \mathbf{b}$};
+  \end{scope}
+\end{tikzpicture}

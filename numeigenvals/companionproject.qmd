@@ -1,0 +1,231 @@
+# Project: The companion matrix
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+ 
+ 
+
+## Introduction
+We have learned that we can find the eigenvalues of a matrix by finding the roots of the characteristic polynomial, 
+but finding the roots of a high degree polynomial can be difficult in itself!
+It turns out that this problem can be turned up side down: We can in fact use linear algebra to find the roots of the characteristic polynomial. 
+In fact, most software find eigenvalues by following this approach, rather than finding them directly as roots in a polynomial!
+We shall look at this linear algebra procedure, which can be viewed as a general method for finding roots in polynomials numerically. 
+Given the polynomial 
+$$ p(t)=a_0+a_1t+\cdots + a_{n-1}t^{n-1}+t^n,$$
+we define the companion matrix $C(p)$ by
+$$
+C(p)
+=
+\left(\begin{array}{rrrrr} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{array}\right).
+$$
+
+::: {#exr-1}
+(a) Show that the characteristic polynomial of $C(p)$ is given by $\det(C(p)-\lambda I)=(-1)^n p(\lambda)$, 
+so that the eigenvalues of $C(p)$ correspond to the roots of $p$. 
+
+\textbf{Hint:} Expand the determinant along the last row.  
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have 
+$$
+C(p) - \lambda I
+=
+\left(\begin{array}{rrrrr} 
+  -\lambda & 1 & 0 & \cdots & 0 \\ 
+  0 & -\lambda & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} - \lambda I
+\end{array}\right).
+$$
+When expanding the determinant along the last row we get the minors 
+$$1,-\lambda,\lambda^2,...,(-1)^{n-1}\lambda^{n-1},$$
+so that the determinant is
+\begin{align*}
+\lefteqn{ \sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} } \\
+&= (-1)^n \sum_{k=1}^{n-1} a_{k-1} \lambda^{k-1}    +   (-1)^n\lambda^n (a_{n-1}\lambda^{n-1} +\lambda^n)  \\
+&= (-1)^n \sum_{k=1}^n a_{k-1} \lambda^{k-1} + (-1)^n\lambda^n \\
+&= (-1)^n p(\lambda).
+\end{align*}
+:::::::
+:::::
+
+(b) Show that $C(p)$ is invertible if and only if $a_0\neq 0$, and that 
+$$
+  C(p)^{-1} 
+  = 
+  \left(\begin{array}{rrrrr}  
+    -\frac{a_1}{a_0} & -\frac{a_2}{a_0} & \cdots & -\frac{a_{n-1}}{a_0} & -\frac{1}{a_0}\\ 
+    1 & 0 & \cdots & 0 & 0 \\ 
+    0 & 1 & \cdots & 0 & 0 \\ 
+    \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+    0 & 0 & \cdots & 1 & 0 
+  \end{array}\right).
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+A matrix is invertible if and only if $\lambda=0$ is not an eigenvalue, and $\lambda=0$ is a root in $(-1)^n p(\lambda)$ if and only if $a_0=0$. 
+For the second part we compute
+$$
+\left(\begin{array}{rrrrr} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{array}\right)
+\left(\begin{array}{rrrrr}  
+    -\frac{a_1}{a_0} & -\frac{a_2}{a_0} & \cdots & -\frac{a_{n-1}}{a_0} & -\frac{1}{a_0}\\ 
+    1 & 0 & \cdots & 0 & 0 \\ 
+    0 & 1 & \cdots & 0 & 0 \\ 
+    \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+    0 & 0 & \cdots & 1 & 0 
+  \end{array}\right)$$
+component by component.
+:::::::
+:::::
+:::
+
+::: {#exr-2}
+Suppose that $\lambda$ is a root in $p(t)$, in other words an eigenvalue for $C(p)$ according to Exercise 1. 
+Show that $(1,\lambda,\lambda^2,...,\lambda^{n-1})$ is a corresponding eigenvector for $C(p)$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+\begin{align*}
+\lefteqn{
+\left(\begin{array}{rrrrr} 
+  0 & 1 & 0 & \cdots & 0 \\ 
+  0 & 0 & 1 & \cdots & 0 \\ 
+  \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+  0 & 0 & 0 & \cdots & 1 \\ 
+  -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
+\end{array}\right)
+\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} } \\
+&= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ -a_0-a_1\lambda-a_2\lambda^2 - \cdots - a_{n-1}\lambda^{n-1} \end{pmatrix}
+= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n-p(\lambda) \end{pmatrix}
+= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n \end{pmatrix} \\
+&= \lambda \begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} 
+\end{align*}
+:::::::
+:::::
+:::
+
+In the following we shall let $\lambda_1,...,\lambda_n$ be the roots in $p(t)$, repeated with multiplicity. Define the Vandermonde matrix 
+$$\mathbf{V} = \left(\begin{array}{rrrr} 1 & 1 & \cdots & 1 \\ \lambda_1 & \lambda_2 & \cdots & \lambda_n \\ \vdots & \vdots & \vdots & \vdots \\ \lambda_1^{n-1} & \lambda_2^{n-1} & \cdots & \lambda_n^{n-1} \end{array} \right).$$
+It is clear that $V$ is not invertible when a $\lambda_i$ has multiplicity larger than $1$, since two columns in $V$ then are equal. 
+$V$ is invertible when the $\lambda_1,\ldots\lambda_n$ are distinct, since eigenvectors for distinct eigenvalues are linearly independent - 
+this implies that the columns in $V$ provide a basis. 
+It follows that $V$ is invertible if and only if all $\lambda_1,...,\lambda_n$ are distinct.
+Let $D$ be the diagonal matrix with $\lambda_1,...,\lambda_n$ on the diagonal. We then have that
+$$ C(p)=VDV^{-1},$$
+so that $C(p)$ is diagionalisable, with $V$ diagonalising it.
+
+We can also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
+
+::: {#exr-3}
+Write a function \texttt{C(A)} which takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
+You can use the command \texttt{poly(A)} in \texttt{numpy} to find the characteristic polynomial of $A$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The code can look as follows.
+```{python}
+{{< include C.py >}}
+```
+:::::::
+:::::
+:::
+
+$C(A)$ and $A$ have the same eigenvalues, since they by definition have the same characteristic polynomial. 
+Aided by Exercise 3, $C(A)$ can be constructed without actually knowing the eigenvalues. 
+Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix.  
+This makes it computationally easier to use the power method (and other methods!), which enables us to find the unknown eigenvalues. 
+
+::: {#exr-4} 
+Write a function `power_impl` which takes a matrix $A$ and an integer $n$ as input, computes $C(A)$, 
+performs $n$ iterations of the power method, and returns the corresponding estimate for the biggest eigenvalue.
+As initial vector for the power method you can choose the vector having $1$ in all components. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The code can look as follows.
+```{python}
+{{< include power_impl.py >}}
+```
+:::::::
+:::::
+:::
+
+With the power method we only found approximations to the biggest eigenvalue above. 
+The  $QR$ factorization is a method which can be used to find all the eigenvalues, not only the biggest. 
+If $A=QR$ is the $QR$-factorisation of $A$, then the matrices $QR$ and $RQ$ are similar (this is Exercise 5.2.31 in @lay), 
+so that they have the same eigenvalues. 
+If we then define $A_1=RQ=Q_1R_1$ (where $Q_1R_1$ is the $QR$-factorisation of $A_1$), 
+and then $A_2=R_1Q_1=Q_2R_2$ (where $Q_2R_2$ is the $QR$-factorisation of $A_2$), and so on, 
+we get a sequence of matrices $A,A_1,A_2,\ldots$, which all have the same eigenvalues.
+
+::: {#exr-5}
+
+(a) Write a function `qr_impl` which prints the matrices $A_1$, $A_2$, $A_n$, following the recipe above ($A$ and $n$ as input again). 
+Use the built-in function `np.linalg.qr()` to find the $QR$ factorisation of a matrix. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+```{python}
+{{< include qr_impl.py >}}
+```
+:::::::
+:::::
+
+(b) We now define the matrix $A=\left(\begin{array}{cccc} 1 & 2 & 3 & 4 \\ 2 & 1 & 2 & 3 \\ 3 & 2 & 1 & 2 \\ 4 & 3 & 2 & 1 \end{array} \right)$. 
+Plot the characteristic polynomial of $A$ over $[-4,10]$. Do you find any zeros? 
+Restrict the plot interval gradually so that you can read out more precise approximations to the zeros, 
+and write down these.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used.
+```{python}
+{{< include code5b.py >}}
+```
+On the second line the plot interval $[-4,10]$ i set. 
+This can be restricted further to for instance $[8,10]$, since the plot shows that there clearly is a zero in this interval. 
+The next plot reveals that a zero can be found in the interval $[8.75,9.25]$. Continuing in this way you will find a zero close to $9.09$. 
+This procedure has to be repeated for te other zeros as well.
+:::::::
+:::::
+
+(c) Consider the matrices printed out when running 
+```{python}
+{{< include code5c1.py >}}
+```
+What do you observe? Explain how you now can see approximations to the eigenvalues of $A$.
+Are they close to the actual eigenvalues?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"} 
+It looks like the matrices $A_n$ get more and more diagonal,
+The actual eigenvalues can be found as follows.
+```{python}
+{{< include code5c2.py >}}
+```
+The entries on the diagonal in the $A_n$ seem to be close to this, so that we have obtained good approximations to the eigenvalues.
+:::::::
+:::::
+:::
+
+It is not always the case that the method above gives good approximations to the eigenvalues. 
+We shall not go into when this does, or does not occur.

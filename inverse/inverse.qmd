@@ -1,0 +1,514 @@
+# The inverse matrix {#sec-invers}
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+We have seen that a system $A\mathbf{x}=\mathbf{b}$ can be solved by Gaussian elimination. 
+If $A$ is square and satisfies 1.-4. in @thm-corekv, we can consider the mapping $\mathbf{b}\to\mathbf{x}$, 
+i.e., the mapping which sends a given right hand side to the unique solution $\mathbf{x}$. 
+This is easily seen to be a linear transformation, and its matrix will be denoted by $A^{-1}$. 
+If we have found $A^{-1}$, we can solve any system $A\mathbf{x}=\mathbf{b}$ simply by computing $\mathbf{x}=A^{-1}\mathbf{b}$. 
+
+In this chapter we shall define the inverse matrix more precisely. We will start by proving the following:
+
+::: {#lem-}
+Le $A$ be a square matrix. $A$ satisfies 1.-4. in @thm-corekv if and only if there exists a matrix $B$ so that $AB=I_n$.
+:::
+
+::: {.proof}
+Suppose that $A=E_k\cdots E_1$ satisfies 1.-4. in @thm-corekv. 
+If $F_i$ are elementary matrices which represent the reverse operations we have that 
+$$E_k\cdots E_1F_1\cdots F_k=I_n.$$
+The matrix $B=F_1\cdots F_k$ thus satisfies $AB=I_n$. 
+The other way, suppose $A$ and $B$ are square matrices so that $AB=I_n$. 
+Suppose that $B\mathbf{x}=\mathbf{0}$ for an $\mathbf{x}\neq 0$. Then $AB\mathbf{x}=\mathbf{0}$ also, which violates that $AB=I_n$.
+$B\mathbf{x}=\mathbf{0}$ therefore has the unique solution $\mathbf{x}=\mathbf{0}$, so that $B$ satisfies 1.-4. in @thm-corekv. 
+But then $B$ can be written as a product of elementary matrices, $B=F_1\cdots F_k$. 
+From $AB=I_n$ it follows that $A=E_k\cdots E_1$, where $E_i$ represents the reverse row operations. 
+$A$ thus satisfies 1.-4. in @thm-corekv også. 
+:::
+
+When $AB=I_n$ we say that $B$ is a *right inverse*\index{Inverse!right} of $A$. 
+Due to the lemma above we can add that $A$ has a right inverse as an equivalence in @thm-corekv. 
+We will do this, but with a small modification:
+We say that $B$ is a *left inverse*\index{Inverse!left} of $A$ if $BA=I_n$. 
+Suppose $A$ has a right inverse $B$. From the reasoning above it follows that we can write $A=E_k\cdots E_1$ and $B=F_1\cdots F_k$, where the $E_i$ are elementary, and where the
+$F_i$ are the reverse counterparts. But then 
+$$BA = F_1\cdots F_kE_k\cdots E_1=I_n,$$
+so that $B$ also is a left inverse of $A$. It also follows that a left/right inverse is unique. We have shown the following.
+
+
+::: {#prp-}
+Suppose that $B$ is a right inverse of $A$. Then $B$ is also a left inverse to $A$. A left inverse/right inverse of $A$ is unique.
+:::
+
+Due to this we need not differ between right- and left inverses, and it is natural to define that $A$ is *invertible*\index{Invertible}
+when there exists a matrix $B$ so that $AB=BA=I_n$. $B$ is called  the *inverse matrix*\index{Inverse} of $A$, 
+and we write $A^{-1}$ for this. 
+
+Some properties of the inverse matrix follow immediately from the definition.
+Since $A^{-1}A=I_n$, in particular $\left(A^{-1}\right)^{-1}=A$. 
+Furthermore, if $s\neq 0$ then 
+$$\left(sA\right)\left(s^{-1}A^{-1}\right)=AA^{-1}=I_n,$$
+so that $(sA)^{-1}=s^{-1}A^{-1}$.
+In the exercises of this chapter you will be asked to prove other properties of the inverse matrix.
+
+Let us now extend @thm-corekv with an equivalence concerning invertibility, and at the same time give it a name.
+
+{{< include invmatteo.qmd >}}
+
+From the discussion above it is also clear that if $E_1,E_2,...,E_k$ are elementary matrices which row reduce $A$ to the identity matrix   
+(so that $E_k\cdots E_1A=I_n$), then
+\begin{align*}
+A &= F_1\cdots F_k & A^{-1} &= E_k\cdots E_1
+\end{align*}
+where $F_i=E_i^{-1}$. In other words:
+
+* $A^{-1}$ can be obtained by multiplying the elementary matrices, 
+* $A$ can be obtained by multiplying their inverses in reverse order. 
+
+To compute $A^{-1}$ it is useful to apply the row operations not only on $A$, but also on the augmented matrix 
+$\begin{pmatrix} A & I_n \end{pmatrix}$. Then we get 
+$$E_k\cdots E_1\begin{pmatrix} A & I_n \end{pmatrix} = \begin{pmatrix} I_n & E_k\cdots E_1 \end{pmatrix} = \begin{pmatrix} I_n & A^{-1} \end{pmatrix}.$$
+From the result we can read out $A^{-1}$ from the last columns. There is an alternative way to interpret this: 
+when row reducing $\begin{pmatrix} A & I_n \end{pmatrix}$, we simultaneously solve the systems
+\begin{align*}
+A\mathbf{x}_1&=\mathbf{e}_1 & A\mathbf{x}_2&=\mathbf{e}_2 & \cdots & \cdots & A\mathbf{x}_n&=\mathbf{e}_n,
+\end{align*}
+and since $A\mathbf{x}_i=\mathbf{e}_i$ implies that $A^{-1}\mathbf{e}_i=\mathbf{x}_i$, column $i$ in $A^{-1}$ will be $\mathbf{x}_i$. 
+Let us summarise. 
+
+::: {#prp-}
+Suppose that $A$ is invertible. The reduced echelon form of  $\begin{pmatrix} A & I_n \end{pmatrix}$ 
+equals $\begin{pmatrix} I_n & A^{-1} \end{pmatrix}$. 
+:::
+
+
+
+
+
+
+
+
+
+::: {#exm-}
+Let us find the inverse matrix of $A=\begin{pmatrix} 2 & 3 & 1 \\ 1 & 4 & 1 \\ 2 & 4 & 2 \end{pmatrix}$:
+\begin{align*}
+\begin{pmatrix} A & I_n \end{pmatrix}&=\begin{pmatrix} 2 & 3 & 1 & 1 & 0 & 0 \\ 1 & 4 & 1 & 0 & 1 & 0 \\ 2 & 4 & 2 & 0 & 0 & 1 \end{pmatrix}
+\stackrel{I\leftrightarrow II}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 2 & 3 & 1 & 1 & 0 & 0 \\ 2 & 4 & 2 & 0 & 0 & 1\end{pmatrix} \\
+&\stackrel{II-2I}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & -5 & -1 & 1 & -2 & 0 \\ 2 & 4 & 2 & 0 & 0 & 1 \end{pmatrix}
+\stackrel{III-2I}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & -5 & -1 & 1 & -2 & 0 \\ 0 & -4 & 0 & 0 & -2 & 1 \end{pmatrix} \\
+&\stackrel{II\leftrightarrow III}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & -4 & 0 & 0 & -2 & 1 \\ 0 & -5 & -1 & 1 & -2 & 0 \end{pmatrix}
+\stackrel{II/(-4)}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & -5 & -1 & 1 & -2 & 0 \end{pmatrix} \\
+&\stackrel{III+5II}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & 0 & -1 & 1 & 1/2 & -5/4 \end{pmatrix}
+\stackrel{III(-1)}{\sim} \begin{pmatrix} 1 & 4 & 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & 0 & 1 & -1 & -1/2 & 5/4 \end{pmatrix} \\
+&\stackrel{I-III}{\sim} \begin{pmatrix} 1 & 4 & 0 & 1 & 3/2 & -5/4 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & 0 & 1 & -1 & -1/2 & 5/4 \end{pmatrix}
+\stackrel{I-4II}{\sim} \begin{pmatrix} 1 & 0 & 0 & 1 & -1/2 & -1/4 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & 0 & 1 & -1 & -1/2 & 5/4 \end{pmatrix}.
+\end{align*}
+We read out the last 3 columns as $A^{-1}=\begin{pmatrix} 1 & -1/2 & -1/4 \\ 0 & 1/2 & -1/4 \\ -1 & -1/2 & 5/4 \end{pmatrix}$. 
+We can verify the result with the built-in function for computing the inverse: \index{python!np.linalg.inv}
+```{python}
+np.linalg.inv([[2,3,1],[1,4,1],[2,4,2]])
+```
+We can also verify the answer symbolically:
+```{python}
+sym.Matrix([[2,3,1],[1,4,1],[2,4,2]]).inv()
+```
+
+We can also read out the elementary matrices
+\begin{align*}
+E_1 &= \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1\end{pmatrix} &
+E_2 &= \begin{pmatrix} 1 & 0 & 0 \\ -2 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} &
+E_3 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ -2 & 0 & 1 \end{pmatrix} &
+E_4 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \\
+E_5 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & -1/4 & 0 \\ 0 & 0 & 1 \end{pmatrix} &
+E_6 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 5 & 0 & 1\end{pmatrix}  &
+E_7 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 &-1\end{pmatrix} &
+E_8 &= \begin{pmatrix} 1 & 0 & -1 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} \\
+E_9 &= \begin{pmatrix} 1 & -4 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\end{align*}
+and 
+\begin{align*}
+F_1 &= \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1\end{pmatrix} &
+F_2 &= \begin{pmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} &
+F_3 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 2 & 0 & 1 \end{pmatrix} &
+F_4 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \\
+F_5 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & -4 & 0 \\ 0 & 0 & 1 \end{pmatrix} &
+F_6 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ -5 & 0 & 1\end{pmatrix}  &
+F_7 &= \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 &-1\end{pmatrix} &
+F_8 &= \begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} \\
+F_9 &= \begin{pmatrix} 1 & 4 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\end{align*}
+With these we have that $A^{-1}=E_9\cdots E_1$, and $A=F_1\cdots F_9$. $\clubsuit$
+:::
+
+::: {#exm-}
+Consider the system $A\mathbf{x}=\mathbf{b}$ with  $A=\begin{pmatrix} 2 & 3 & 1 \\ 1 & 4 & 1 \\ 2 & 4 & 2 \end{pmatrix}$ from the 
+preceding example, and where $\mathbf{b}=\begin{pmatrix} 19 \\ 21 \\ 26 \end{pmatrix}$. 
+We found $A^{-1}$ above. If we use this we see that the solution to the system above is 
+$$
+\mathbf{x}=A^{-1}\mathbf{b} = \begin{pmatrix} 1 & -1/2 & -1/4 \\ 0 & 1/2 & -1/4 \\ -1 & -1/2 & 5/4 \end{pmatrix}\begin{pmatrix} 19 \\ 21 \\ 26 \end{pmatrix}
+= \begin{pmatrix} 19-21/2-13/2 \\ 21/2-13/2 \\ -19 -21/2 + 65/2 \end{pmatrix} 
+= \begin{pmatrix} 2 \\ 4 \\ 3 \end{pmatrix}.
+$$
+The system can also be solved by Gaussian elimination on the augmented matrix
+$\begin{pmatrix} A & \mathbf{b}\end{pmatrix}$. 
+This is preferable, since Gaussian elimination on $\begin{pmatrix} A & I_n \end{pmatrix}$ requires more computation
+than that on $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ (there are fewer columns in this matrix). $\clubsuit$
+:::
+
+
+::: {#exm-vandermondeinv name='Square Vandermonde matrices are invertible'}
+Let us prove that the Vandermonde matrix
+$$
+\begin{pmatrix}
+1 & x_0 & x_0^2 & \cdots & x_0^n \\
+1 & x_1 & x_1^2 & \cdots & x_1^n \\
+1 & x_2 & x_2^2 & \cdots & x_2^n \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_n & x_n^2 & \cdots & x_n^n
+\end{pmatrix}
+$$ {#eq-solveforc}
+is invertible if and only if the generators $x_0,x_1,\dots,x_n$ are distinct.\index{Vandermonde matrix!inverse}
+One direction of the proof is easy: If two of the generators are equal, then two of the rows are equal, 
+and then $A$ can't be invertible (@exr-equalrowsnoninvertible). The other way is a bit more complicated. 
+
+Suppose now that all generators are distinct. We will prove by induction on $n$ that the Vandermonde matrix is invertible. 
+It is clear that  $1\times 1$ Vandermonde matrices are invertible, since they are simply equal to $(1)$. 
+Suppose now that all square Vandermonde matrices of dimension $n\times n$, $(n-1)\times(n-1)$,...,$1\times 1$ 
+have been shown to be invertible. 
+To show that all $(n+1)\times(n+1)$-matrices are invertible it is enough to show that their transposes are invertible (@exr-ainvatinv). 
+So, consider the matrix
+$$
+\begin{pmatrix}
+1               & 1               & \cdots & 1 \\
+x_0           & x_1           & \cdots & x_n \\
+x_0^2       & x_1^2       & \cdots &  x_n^2 \\
+\vdots       & \vdots       & \ddots & \vdots \\
+x_0^n & x_1^n & \cdots & x_n^n
+\end{pmatrix}.
+$$
+We now subtract $x_0$ times row $i-1$ from row $i$ (for $i=n,n-1,...,2$). 
+This zeros everything under the leading one in the upper left corner, 
+and does not change whether the matrix is invertible or not. It therefore holds to show that
+$$
+\begin{pmatrix}
+1               & 1               & \cdots & 1 \\
+0              & x_1-x_0           & \cdots & x_n -x_0 \\
+0              & x_1(x_1-x_0)       & \cdots & x_n(x_n-x_0) \\
+\vdots       & \vdots       & \ddots & \vdots \\
+0 & x_1^{n-1}(x_1-x_0) & \cdots & x_n^{n-1}(x_n-x_0)
+\end{pmatrix}
+$$
+is invertible. But this is the same as that
+$$
+\begin{pmatrix}
+x_1-x_0           & \cdots & x_n -x_0 \\
+x_1(x_1-x_0)       & \cdots & x_n(x_n-x_0) \\
+\vdots       & \ddots & \vdots \\
+x_1^{n-1}(x_1-x_0) & \cdots & x_n^{n-1}(x_n-x_0)
+\end{pmatrix}
+$$
+is invertible, which is the same as that
+$$
+\begin{pmatrix}
+x_1-x_0 & x_1(x_1-x_0) & \cdots & x_1^{n-1}(x_1-x_0) \\
+\vdots      & \vdots & \ddots & \vdots \\
+x_n-x_0 & x_n(x_n-x_0) & \cdots & x_n^{n-1}(x_n-x_0)
+\end{pmatrix}
+$$
+is invertible (@exr-ainvatinv again). We now apply more row operations: 
+The first row is multiplied with $1/(x_1-x_0)$ the second row with $1/(x_2-x_0)$, and so on. 
+After having done this we see that it is enough to show that
+$$
+\begin{pmatrix}
+1 & x_1 & \cdots & x_1^{n-1} \\
+\vdots      & \vdots & \ddots & \vdots \\
+1 & x_n & \cdots & x_n^{n-1}
+\end{pmatrix}
+$$
+is invertible. But this is an $n\times n$ Vandermonde matrix, which we assumed to be invertible. This completes the proof. $\clubsuit$
+:::
+
+::: {#exm-fourierinverse name='The Fourier matrix'}
+The Fourier matrix is also a Vandermonde matrix, so that this is invertible as well. 
+While we don't have a general expression for the inverse of a Vandermonde matrix, the situation is different for the 
+Fourier matrix: We claim that the inverse matrix has components $\frac{1}{N}e^{2\pi ikn/N}$. We have that
+$$\sum_{n=0}^{N-1} e^{-2\pi ikn/N}\frac{1}{N}e^{2\pi inl/N}=\frac{1}{N}\sum_{n=0}^{N-1} e^{2\pi in(l-k)/N}.$$
+If $l=k$ this is $1$. If $l\neq k$ we can use the sum formula for a geometric series to get
+$$\frac{1-e^{2\pi i(l-k)}}{1-e^{2\pi i(l-k)/N}}=0.$$
+It follows that the inverse matrix has components $\frac{1}{N}e^{2\pi ikn/N}$, so that $(F_N)^{-1}=\frac{1}{N}\overline{F_N}$. $\clubsuit$
+:::
+
+
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+## Matching dimensions in matrix multiplication
+
+Let $A\in\mathbb{R}^{3\times 5}$ and $B\in \mathbb{R}^{6\times 3}$. Which of the following statements are correct?
+
+> We have $A^T\in\mathbb{R}^{5\times 3}$ and $B\in\mathbb{R}^{6\times 3}$, so that $A^T$ does not have as many columns (3) 
+as $B$ has rows (6).
+
+1. [ ] The product $AB$ is defined.
+1. [ ] The equation $BA=C$ has the solution $A=B^{-1}C$.
+1. [ ] The matrix $B$ has double as many components as $A$.
+1. [x] The product $A^TB$ is not defined.
+1. [ ] None of the other statements are true.
+
+## Inverse of a matrix
+
+The inverse of the matrix $$\begin{pmatrix} 1 & 0 & 3 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$$ is
+
+1. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ -3 & 0 & 1 \end{pmatrix}$$
+1. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 3 & 0 & 1 \end{pmatrix}$$
+1. [x] $$\begin{pmatrix} 1 & 0 & -3 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$$
+
+
+
+## Inverse of a matrix
+
+The inverse matrix of $$\begin{pmatrix} 1/2 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & 1 & -1 \end{pmatrix}$$ 
+
+1. [x] is $$\begin{pmatrix} 2 & 0 & 0 \\ 0 & 1 /2& 1/2 \\ 0 & 1/2 & -1/2 \end{pmatrix}$$
+2. [ ] does not exist
+3. [ ] is $$\begin{pmatrix} 2 & 0 & 0 \\ 0 & 1 & 1 \\ 0 & 1 & -1 \end{pmatrix}$$
+```
+:::
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-proveeks2}
+In this exercise we set $A=\begin{pmatrix} 2 & -1 & 1 \\ 0 & 1 & 4 \\ 1 & -2 & -6\end{pmatrix}$
+
+(a) Find the inverse matrix of $A$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Gaussian elimination gives:
+\begin{align*}
+\lefteqn{\begin{pmatrix} 2 & -1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 4 & 0 & 1 & 0 \\ 1 & -2 & -6 & 0 & 0 & 1\end{pmatrix}} \\
+&\stackrel{I\leftrightarrow III}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1 \\ 0 & 1 & 4 & 0 & 1 & 0 \\ 2 & -1 & 1 & 1 & 0 & 0 \end{pmatrix} 
+\stackrel{III-2I}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1\\ 0 & 1 & 4 & 0 & 1 & 0 \\ 0 & 3 & 13 & 1 & 0 & -2 \end{pmatrix} \\
+&\stackrel{III-3II}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1\\ 0 & 1 & 4 & 0 & 1 & 0 \\ 0 & 0 & 1 & 1 & -3 & -2 \end{pmatrix} 
+\stackrel{II-4III}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1\\ 0 & 1 & 0 & -4 & 13 & 8\\ 0 & 0 & 1 & 1 & -3 & -2 \end{pmatrix} \\
+&\stackrel{I+6III}{\sim} \begin{pmatrix} 1 & -2 & 0 & 6 & -18 & -11 \\ 0 & 1 & 0 & -4 & 13 & 8 \\ 0 & 0 & 1 & 1 & -3 & -2 \end{pmatrix} 
+\stackrel{I+2II}{\sim}\begin{pmatrix} 1 & 0 & 0 & -2 & 8 & 5 \\ 0 & 1 & 0 & -4 & 13 & 8  \\ 0 & 0 & 1 & 1 & -3 & -2 \end{pmatrix}
+\end{align*}
+It follows that $A^{-1}=\begin{pmatrix} -2 & 8 & 5 \\ -4 & 13 & 8 \\ 1 & -3 & -2\end{pmatrix}$.
+:::::::
+:::::
+
+(b) Write $A$ and $A^{-1}$ as products of elementary matrices. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+From the row operations above it follows that we can write
+\begin{align*}
+A^{-1}=&
+\begin{pmatrix} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 0 & 6 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & -4 \\ 0 & 0 & 1\end{pmatrix} \\
+&\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & -3 & 1\end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ -2 & 0 & 1\end{pmatrix}
+\begin{pmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{pmatrix}
+\\
+A =& \begin{pmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{pmatrix}
+    \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 2 & 0 & 1\end{pmatrix}
+    \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 3 & 1\end{pmatrix} \\
+    &\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 4 \\ 0 & 0 & 1\end{pmatrix}
+    \begin{pmatrix} 1 & 0 & -6 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+    \begin{pmatrix} 1 & -2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+\end{align*}
+For $A$ we applied the reverse row operations in reverse order. 
+:::::::
+:::::
+:::
+
+::: {#exr- name='The inverse of $2\times 2$-matrices'}
+Show that a general $2\times 2$-matrix $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$ is invertible if and only if $ad-bc\neq 0$, 
+and that the inverse is 
+$\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+\begin{align*}
+\lefteqn{\begin{pmatrix} a & b \\ c & d \end{pmatrix} \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}} \\ 
+&= \frac{1}{ad-bc} \begin{pmatrix} ad-bc & -ab+ab \\ cd - cd & -bc+ad\end{pmatrix} = \frac{1}{ad-bc}\begin{pmatrix}ad-bc & 0 \\ 0 & ad-bc \end{pmatrix} = I_n.
+\end{align*}
+It follows that $\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1}=\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$ when $ad-bc\neq 0$. 
+When $ad-bc=0$ there are two possibilities:
+
+1. $ad=bc=0$: $A$ must then have  a row or column which is 0, and we know that it then can't be row reduced to 
+ $I_n$, so that it is not invertible. 
+2. $ad=bc\neq 0$: The all four numbers are $\neq 0$ and we get
+$$
+\begin{pmatrix} a & b \\ c & d \end{pmatrix} \sim \begin{pmatrix} 1 & b/a \\ 0 & d - bc/a \end{pmatrix} = \begin{pmatrix} 1 & b/a \\ 0 & (ad - bc)/a \end{pmatrix}
+= \begin{pmatrix} 1 & b/a \\ 0 & 0 \end{pmatrix},
+$$
+which also can't be row reduced to $I_n$. 
+:::::::
+:::::
+:::
+
+::: {#exr-ainvatinv name='The transpose of an invertible matrix is invertible'}
+Show that $A$ is invertible if and only if $A^T$ is invertible. Show that then $(A^{T})^{-1}=(A^{-1})^T$.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Suppose that $A$ is invertible. Then 
+$$(A^{-1})^TA^T=(AA^{-1})^T=I^T=I,$$
+so that $A^T$ is invertible with inverse $(A^T)^{-1}=(A^{-1})^T$. The other way follows by replacing $A$ with $A^T$. 
+:::::::
+:::::
+:::
+
+::: {#exr-equalrowsnoninvertible}
+Let $A$ be a matrix with either a row or a column of zeros. Show that $A$ is not invertible. 
+Show also that the same conclusion holds  if $A$ has two equal rows or columns.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If row $i$ in $A$ is zero we have that $A\mathbf{e}_i=\mathbf{0}$, and it follows that $A$ is not invertible. 
+If $A$ has two equal rows we can apply an elementary row operation to obtain a matrix with a row of zeros. 
+This is then not invertible, and $A$ is then not invertible either. 
+
+In the case when $A$ has a column of zeros or two equal columns, $A^T$ has a row of zeros or two equal rows. 
+From what we just have shown, $A^T$ is not invertible.  
+From @exr-ainvatinv it follows that $A$ is not invertible either.
+:::::::
+:::::
+:::
+
+::: {#exr-prod_inv_matr name='Products of invertible matrices are invertible'}
+Suppose that $A$ and $B$ both are invertible $n\times n$-matrices. Show that $AB$ also is invertible, and that $(AB)^{-1}=B^{-1}A^{-1}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Assume that $AB\mathbf{x}=\mathbf{0}$. Since $A$ is invertible it follows that $B\mathbf{x}=\mathbf{0}$. 
+Since $B$ is invertible we must also have that $\mathbf{x}=\mathbf{0}$. It follows that $AB$ is invertible. 
+
+Since
+$$
+B^{-1}A^{-1}AB=B^{-1}B=I_n,
+$$
+it also follows that $(AB)^{-1}=B^{-1}A^{-1}$.
+:::::::
+:::::
+:::
+
+::: {#exr-invertiblematrixiso name='Invertible matrices are ismorphisms'}
+Let $T:\mathbb{R}^n\to\mathbb{R}^n$ be a linear transformation. We say that $T$ is $1\to 1$ if $T(\mathbf{x})\neq T(\mathbf{y})$ whenever $\mathbf{x}\neq\mathbf{y}$. 
+We also say that $T$ is onto if, for any $\mathbf{y}\in V$, there exists a $\mathbf{x}\in U$ so that $T(\mathbf{x})=\mathbf{y}$. 
+Show that the matrix of $T$ is invertible if and only if $T$ is onto and $1\to 1$. 
+Linear transformations that are onto and $1\to 1$ are also called isomorphisms.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Let $A$ be the matrix of $T$, so that $T(\mathbf{x})=A\mathbf{x}$. If $A$ is invertible, $A\mathbf{x}=\mathbf{b}$ has a unique solution for any $\mathbf{b}$, so that $T$ is onto. 
+Also, if $A\mathbf{x}_1=A\mathbf{x}_2$, we have that $A(\mathbf{x}_2-\mathbf{x}_1)=\mathbf{0}$, so that $\mathbf{x}_2-\mathbf{x}_1=\mathbf{0}$ (since $A$ is invertible), so that $\mathbf{x}_2=\mathbf{x}_1$. 
+It follows that $T$ also is $1\to 1$. 
+
+The other way, Assume that $T$ is onto. Then $A\mathbf{x}=\mathbf{b}$ always has a solution. But, since $T$ also is $1\to 1$, if $A\mathbf{x}_1=A\mathbf{x}_2$ we must have that $\mathbf{x}_1=\mathbf{x}_2$. 
+It follows that $A\mathbf{x}=\mathbf{b}$ always has a unique solution. It follows that $A$ is invertible. 
+:::::::
+:::::
+:::
+
+
+
+::: {#exr-nilpotnotinv name='Nilpotent matrices are not invertible'}
+A square matrix $A$ is called *nilpotent*\index{Matrix!nilpotent} 
+if there exists a $k>1$ so that $A^k=0$. The smallest such $k$ is called the *index of nilpotence*\index{Index of nilpotence} of $A$.
+
+(a) Run the following code\index{python!np.linalg.matrix\_power}:
+```{pyodide-python}
+import numpy as np
+
+n = 6
+A = np.zeros((n,n))
+A[:(-1),1:] = np.eye(n-1)
+for k in range(1,n+1):
+    print( np.linalg.matrix_power(A,k))
+```
+Is $A$ nilpotent? If so, what is the index of nilpotence?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The index of nilpotence seems to be $n$. 
+:::::::
+:::::
+
+(b) Show that nilpotent matrices are not invertible.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $A^k$ is not invertible, and since $A=A^{k-1}A$, it follows from @exr-prod_inv_matr that 
+one of $A$ and $A^{k-1}$ can not be invertible. 
+If $A$ is not invertible we are done, so assume that $A^{k-1}$ is not invertible. 
+Continuing in the same way we can assume that $A^{k-2}$,  $A^{k-3}$, and so on, are all not invertible. 
+At the end we have that $A^2$ is not invertible, from which it follows that $A$ is not invertible. 
+:::::::
+:::::
+:::
+
+::: {#exr-triangular name='Triangular matrices and invertibility'}
+A square matrix $A$ is called upper-triangular if everything below the diagonal of $A$ is $0$, 
+and lower-triangular if everything above the diagonal of $A$ is $0$. 
+$A$ is called triangular if it is either upper- or lower-triangular. 
+
+(a) Show that a triangular matrix is invertible if and only if all elements on the diagonal are $\neq 0$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Suppose $A$ is upper triangular. If $A$ has no zero entries on the diagonal it is easy to row-reduce the matrix to 
+the identity matrix, and it follows that $A$ is invertible. 
+Otherwise, one can row-reduce so that the nonzero entries on the diagonal are $1$, with zeros above them. 
+In this echelon form the entries with zero on the diagonal correspond to free variables, so that 
+$A$ is not invertible. 
+:::::::
+:::::
+
+(b) Suppose that $A$ is invertible and upper/lower-triangular. Show that $A^{-1}$ also is upper/lower-triangular.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Suppose $A$ has no zeros on the diagonal. 
+Column $i$ in $A^{-1}$ is the solution to $A\mathbf{x}=\mathbf{e}_i$. Clearly $x_n=x_{n-1}=\cdots=x_{i+1}=0$. 
+It follows that the entries below entry $i$ in column $i$ of $A^{-1}$ are all zero, so that $A^{-1}$ is upper triangular as well. 
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Let $A$ be an invertible matrix. Write code which verifies that, when $\mathbf{b}$ is a column vector, the  commands `np.linalg.solve(A,b)`\index{python!np.linalg.solve} and `np.linalg.inv(A)*b` return the same.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code generates a random $A$ and $\mathbf{b}$, and compares the two expressions.
+```{python}
+#| output: false
+A = np.random.rand(5, 5)
+b = np.random.rand(5,1)
+np.linalg.solve(A,b) - np.linalg.inv(A)*b
+```
+:::::::
+:::::
+:::

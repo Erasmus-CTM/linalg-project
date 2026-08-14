@@ -1,0 +1,338 @@
+---
+title: "Foils for Chapter 1 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+np.set_printoptions(linewidth=50)
+```
+
+
+## Vectors
+
+## Creating vectors with Python
+
+```{python}
+a = np.array([2,4,6,8,10,12,14,16])
+a
+```
+
+```{python}
+np.linspace(0,1,6)
+```
+
+```{python}
+np.arange(1,7)
+```
+
+```{python}
+np.arange(1,7,2)
+```
+
+---
+
+```{python}
+a[0:6]
+```
+
+```{python}
+a[0:6:2]
+```
+
+```{python}
+a[3:]
+```
+
+```{python}
+a[-1]
+```
+---
+
+```{python}
+np.max(a)
+```
+
+```{python}
+np.min(a)
+```
+
+```{python}
+np.sum(a)
+```
+
+```{python}
+np.prod(a)
+```
+
+
+
+---
+
+## Vector addition- and subtraction are defined component-wise
+
+---
+
+::: {#fig-opsonvectors layout-ncol=2}
+
+![The sum of two vectors](matrixintro/aplusb.pdf)
+
+![The difference between two vectors](matrixintro/aminusb.pdf){#fig-aminusb}
+
+:::
+
+---
+
+![Multiplication of a vector with a scalar](matrixintro/multscalar.pdf)
+
+---
+
+## Example with $\mathbf{a}=(1,2,3)$, $\mathbf{b}=(4,5,6)$, and $t=2$
+
+---
+
+## Example with Python
+
+```{python}
+a = np.array([1,2,3])
+b = np.array([4,5,6])
+t = 2
+a + b
+```
+
+```{python}
+a-b
+```
+
+```{python}
+t*a
+```
+
+Deviation between mathematical notation and python:
+
+```{python}
+a+t
+```
+---
+
+## Vectorised functions
+
+---
+
+## Examples of vectorised functions
+
+```{python}
+np.sqrt(np.array([1,4,9,16]))
+```
+
+```{python}
+np.abs(np.array([-2,-1,1,2]))
+```
+
+```{python}
+np.sin(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi]))
+```
+
+```{python}
+np.exp(np.log(np.array([1,2,3])))
+```
+
+```{python}
+np.log(np.exp(np.array([0,1,2])))
+```
+
+
+---
+
+## Vectorised binary functions
+
+---
+
+## Examples of vectorised binary functions
+
+```{python}
+np.maximum(a,b)
+```
+
+```{python}
+np.minimum(a,b)
+```
+
+```{python}
+a*b
+```
+
+```{python}
+a**b
+```
+
+---
+
+::: {#prp-regneregler1}
+We have that
+
+1. $\mathbf{a}+\mathbf{b}=\mathbf{b}+\mathbf{a}$
+2. $(\mathbf{a}+\mathbf{b})+\mathbf{c}  = \mathbf{a}+(\mathbf{b}+\mathbf{c})$
+3. $s(\mathbf{a}+\mathbf{b})=s\mathbf{a} + s\mathbf{b}$
+4. $(s+t)\mathbf{a}=s\mathbf{a} + t\mathbf{a}$,
+
+where $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are vectors, and $s$ and $t$ are scalars.
+:::
+
+---
+
+## How to find the expression for a line between two points 
+
+---
+
+## Length and scalar product in $\mathbb{R}^n$
+
+Let $\mathbf{a},\mathbf{b}\in\mathbb{R}^n$
+
+- The *length* of $\mathbf{a}$ is defined as 
+$$  |\mathbf{a}|=\sqrt{a_1^2+a_2^2+\cdots+a_n^2}.$$
+- The *scalar product* $\mathbf{a}\cdot\mathbf{b}$ is defined as 
+$$\mathbf{a}\cdot\mathbf{b}=a_1b_1+a_2b_2+\cdots+a_nb_n.$$
+
+We say that $\mathbf{a}$ and $\mathbf{b}$ are *orthogonal*\index{Orthogonal} if $\mathbf{a}\cdot\mathbf{b}=0$. 
+
+--- 
+
+## Example with $\mathbf{a}=(1,-4,9)$ and $\mathbf{b}=(2,3,-6)$
+
+---
+
+## Computing length in Python
+
+```{python}
+a=np.array([3,4])
+np.linalg.norm(a)
+```
+
+This can also be programmed as follows
+
+```{python}
+np.sqrt(np.sum(np.abs(a)**2))
+```
+---
+
+::: {#prp-regneregler2 name="Properties of the scalar product"}
+For all vectors $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$ in $\mathbb{R}^n$, and scalars $s$, we have that
+
+1. $\mathbf{a}\cdot\mathbf{a} = |\mathbf{a}|^2$,
+2. $\mathbf{a}\cdot\mathbf{b}=\mathbf{b}\cdot\mathbf{a}$,
+3. $\mathbf{c}\cdot(\mathbf{a}+\mathbf{b})=\mathbf{c}\cdot\mathbf{a}+\mathbf{c}\cdot\mathbf{b}$ and $(\mathbf{a}+\mathbf{b})\cdot\mathbf{c}=\mathbf{a}\cdot\mathbf{c}+\mathbf{b}\cdot\mathbf{c}$,
+4. $(s\mathbf{a})\cdot\mathbf{b}=\mathbf{a}\cdot(s\mathbf{b})=s(\mathbf{a}\cdot\mathbf{b})$
+
+:::
+
+---
+
+
+## Length and scalar product in $\mathbb{C}^n$
+
+More generally, if $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$:
+
+- The *length* of $\mathbf{a}$ is defined as 
+$$|\mathbf{a}|=\sqrt{|a_1|^2+|a_2|^2+\cdots+|a_n|^2}.$$
+- The *(complex) scalar product* $\mathbf{a}\cdot\mathbf{b}$ is defined as
+$$\mathbf{a}\cdot\mathbf{b}=a_1\overline{b_1}+\cdots+a_n\overline{b_n}.$$
+
+---
+
+
+::: {#prp- name="Properties of the complex scalar product"}
+Assume that $\mathbf{a},\mathbf{b},\mathbf{c}\in\mathbb{C}^n$, and that $s\in\mathbb{C}$.
+If $\mathbf{a}\cdot\mathbf{b}$ is the complex scalar product we have that 
+
+1. $\mathbf{a}\cdot\mathbf{a} = |\mathbf{a}|^2$,
+2. $\mathbf{a}\cdot\mathbf{b}=\overline{\mathbf{b}\cdot\mathbf{a}}$,
+3. $\mathbf{c}\cdot(\mathbf{a}+\mathbf{b})=\mathbf{c}\cdot\mathbf{a}+\mathbf{c}\cdot\mathbf{b}$ and $(\mathbf{a}+\mathbf{b})\cdot\mathbf{c}=\mathbf{a}\cdot\mathbf{c}+\mathbf{b}\cdot\mathbf{c}$,
+4. $(s\mathbf{a})\cdot\mathbf{b}=s(\mathbf{a}\cdot\mathbf{b})$ and $\mathbf{a}\cdot(s\mathbf{b})=\overline{s}(\mathbf{a}\cdot\mathbf{b})$,
+
+:::
+
+---
+
+## Example with $\mathbf{a}=(2i,1+i,3)$, $\mathbf{b}=(1+2i,-1,2-i)$
+
+---
+
+```{python}
+a = np.array([2j,1+1j,3])
+b = np.array([1+2j,-1,2-1j])
+np.vdot(a,b)
+```
+
+```{python}
+np.sum(np.conj(a)*b)
+```
+
+
+
+---
+
+## How to find an expression for the plane passing through a given point $(x_0,y_0,z_0)$, and which is orthogonal to a given vector $\mathbf{n}=(a,b,c)$.
+
+---
+
+
+
+## A generalisation of Pythagoras theorem
+
+---
+
+## Projection
+
+$\mathbf{p}=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is the unique point on 
+the line between $\mathbf{0}$ and $\mathbf{b}$ so that
+$\mathbf{a}-\mathbf{p}$ and $\mathbf{p}$ are orthogonal. 
+$\mathbf{p}$ is also the closest point to $\mathbf{a}$ on this line. It is also called the *projection* of $\mathbf{a}$ onto the line.
+
+The decomposition 
+$$\mathbf{a} = \frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} + \left(\mathbf{a}-\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}\right)$$
+splits $\mathbf{a}$ in a sum where one vector is parallel to $\mathbf{b}$, and the other orthogonal to $\mathbf{b}$. 
+This is also called an *orthogonal decomposition*.
+
+```{python}
+np.vdot(b,a)*b/np.linalg.norm(b**2)
+```
+
+---
+
+![Projection of the vector $\mathbf{a}$ onto the vector $\mathbf{b}$ in the plane.](matrixintro/projab.pdf){#fig-proj}
+
+---
+## Proof
+
+---
+
+## Example with $\mathbf{a}=(10,5)$, $\mathbf{b}=(2,4)$
+
+---
+
+## Observations from the figure
+
+---
+
+## Some important results
+
+::: {#prp- name="Schwarz' inequality"} 
+We have that $|\mathbf{a}\cdot\mathbf{b}|\leq|\mathbf{a}||\mathbf{b}|$ 
+for all vectors $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$. \index{Schwarz' inequality}
+We have equality if and only if either $\mathbf{a}$ or $\mathbf{b}$ are parallel, or at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$. 
+:::
+
+::: {#prp- name='The triangle inequality'} 
+We have that \index{Triangle inequality} $|\mathbf{a}+\mathbf{b}|\leq|\mathbf{a}|+|\mathbf{b}|$ for all vectors $\mathbf{a},\mathbf{b}\in\mathbb{C}^n$. 
+We have equality if and only if either $\mathbf{a}=s\mathbf{b}$ for an $s>0$, or at least one of $\mathbf{a}$ and $\mathbf{b}$ is $0$ (The shortest distance to a point is a straight line).
+:::
+
+---
+
+## Proofs

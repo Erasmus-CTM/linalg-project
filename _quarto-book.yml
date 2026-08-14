@@ -1,0 +1,45 @@
+project:
+  title: "Linear algebra and numerical methods"
+  type: book
+
+format:
+  pdf:
+    documentclass: book
+    include-in-header:
+      text: |
+        \usepackage{makeidx}
+        \makeindex
+    include-after-body:
+      text: |
+        \printindex
+  html:
+    theme: cosmo
+
+  
+book:
+  title: "Linear algebra and numerical methods"
+  author: "Øyvind Ryan"
+  date: last-modified
+  chapters:
+    - index.qmd
+    - part: "Linear algebra"
+      chapters:
+        - matrixintro/matrixintro.qmd
+        - matrixmult/matrixmult.qmd
+        - gaussianelimination/gaussianelimination.qmd
+        - inverse/inverse.qmd
+        - bases/bases.qmd
+        - determinants/determinants.qmd
+        - eigenvalues/eigenvalues.qmd
+        - diagonalisation/diagonalisation.qmd
+        - cond/cond.qmd
+    - part: "Numerical methods"
+      chapters:
+        - approximation/approximation.qmd
+        - differentiation/differentiation.qmd
+        - integration/integration.qmd
+    - part: "Advanced linear algebra"
+      chapters:
+        - leastsquares/leastsquares.qmd
+        - svd/svdbook.qmd
+        - numeigenvals/numeigenvals.qmd

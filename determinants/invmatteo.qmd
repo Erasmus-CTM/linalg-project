@@ -1,0 +1,13 @@
+::: {#prp-corekv3 name='Invertible matrix theorem'}
+\index{Invertible matrix theorem}
+The following are equivalent for an $n\times n$-matrix $A$: 
+
+1. $A$ is row equivalent with $I_n$. 
+2. $A\mathbf{x}=\mathbf{0}$ has the unique solution $\mathbf{x}=\mathbf{0}$. 
+3. $A\mathbf{x}=\mathbf{b}$ has a unique solution for all right hand sides $\mathbf{b}$. 
+4. $A$ can be written as a product of elementary matrices. 
+5. $A$ is invertible.
+6. The columns of $A$ provide a basis for $\mathbb{R}^n$.
+7. $\det(A)\neq 0$
+
+:::

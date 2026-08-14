@@ -1,0 +1,1096 @@
+# Gaussian elimination and reduced echelon form
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+A general systems with $m$ equations and $n$ unknowns has the form
+\begin{align*}
+\begin{array}{lllll}
+a_{11}x_1 &+ a_{12}x_2 &+ \cdots &+ a_{1n}x_n &= b_1 \\
+a_{21}x_1 &+ a_{22}x_2 &+ \cdots &+ a_{2n}x_n &= b_2 \\
+\vdots        & \vdots         & \vdots    & \vdots         & \vdots\\
+a_{m1}x_1 &+ a_{m2}x_2 &+ \cdots &+ a_{mn}x_n &= b_m
+\end{array}
+\end{align*}
+*Gaussian elimination*\index{Gaussian elimination} solves such a system by systematically eliminating variables from left to right. 
+To explain this further, suppose that the variables $x_1,...,x_n$ already have been eliminated. There are now two  possibilities:
+
+1. $x_{n+1}$ does not appear in the remaining equations. Then $x_{n+1}$ has been eliminated as well, and we proceed with the elimination of $x_{n+2}$.
+2. $x_{n+1}$ appears in at least one of the remaining equations. We do the following:
+    (a) Take one of the equations where $x_{n+1}$ appears, and place this first among the remaining equations. 
+    (b) Scale this equation so that there is a $1$ in front of $x_{n+1}$. We shall call this a leading one *leading one*\index{Leading one} (there should be no contribution left of $x_{n+1}$ in this equation).
+    (c) Add multiples of this equation to the other remaining equations so that $x_{n+1}$ gets eliminated. 
+    
+    We have now eliminated $x_{n+1}$, and proceed with the elimination of $x_{n+2}$.
+
+Some concrete examples will clarify this
+
+::: {#exm-gauss1 name='A system with a unique solution'}
+Consider the system 
+$$
+\begin{array}{rrrr}
+        & -8x_2&+3x_3=& 6 \\
+ 4x_1& -3x_2&+2x_3=& 8\\
+  x_1& -2x_2& + x_3=& 3
+\end{array}
+$$
+First we eliminate $x_1$. Since $x_1$ does not contribute in the first equation we swap the first and third equation and get
+$$
+\begin{array}{rrrr}
+x_1& -2x_2& + x_3=& 3 \\
+ \textcolor{red}{4}x_1& -3x_2&+2x_3=& 8\\
+  & -8x_2&+3x_3=& 6
+\end{array}
+$$
+We also need to ensure that there is a leading one in the first equation, but this is already the case.
+We now eliminate $x_1$ in the second equation by subtracting 4 times the first equation (vi mark in red what we eliminate). Then we get
+$$
+\begin{array}{rrrr}
+x_1& -2x_2& + x_3=& 3 \\
+ & 5x_2&-2x_3=& -4\\
+  & -8x_2&+3x_3=& 6
+\end{array}
+$$
+We then make a leading one in the second equation: 
+$$
+\begin{array}{rrrr}
+x_1& -2x_2& + x_3=& 3 \\
+ & x_2&-\frac{2}{5}x_3=& -\frac{4}{5}\\
+  & \textcolor{red}{-8}x_2&+3x_3=& 6
+\end{array}
+$$
+We eliminate $x_2$ in the third equation:
+$$
+\begin{array}{rrrr}
+x_1& -2x_2& + x_3=& 3 \\
+ & x_2&-\frac{2}{5}x_3=& -\frac{4}{5}\\
+  &   &-\frac{1}{5}x_3=& -\frac{2}{5}
+\end{array}
+$$
+We make a leading one in the third equation: 
+$$
+\begin{array}{rrrr}
+x_1& -2x_2& + \textcolor{red}{1}x_3=& 3 \\
+ & x_2&\textcolor{red}{-\frac{2}{5}}x_3=& -\frac{4}{5}\\
+  &   &x_3=& 2
+\end{array}
+$$
+We now say that the system is on *echelon form*\index{Echelon form}, meaning that:
+
+* each equation is either zero or has a leading one,
+* each equation begins with at least one more 0-coefficient than the equation above.
+
+When we have arrived at an echelon form, we are finished eliminating variables left to right. 
+We proceed by eliminating variables from right to left: 
+$x_3$ can be eliminated in the first two equations by adding multiples of the third equation. 
+If we perform both these operations we get
+$$
+\begin{array}{rrrr}
+x_1& \textcolor{red}{-2}x_2& =& 1 \\
+ & x_2&=& 0\\
+  &   &x_3=& 2
+\end{array}
+$$
+Finally we eliminate $x_2$ in the first equation by adding a multiple of the second equation:
+$$
+\begin{array}{rrrr}
+x_1& & =& 1 \\
+ & x_2&=& 0\\
+  &   &x_3=& 2
+\end{array}
+$$
+We thus have the unique solution $\mathbf{x}=(x_1,x_2,x_3)=(1,0,2)$. 
+The system is now on what we call *reduced echelon form*\index{Echelon form!reduced}: 
+It is on echelon form, and in addition each variable with a leading one appears in just one equation. 
+These are also called *pivot variables*\index{Pivot!variable}. 
+We also call the position of a leading one a *pivot element*\index{Pivot!element}. $\clubsuit$
+:::
+
+Ti simplify what we did above it can be useful to gather the coefficients and the right hand side in a matrix - 
+without writing down equality signs and variable names. 
+The matrix $\begin{pmatrix}A & \mathbf{b}\end{pmatrix}$ is called the *augmented matrix*\index{Augmented matrix} 
+of the system $A\mathbf{x}=\mathbf{b}$. 
+From the example above we have that 
+\begin{align*}
+A &= \begin{pmatrix} 0 & -8 & 3 \\ 4 & -3 & 2 \\ 1 & -2 & 1 \end{pmatrix} & 
+\mathbf{b} &= \begin{pmatrix} 6 \\ 8 \\ 3 \end{pmatrix} &
+\begin{pmatrix}A & \mathbf{b}\end{pmatrix} &= \begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
+\end{align*}
+An equation can be thought of as a row, a column as the coefficients associated with a variable. 
+The columns in $A$ which have a pivot element are called *pivot columns*\index{Pivot!column}. 
+In the same way, the rows in $A$ which have a pivot element are called *pivot rows*\index{Pivot!row}. 
+If we let $\sim$ denote the operations we did above, everything can be written more compactly as: 
+$$
+\begin{aligned} 
+\begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
+&\sim
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ \textcolor{red}{4} & -3 & 2 & 8 \\ 0 & -8 & 3 & 6 \end{pmatrix}
+\sim
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 5 & -2 & -4 \\ 0 & -8 & 3 & 6 \end{pmatrix} \nonumber \\ 
+&\sim
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & \textcolor{red}{-8} & 3 & 6 \end{pmatrix}
+\sim
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & 0 & -\frac{1}{5} & -\frac{2}{5} \end{pmatrix} \nonumber \\
+&\sim
+\begin{pmatrix} 1 & -2 & \textcolor{red}{1} & 3 \\ 0 & 1 & \textcolor{red}{-\frac{2}{5}} & -\frac{4}{5} \\ 0 & 0 & 1 & 2 \end{pmatrix}
+\sim
+\begin{pmatrix} 1 & \textcolor{red}{-2} & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix} \nonumber \\
+&\sim
+\begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}
+\end{aligned}
+$$ {#eq-rowred1}
+After the first five operations the matrix is on echelon form. 
+The last matrix is on reduced echelon form. 
+
+We can bring a general matrix to reduced echelon form with the function 
+`rref` in the class `sym.Matrix`\index{python!sym.Matrix}. If we test this on the matrix above we get
+
+```{python}
+C, cols = sym.Matrix([[0,-8,3,6],[4,-3,2,8],[1,-2,1,3]]).rref()
+C
+```
+
+We see that we obtained the same matrix. 
+This is not obvious, since there are many different ways to bring a matrix to reduced echelon form, 
+and each such can in principle lead to different reduced forms. 
+
+We shall later see that the reduced echelon form is unique - 
+regardless of the operations, we will always end up with the same reduced echelon form.
+
+In @eq-rowred1 we indicated the operations we did. Let us establish some notation for the first operations.
+
+1. The first operation swapped row 1 and 3. We will write this as $I\leftrightarrow III$. 
+2. The second operation subtracted 4 times row 1 in row 2. We will write this as $II-4I$. 
+3. The third operation multiplied row $2$ with $1/5$. We will write this as $II\cdot(1/5)$.
+
+With the help of this notation @eq-rowred1 can be rewritten as follows: 
+\begin{align*}
+\begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
+&\stackrel{I\leftrightarrow III}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 4 & -3 & 2 & 8 \\ 0 & -8 & 3 & 6 \end{pmatrix}
+\stackrel{II-4I}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 5 & -2 & -4 \\ 0 & -8 & 3 & 6 \end{pmatrix}\\
+&\stackrel{II\cdot(1/5)}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & -8 & 3 & 6 \end{pmatrix}
+\stackrel{III+8II}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & 0 & -\frac{1}{5} & -\frac{2}{5} \end{pmatrix}\\
+&\stackrel{III\cdot(-5)}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & 0 & 1 & 2 \end{pmatrix}
+\stackrel{II+\frac{2}{5}III,I-III}{\sim}
+\begin{pmatrix} 1 & -2 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix} \\
+&\stackrel{I+2II}{\sim}
+\begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}
+\end{align*}
+The system was thus brought to reduced row ev´chelon form with help of three types of operations:
+
+1. Add a multiple of one row to another,
+2. multiply a row with a constant $\neq 0$,
+3. Swap two rows.
+
+These are called *elementary row operations*\index{Elementary!row operation}, and are easily implemented:
+
+```{python}
+#| eval: false
+A[j,:] = A[j,:] + c*A[i,:]
+A[i,:] = c*A[i,:]
+A[[i,j],:] = A[[j,i], :]
+```
+
+The 3 first operations from @exm-gauss1 can in particular be programmed as follows:
+```{python}
+A=np.array([[0,-8,3,6],[4,-3,2,8],[1,-2,1,3]])
+A[[0,2],:] = A[[2,0],:]
+A[1,:] = A[1,:] - 4*A[0,:]
+A[1,:] = A[1,:]/5
+```
+In practice Gaussian elimination is not implemented this way: 
+The program itself find the row operations to be applied (see @sec-kodegaussel). 
+
+We also say that $A$ and $B$ are *row equivalent* if we can transform $A$ to $B$ through a series of elementary 
+row operations. From the discussion above we get
+$$
+\begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix} \sim \begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}.
+$$
+Every matrix is row equivalent to a matrix on reduced echelon form.
+Elementary row operations can also be expressed in terms of matrices:
+
+::: {#prp-smh:elemradop}
+Suppose $B$ is obtained by applying an elementary row operation to the $m\times n$-matrix $A$. 
+Then $B=EA$ where $E$ is the matrix obtained by applying the same row operation to the identity matrix $I_m$.
+:::
+
+::: {.proof}
+Let $F(A)$ be the matrix obtained by applying the row operation to the matrix $A$. 
+If we apply the row operation column-wise we get 
+$$
+F(A) = \begin{pmatrix} F(\mathbf{a}_1) & F(\mathbf{a}_2) & \cdots & F(\mathbf{a}_n) \end{pmatrix}.
+$$
+Furthermore $\mathbf{a}\to F(\mathbf{a})$ is a linear transformation from $\mathbb{R}^m$ to $\mathbb{R}^m$ with matrix 
+$$\begin{pmatrix} F(\mathbf{e}_1) & F(\mathbf{e}_2) & \cdots & F(\mathbf{e}_m) \end{pmatrix}=F(I_m).$$
+It follows that
+\begin{align*}
+F(A)&= \begin{pmatrix} F(I_m)\mathbf{a}_1 & F(I_m)\mathbf{a}_2 & \cdots & F(I_m)\mathbf{a}_n \end{pmatrix} \\
+&= F(I_m) \begin{pmatrix} \mathbf{a}_1 & \mathbf{a}_2 & \cdots & \mathbf{a}_n \end{pmatrix} = F(I_m)A,
+\end{align*}
+which is what we wanted to show. 
+:::
+
+A matrix is called *elementary*\index{Elementary!matrix} if it is obtained by applying an elementary row operation to the identity matrix. 
+The following matrices are elementary, and correspond to the row operations where we
+add $2$ times row $2$ to row $1$, multiply row $3$ with $3$, and swap rows $1$ and $2$, respectively:
+$$
+\begin{aligned}
+E_1 &=\begin{pmatrix} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & 
+E_2 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 3 \end{pmatrix} &
+E_3 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}
+\end{aligned}
+$$ {#eq-reverseradops}
+Row operations can be reversed in the sense that one can find a row operation reversing what the first one did. 
+The reverse row operations of @eq-reverseradops are
+adding $-2$ times row $2$ to row $1$, multiplying row $3$ with $1/3$, and swapping rows $1$ and $2$, respectively. 
+The elementary matrices for these are 
+\begin{align*}
+F_1 &=\begin{pmatrix} 1 & -2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & 
+F_2 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1/3 \end{pmatrix} &
+F_3 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}
+\end{align*}
+That $F_i$ reverses $E_i$ means that $F_1E_1=I_n$, $F_2E_2=I_n$, $F_3E_3=I_n$, 
+which also can be verified by multiplying the matrices. 
+From @prp-smh:elemradop we get the following.
+
+::: {#prp-}
+For every matrix $A$ we can write 
+$$C=E_k\cdots E_2E_1A$$
+where $C$ is a matrix on reduced echelon form, and where $E_1,E_2,...,E_k$ are elementary matrices.
+:::
+
+We also have the following result.
+
+::: {#prp-}
+Assume a system is obtained from another by applying an elementary row operation. 
+Then the two systems have the same solutions. 
+:::
+
+::: {.proof}
+Let $E$ be the elementary matrix associated with the row operation, 
+and $F$ the elementary matrix associated with the reverse row operation. 
+When we apply an elementary row operation to the original system $A\mathbf{x}=\mathbf{b}$ 
+we get the new system $EA\mathbf{x}=E\mathbf{b}$.
+
+* If $A\mathbf{x}=\mathbf{b}$ it is clear that also $EA\mathbf{x}=E\mathbf{b}$, so that $\mathbf{x}$ also solves the new system. 
+* If $EA\mathbf{x}=E\mathbf{b}$ we get by applying $F$ on both sides that $A\mathbf{x}=\mathbf{b}$, so that $\mathbf{x}$ 
+also solves the original system.
+
+It follows that the original- and the new system have the same solutions. 
+:::
+
+Above we row reduced a system, and obtained a unique solution. 
+Let us do the same for systems with no solution, and with infiniteky many solutions.
+
+::: {#exm-gauss2 name='A system with infinitely many solutions'}
+Consider the system 
+$$
+\begin{array}{rrrr}
+x_1 & + x_2 & + x_3=& 4 \\
+2x_1 & &-x_3=& 2.
+\end{array}
+$$
+We write down the augmented matrix, and apply elementary row operations: 
+\begin{align*}
+\begin{pmatrix} 1 & 1 & 1 & 4 \\ 2 & 0 &-1 & 2 \end{pmatrix}
+&\stackrel{II-2I}{\sim}
+\begin{pmatrix} 1 & 1 & 1 & 4 \\ 0 & -2 &-3 & -6 \end{pmatrix}
+\stackrel{II\cdot(-1/2)}{\sim}
+\begin{pmatrix} 1 & 1 & 1 & 4 \\ 0 & 1 & 3/2 & 3 \end{pmatrix}\\
+&\stackrel{I-II}{\sim}
+\begin{pmatrix} 1 & 0 & -1/2 & 1 \\ 0 & 1 & 3/2 & 3 \end{pmatrix}
+\end{align*}
+Again we ended up with a reduced echelon form. In equation form this says
+$$
+\begin{array}{rrrr}
+x_1 &         & -\frac{1}{2}x_3=& 1 \\ 
+        & x_2 & +\frac{3}{2}x_3=& 3
+\end{array}
+$$
+Which also can be written $x_1=1+\frac{1}{2}x_3$, $x_2 = 3-\frac{3}{2}x_3$. 
+We see that $x_3$ can be chosen freely, and that a general solution can be written as 
+$$
+\mathbf{x}
+=\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix}
+=\begin{pmatrix} 1+\frac{1}{2}x_3 \\ 3-\frac{3}{2}x_3 \\ x_3 \end{pmatrix}
+=\begin{pmatrix} 1\\ 3\\ 0 \end{pmatrix} + x_3\begin{pmatrix} \frac{1}{2} \\ -\frac{3}{2} \\ 1 \end{pmatrix}
+$$
+We see that there infinitely many solutions. $x_1$ and $x_2$ are pivot variables, 
+and we see that these can be expressed with $x_3$. 
+$x_3$ is not a pivot variable since column $3$ does not have a leading one. $x_3$ can be set to anything, 
+and is therefore called a *free variable*. $\clubsuit$
+:::
+
+::: {#exm-gauss3 name='A system without solutions'}
+Consider the system
+$$
+\begin{array}{rrr}
+x_1 & +x_2=& 2 \\
+3x_1 & +3x_2=& 5 
+\end{array}
+$$
+Row reduction of the augmented matrix gives
+\begin{align*}
+\begin{pmatrix} 1 & 1 & 2 \\ 3 & 3 & 5 \end{pmatrix}
+\stackrel{II-3I}{\sim}
+\begin{pmatrix} 1 & 1 & 2 \\ 0 & 0 & -1 \end{pmatrix}
+\stackrel{II\cdot(-1)}{\sim}
+\begin{pmatrix} 1 & 1 & 2 \\ 0 & 0 & 1 \end{pmatrix}
+\stackrel{I-2II}{\sim}
+\begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}.
+\end{align*}
+Again we arrived at a reduced echelon form.
+Note here that, when eliminating $x_1$, $x_2$ also got eliminated. In equation form this says that 
+$$
+\begin{array}{rrr}
+x_1 & + x_2=& 0 \\
+       &          0=& 1 
+       \end{array}
+$$
+$0=1$ is impossible, so that there are no solutions. $\clubsuit$
+:::
+
+The three examples above illustrate three possibilities: A system can have
+
+1. a unique solution, as in @exm-gauss1. Here we had only pivot variables, and no pivot element in the last column.
+2. infinitely many solutions, as in @exm-gauss2. Here we had a free variable, and no pivot element in the last column.
+3. no solutions, as in @exm-gauss3. Here we had a pivot element in the last column.
+
+Furthermore, we arrived at a reduced echelon form in all examples. 
+These observations turn out to hold more generally:
+
+
+
+::: {#prp-gaussel}
+Any system can be brought to reduced echelon form, and we have the following possibilities:
+
+1. The system has no solutions. In this case the last column is a pivot column,
+2. The system has solutions. In this case the last column is not a pivot column and we have that
+    (a) when there are free variables the system has infinitely many solutions (any value of the free variables give a solution),
+    (b) when there are no free variables (all columns except the last is a pivot column) the system has a unique solution.
+
+:::
+
+From the discussion above we also have the following.
+
+{{< include invmatteo.qmd >}}
+
+Later we will extend this result with more equivalences.
+
+::: {.proof}
+$1.\Rightarrow 3.$: Suppose that $A$ can be row reduced to the identity matrix. We can solve $A\mathbf{x}=\mathbf{b}$ by row reducing 
+the augmented matrix $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$, using the same row operations. 
+At the end we then arrive at equations of the form $x_1=b_1'$, $x_2=b'_2$,...,$x_n=b'_n$, so that the system has a unique solution for all right hand sides $\mathbf{b}$. 
+
+$3.\Rightarrow 2.$ is obvious. 
+
+$2.\Rightarrow 1.$: We solve $A\mathbf{x}=\mathbf{0}$ by row reducing the augmented matrix $\begin{pmatrix} A & \mathbf{0} \end{pmatrix}$.
+Since the system only has one solution, there can be no free variables. But then all columns in $A$ are pivot columns. 
+Since $A$ is square, all rows must also be pivot rows. It follows that $A$ is row equivalent with $I_n$. 
+
+$1.\Rightarrow 4.$:
+That $A\sim I_n$ means that we can write $I_n=E_k\cdots E_1A$, where $E_i$ are elementary matrices. 
+Let $F_i$ be the elementary matrix which corresponds to the reverse row operation of $E_i$. 
+If we multiply with $F_k$ to the left on both sides we get that $F_k=E_{k-1}\cdots E_1A$. 
+If we then multiply with $F_{k-1}$ to the left on both sides we get that $F_{k-1}F_k=E_{k-2}\cdots E_1A$. 
+If we continue this way we arrive in the end at $A=F_1\cdots F_k$, so that $A$ can be written as a product of elementary matrices.
+
+$4.\Rightarrow 1.$: If $A=F_1\cdots F_k$ we can as above show that $I_n=E_k\cdots E_1A$ (where again $F_i$ represents the reverse row operation of $E_i$), 
+so that $A\sim I_n$. 
+:::
+
+
+
+
+
+
+## Gaussian elimination and complexity {#sec-numopsgauss}
+Suppose we have a system with $n$ equations and $n$ unknowns. How many operations (additions, multiplications, etc.) are needed to solve the system, 
+i.e., bring it to reduced echelon form? 
+Suppose for simplicity that the coefficient matrix $A$ is row equivalent with the identity matrix. 
+Let us also assume that row interchanges do not cost anything (in terms of operations). 
+
+
+* In Gaussian elimination we ensure leading ones in the rows by dividing with the first non-zero.
+This requires 
+$$(n-1)+(n-2)+\cdots +1=(n-1)n/2$$
+divisions. 
+*
+In the first part of Gaussian elimination we zero out the components below the diagonal, column by column. 
+Under diagonal element $k$ in column $k$ there are $n-k$ rows. For each of these we multiply row $k$ with a number (this corresponds to $n-k$ multiplications, since the row starts with $k-1$ zeroes), 
+and add this to the row (this gives $n-k$ additions). Together we get $(n-k)((n-k)+(n-k))=2(n-k)^2$ operations here. 
+Summing over all $k$ we get
+$$2\sum_{k=1}^{n-1} (n-k)^2=2\sum_{k=0}^n k^2=n(n+1)(2n+1)/6\approx 2n^3/3,$$
+since $n^3/3$ is the dominating term when multiplying out $n(n+1)(2n+1)/6$ (which is the formula for the sum of the $n$ første squares).
+The interest in the dominating term only comes from that we are usually interested in counting operations when $n$ gets big - we are not interested in the exact number of operations, which typically is an uglier expression.
+* In the second part of Gaussian elimination we zero out the components over the diagonal, column by column. No extra operations are needed for this. 
+
+Since $(n-1)n/2\approx n^2/2$ is dominated by $2n^3/3$, we have in totalt about $2n^3/3$ operations.
+We have shown the following.
+
+::: {#prp- name='Number of operations in Gaussian elimination'}
+\index{Operation count!Gaussian elimination}
+Suppose that $A\sim I_n$. About $2n^3/3$ operations are required to bring $A$ to reduced echelon form. 
+:::
+
+
+
+
+
+
+## Simultaneous solution of systems
+Suppose we want to solve two systems with the same coefficient matrix, $A\mathbf{x}=\mathbf{b}_1$ and $A\mathbf{x}=\mathbf{b}_2$. 
+We bring $A$ to reduced echelon form, $C$, and apply the same row operations to $\mathbf{b}_1$ and $\mathbf{b}_2$, and get $\mathbf{b}'_1$ and $\mathbf{b}'_2$. 
+This corresponds to
+$$\begin{pmatrix} A & \mathbf{b}_1 & \mathbf{b}_2 \end{pmatrix} \sim \begin{pmatrix} C & \mathbf{b}'_1 & \mathbf{b}'_2 \end{pmatrix},$$
+since row reducing $A$, $\mathbf{b}_1$, and $\mathbf{b}_2$ separately can also be done by row reducing $\begin{pmatrix} A & \mathbf{b}_1 & \mathbf{b}_2 \end{pmatrix}$ as a whole. 
+From $\begin{pmatrix} C & \mathbf{b}'_1 & \mathbf{b}'_2 \end{pmatrix}$ we can read out the solutions to the two systems. Let us consider an example.
+
+::: {#exm-}
+In @exm-gauss1 we solved the system $A\mathbf{x}=\mathbf{b}_1$ where $\mathbf{b}_1=(6,8,3)$. By using the row operations from this example we can simultaneously solve 
+the system $A\mathbf{x}=\mathbf{b}_2$ where $\mathbf{b}_2=(1,8,2)$ as follows:
+
+\begin{align*}
+\begin{pmatrix}A & \mathbf{b}_1 & \mathbf{b}_2 \end{pmatrix} &=
+\begin{pmatrix} 0 & -8 & 3 & 6 & 1\\ 4 & -3 & 2 & 8 & 8 \\ 1 & -2 & 1 & 3 & 2\end{pmatrix}
+\stackrel{I\leftrightarrow III}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 & 2 \\ 4 & -3 & 2 & 8 & 8 \\ 0 & -8 & 3 & 6 & 1\end{pmatrix}
+\stackrel{II-4I}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 & 2 \\ 0 & 5 & -2 & -4 & 0 \\ 0 & -8 & 3 & 6 & 1\end{pmatrix}\\
+&\stackrel{II\cdot(1/5)}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 & 2\\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} & 0 \\ 0 & -8 & 3 & 6 & 1\end{pmatrix}
+\stackrel{III+8II}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 & 2\\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} & 0 \\ 0 & 0 & -\frac{1}{5} & -\frac{2}{5} & 1 \end{pmatrix}\\
+&\stackrel{III\cdot(-5)}{\sim}
+\begin{pmatrix} 1 & -2 & 1 & 3 & 2 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} & 0 \\ 0 & 0 & 1 & 2 & -5\end{pmatrix}
+\stackrel{II+\frac{2}{5}III,I-III}{\sim}
+\begin{pmatrix} 1 & -2 & 0 & 1 & 7 \\ 0 & 1 & 0 & 0 & -2 \\ 0 & 0 & 1 & 2 & -5\end{pmatrix} \\
+&\stackrel{I+2II}{\sim}
+\begin{pmatrix} 1 & 0 & 0 & 1 & 3 \\ 0 & 1 & 0 & 0 & -2 \\ 0 & 0 & 1 & 2 & -5 \end{pmatrix}
+\end{align*}
+It follows that $A\mathbf{x}_1=\mathbf{b}_1$ as before has the solution $\mathbf{x}_1=(1,0,2)$, but also that $A\mathbf{x}_2=\mathbf{b}_2$ has the solution $\mathbf{x}_2=(3,-2,-5)$. $\clubsuit$
+:::
+
+
+
+
+## Implementation of Gaussian elimination {#sec-kodegaussel}
+Let $A$ be an $m\times n$-matrix. 
+Gaussian elimination is a bit complicated to implement, but consider the following code which is a skeleton for bringing a matrix to echelon form: 
+```{python}
+#| eval: false
+piv = np.zeros(m).astype(int) # Stores the positions of the pivots.
+i, j = 0, 0
+while i < m and j < n: # Start scan for next pivot element
+    k = i
+    while k < m and abs(A[k,j]) < 10**(-6):
+        k += 1
+    if k == m: # Need to go to the next column
+        j += 1
+    else: # Found a nonzero in the current column
+        # The next pivot element is in row k. If k>i, 
+        # swap row i and k, so that the next pivot element is (i,j).
+        # Create a leading one at pos. (i,j)
+        # Zero out col. j below row i.
+        piv[i] = j # The i'th leading one is in position (i,j)
+        i += 1; j += 1
+```
+The initial position is $(0,0)$. The outer `while`-loop scans for a next nonzero entry to be scaled to a leading one/a pivot element. 
+First it looks for this below the current position (`i`) in the current column (the inner `while`-loop). 
+
+When applying row operations roundoff errors occur. Thus, we may get something nonzero, even if exactly zero should appear. 
+The inner `while`-loop remedies this by assuming that $a_{kj}$ is zero when $|a_{kj}| < 10^{-6}$.
+
+If the search in the current column fails (the `if`-statement succeeds), the search moves to the next column (by continuing in the outer `while`-loop). 
+
+If the search in the current column succeeds, the `else`-statement is executed. Let us comment on how to implement the next three lines. 
+If the nonzero (which is in row $k$) was found below the current row (row $i$), these rows are swapped:
+```{python}
+#| eval: false
+A[[k,i]] = A[[i,k]]
+```
+We then create a leading one at position (`i`,`j`):
+```{python}
+#| eval: false
+A[i,j:] = A[i,j:]/A[i,j]
+```
+(i.e., $\mathbf{a}_i = \mathbf{a}_i/a_{ij}$, where $\mathbf{a}_i$ is row $i$ in $A$). 
+Note here that we only modified column $j$ and upwards in row $i$. We did not need to divide with $a_{ij}$ for columns $1,...,j-1$, as the entries here are zero.
+In column `j` we can zero out component $k$ by subtracting a multiple of row `i`:
+```{python}
+#| eval: false
+A[k,j:] = A[k,j:] - A[k,j] * A[i,j:]
+```
+(i.e., $\mathbf{a}_k = \mathbf{a}_k - a_{kj}\mathbf{a}_i$). We need to do this for $k=i+1,i+2,...,m$, i.e., 
+$$
+\begin{aligned}
+\mathbf{a}_{i+1} &= \mathbf{a}_{i+1} - a_{(i+1)j}\mathbf{a}_i \\
+\mathbf{a}_{i+2} &= \mathbf{a}_{i+2} - a_{(i+2)j}\mathbf{a}_i \\
+\vdots & \vdots \\
+\mathbf{a}_m &= \mathbf{a}_m - a_{mj}\mathbf{a}_i
+\end{aligned}
+$$
+We here find $A_{(i+1):,:}$ on the left hand side, and on the right hand side the product  
+$$\begin{pmatrix} a_{(i+1)j} \\ a_{(i+2)j} \\ \vdots \\ a_{mj}\end{pmatrix} \mathbf{a}_i = A_{(i+1):,j}\mathbf{a}_i$$
+This means that we can program this as
+```{python}
+#| eval: false
+A[(i+1):,j:] = A[(i+1):,j:] - A[(i+1):,[j]] @ A[[i],j:]
+```
+Once this has been done, the code stores the position of the leading one in row `i` (`piv[i] = j`), and moves to the next row/column.
+Once the outer `while`-loop finishes, we arrive at echelon form. 
+
+
+After arriving at echelon form, we can similarly zero out all components above the leading ones to arrive at the reduced echelon form. 
+If the pivot in row $i$ is in column $j$ we get
+$$
+\begin{aligned}
+\mathbf{a}_{1} &= \mathbf{a}_{1} - a_{1j}\mathbf{a}_i \\
+\mathbf{a}_{2} &= \mathbf{a}_{2} - a_{2j}\mathbf{a}_i \\
+\vdots & \vdots \\
+\mathbf{a}_{i-1} &= \mathbf{a}_{i-1} - a_{(i-1)j}\mathbf{a}_i
+\end{aligned}
+$$
+On the right hand side we recognise the product
+$$\begin{pmatrix} a_{1j} \\ a_{2j} \\ \vdots \\ a_{(i-1)j}\end{pmatrix} \mathbf{a}_i = A_{:(i-1),j}\mathbf{a}_i$$
+so that this can be programmed as
+```{python}
+#| eval: false
+j = piv[i]
+A[:(i-1),j:] = A[:(i-1),j:] - A[:(i-1),[j]] @ A[[i], j:]
+```
+We here needed the stored locations of the leading ones. 
+
+If we also add some print statements to track the steps in Gaussian elimination, we arrive at the following code which tests everything on the matrix from @exm-gauss1. 
+
+```{pyodide-python}
+import numpy as np
+
+A = np.array([[0.,-8.,3.,6.],[4.,-3.,2.,8.],[1.,-2.,1.,3.]])
+m, n = np.shape(A)
+piv = np.zeros(m).astype(int)
+i, j = 0, 0
+while i < m and j < n:
+    k = i
+    while k < m and abs(A[k,j]) < 10**(-6):
+        k += 1
+    if k == m:
+        j += 1
+    else:
+        if k > i:
+            A[[k,i]] = A[[i,k]]
+            print(f"Swapped row {i} and {k}:\n", A)
+        A[i,j:] = A[i,j:]/A[i,j]
+        print(f"created a leading one at pos. ({i},{j}):\n",A)
+        A[(i+1):,j:] = A[(i+1):,j:] - A[(i+1):,[j]] @ A[[i],j:]
+        print(f"zeroed out below row {i} in col. {j}:\n", A)
+        piv[i] = j
+        i += 1; j += 1
+i -= 1
+while i > 0:
+    j = piv[i]
+    A[:i,j:] = A[:i,j:] - A[:i,[j]] @ A[[i], j:]
+    print(f"zeroed out above row {i} in col. {j}:\n", A)
+    i -= 1
+```
+
+::: {.content-visible when-format="pdf"}
+In the html-version of these notes you can change the matrix and run the code as you like.
+:::
+
+
+::: {.content-visible when-format="html"}
+## Quiz {.unnumbered}
+
+```quizdown
+---
+primary_color: orange
+secondary_color: lightgray
+text_color: black
+shuffle_questions: false
+shuffle_answers: false
+---
+
+
+
+## A system with two equations and two unknowns
+
+The equations
+$$\begin{aligned}x-y&=1 \\ x+y&=2\end{aligned}$$
+have
+
+1. [x] a unique solution
+2. [ ] infinitely many solutions
+3. [ ] no solution
+
+
+## A system with two equations and three unknowns
+
+The equations 
+$$\begin{aligned} x+y+z&=2\\x+2y+3z&=3\end{aligned}$$
+have
+
+1. [ ] a unique solution
+2. [x] infinitely many solutions
+3. [ ] no solution
+
+
+
+## A system with three equations and three unknowns
+
+The equations 
+$$\begin{aligned} x-y+z&=3\\2x+2y-z&=1\\4y-3z&=0\end{aligned}$$
+have
+
+1. [ ] a unique solution
+2. [ ] infinitely many solutions
+3. [x] no solution
+
+
+
+## A system with three equations and three unknowns
+
+What can be said about the solutions to the following system?
+$$
+\begin{aligned}
+3x_1 &= 7-x_2 \\
+2x_1-3x_2 &= -3-4x_3 \\
+2x_2-4 &= 2x_3
+\end{aligned}
+$$
+
+> $$\begin{aligned}
+\begin{pmatrix}
+3 & 1 & 0 & 7\\
+2 & -3 & 4 & -3 \\
+0 & 2 & -2 & 4
+\end{pmatrix}
+&\sim
+\begin{pmatrix}
+1 & 1/3 & 0 & 7/3\\
+0 & -11/3 & 4 & -23/3 \\
+0 & 1 & -1 & 2
+\end{pmatrix}
+\sim
+\begin{pmatrix}
+1 & 1/3 & 0 & 7/3\\
+0 & 1 & 1 & 2 \\
+0 & 0 & 1/3 & -1/3
+\end{pmatrix} \\
+&\sim
+\begin{pmatrix}
+1 & 0 & 0 & 2\\
+0 & 1 & 0 & 1 \\
+0 & 0 & 1 & -1
+\end{pmatrix}
+\end{aligned}
+$$
+
+1. [ ] The system has no solutions
+2. [ ] The system has infinitely many solutions
+3. [ ] The system has the unique solution $$\mathbf{x}=\begin{pmatrix} 4\\-5\\-13/2\end{pmatrix}$$
+4. [ ] The system has the unique solution $$\mathbf{x}=\begin{pmatrix} 6\\-11\\-12 \end{pmatrix}$$
+5. [x] The system has the unique solution $$\mathbf{x}=\begin{pmatrix} 2\\1\\-1 \end{pmatrix}$$
+
+
+
+## System with different right hand sides.
+
+Let $A$ be a $4\times 2$-matrix. 
+Suppose that the system 
+$$A\mathbf{x} = \begin{pmatrix}1\\2\\4\\-1\end{pmatrix}$$ 
+has the solution 
+$$\mathbf{x}=\begin{pmatrix}1\\0\end{pmatrix}$$, 
+and that the system 
+$$A\mathbf{y} = \begin{pmatrix}2\\0\\-1\\-3\end{pmatrix}$$ has the solution 
+$$\mathbf{y}=\begin{pmatrix} 0\\1\end{pmatrix}.$$ 
+What can you say about the solution to the system 
+$$A\mathbf{z}=\begin{pmatrix} 1\\4\\2\\0\end{pmatrix}$$?
+
+1. [ ] The system has the solution $$\mathbf{z} = \begin{pmatrix} 11 \\ 4\end{pmatrix}.$$
+2. [ ] The system has a unique solution. 
+3. [x] The systemet has no solutions.
+4. [ ] The system has an infinite number of solutions.
+5. [ ] The system has the solution $$\mathbf{z} = \begin{pmatrix} 1 \\ 7\end{pmatrix}.$$
+
+
+
+
+## The reduced echelon form of a $3\times 3$ matrix
+
+The reduced echelon form of the matrix $$\begin{pmatrix} 1 & 2 & 3 \\ 1 & 4 & 5 \\ 2 & 6 & 8 \end{pmatrix}$$ is
+
+1. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 2 \\ 0 & 0 & 0 \end{pmatrix} $$
+2. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$$
+3. [x] $$\begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 0 \end{pmatrix}$$
+
+
+## The reduced echelon form of a $3\times 5$ matrix
+
+The reduced echelon form of the matrix
+$$\begin{pmatrix}2 & -1 & 2 & 10 & 11 \\ 5 &1 &1 &23 &12 \\ 4 & -1 & 3 & 20 & 18 \end{pmatrix}$$ 
+is
+
+1. [ ] $$\begin{pmatrix} 1  &   2   &  3   &  4   &  1 \\ 0  &   1   &  3   &  -1  &  -2 \\ 0   &  0   &  1  &   2  &   2 \end{pmatrix}$$
+2. [ ] $$\begin{pmatrix} 1  &   0   &  0   &  2   &  2 \\ 0  &   1   &  0   &  3  &  1 \\ 0   &  0   &  1  &   3  &   1 \end{pmatrix}$$
+3. [ ] $$\begin{pmatrix} 1  &   0   &  0   &  2   &  -1 \\ 0  &   1   &  0   &  3  &  2 \\ 0   &  0   &  1  &   3  &   -7 \end{pmatrix}$$
+4. [x] $$\begin{pmatrix} 1  &   0   &  0   &  3   &  2 \\ 0  &   1   &  0   &  4  &  -1 \\ 0   &  0   &  1  &   4  &   3 \end{pmatrix}$$
+5. [ ] $$\begin{pmatrix} 1  &   0   &  0   &  0   &  4 \\ 0  &   1   &  -3   &  0  &  -1 \\ 0   &  0   &  0  &   1  &   2 \end{pmatrix}$$
+
+
+
+
+## Elementary matrices
+
+Which one of the following matrices is not elementary?
+
+1. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 3 & 0 & 1 \end{pmatrix}$$
+2. [x] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 2 & 0 \\ 3 & 0 & 1 \end{pmatrix}$$
+3. [ ] $$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 1 \end{pmatrix}$$
+
+
+## System with parameter $a$
+
+For which values of $a$ does the system
+$$\begin{array}{lll}
+x &+y &+z &= 3 \\ x &-y&+z &= 2 \\ x & &+z &= a
+\end{array}$$
+have solution(s)?
+
+1. [ ] 2
+2. [x] 5/2
+3. [ ] 1
+
+
+## System with parameter $a$
+
+Let
+$$
+\begin{aligned}
+A &= \begin{pmatrix} 3 & -1 & 2 \\ 2 & 4 & 1 \\ -2 & 3 & 2 \\ 1 & 2 & 4 \end{pmatrix} & {\bf b} &= \begin{pmatrix}1 \\ 4 \\ -1 \\ a \end{pmatrix}.
+\end{aligned}
+$$
+For which values of $a$ does the system $A{\bf x}={\bf b}$ have a solution?
+
+> Row reducing the augmented matrix gives
+$$\begin{pmatrix} 1 & 2 & 4 & a \\ 0 & -7 & -10 & 1-3a \\ 0 & 0 & -7 & 4-2a \\ 0 & 0 & 0 & -a \end{pmatrix}.$$
+It is clear that the last column is a pivot column if and only if $a\neq 0$, so that the system has a solution only when $a=0$.
+
+1. [ ] $a=-1$ 
+2. [ ] $a=2$
+3. [x] $a=0$
+4. [ ] $a=1$
+5. [ ] No such $a$ exists.
+
+
+
+
+
+## Pivot columns
+
+The pivot columns of the matrix 
+$$\begin{pmatrix} 4  &   2 &    3  &   4 \\ 2  &  -2   &  1  &   3 \\ 8 &   10  &   7   &  6 \end{pmatrix}$$
+are column
+
+1. [x] 1 and 2
+2. [ ] 1 and 3
+3. [ ] 1, 2, and 3
+4. [ ] 1, 2, 3, and 4
+5. [ ] 1, 2, and 4
+
+
+
+## Which claim is true?
+
+Suppose $A$ is a matrix. Which claim is true? 
+
+1. [ ] $A$ can have different reduced echelon forms - depending on how we row reduce. 
+2. [x] $A$ can have different echelon forms - depending on how we row reduce. 
+3. [ ] In the reduced echelon forms of $A$ there can be numbers $\neq 0$ above the leading ones. 
+4. [ ] In $A$ the number of pivot rows can be different from the number of pivot columns. 
+5. [ ] $A{\bf x}={\bf b}$ must have a solution if the reduced echelon form of $A$ has a row of zeros.
+
+
+## Which claim is true?
+
+1. [ ] In a matrix on reduced echelon form there is always only one non-zero in each column. 
+2. [x] In a matrix on reduced echelon form there is always only one non-zero in each pivot column.
+3. [ ] The reduced echelon form is not unique.
+4. [ ] An $m\times n$-matrix always has $n$ pivot columns.
+5. [ ] An $m\times n$-matrix always has $n$ rows with pivot elements.
+
+
+
+
+
+```
+:::
+
+
+
+
+## Exercises {.unnumbered}
+
+::: {#exr-}
+Find the solution(s) to the following systems.
+
+(a)
+$$
+\begin{array}{rrrr}
+  2x_1 & -7x_2&+x_3=& -21 \\
+ x_1& -4x_2&-3x_3=& -23\\
+ x_1& -x_2& + 2x_3=& 4
+\end{array}
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$(2,4,3)$
+:::::::
+:::::
+
+(b) 
+$$
+\begin{array}{rrrr}
+  x_1 & -2x_2 =& 3 \\
+ x_1& -3x_2=& 4\\
+ -x_1& +5x_2=& 2
+\end{array}
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The system has no solution.
+:::::::
+:::::
+
+(c)
+$$
+\begin{array}{rrrr}
+  x_1 & -2x_2&+2x_3=& 2 \\
+ 2x_1& +3x_2&-4x_3=& 2
+\end{array}
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$\mathbf{x}=(3/2,x_3-1/4,x_3)=(3/2,-1/4,0)+x_3(0,1,1).$
+:::::::
+:::::
+:::
+
+::: {#exr-}
+We are given the matrix $A=\begin{pmatrix} 1 & -1 & 3 \\ 2 & 1 & 4 & \\ -4 & 7 & 2\end{pmatrix}$. 
+Find the solution to the systems $A\mathbf{x}=\mathbf{b}_1$ and $A\mathbf{x}=\mathbf{b}_2$ where $\mathbf{b}_1=(-8,-7,-7)$ and $\mathbf{b}_2=(9,5,-17)$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$\mathbf{x}_1=(2,1,-3)$ and $\mathbf{x}_2=(0,-3,2)$.
+:::::::
+:::::
+:::
+
+::: {#exr-}
+Find another set of row operations which brings the matrix from @exm-gauss1 to reduced echelon form. 
+Verify that you obtain the same reduced echelon form as in the example.
+:::
+
+
+
+
+::: {#exr-}
+For which value of $a$ has the following system a solution?
+\begin{align*}
+2x + 3y + 4z &= 5 \\
+2x + 5y + 4z &= 7 \\
+4x + 7y + 8z &= a
+\end{align*}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$
+\begin{pmatrix} 2 & 3 & 4 & 5 \\ 2 & 5 & 4 & 7 \\ 4 & 7 & 8 & a \end{pmatrix}
+\sim
+\begin{pmatrix} 2 & 3 & 4 & 5 \\ 0 & 2 & 0 & 2 \\ 0 & 1 & 0 & a-10 \end{pmatrix}
+\sim
+\begin{pmatrix} 2 & 3 & 4 & 5 \\ 0 & 1 & 0 & 1 \\ 0 & 0 & 0 & a-11\end{pmatrix}
+$$
+We see that it is only for $a=11$ that the last column is not a pivot column.
+:::::::
+:::::
+:::
+
+::: {#exr-} 
+Find the reduced echelon form of the following matrices
+
+(a) 
+$$
+A = \begin{pmatrix}
+1  &   2  &  -2   &  2 \\
+2  &   4  &  -1   & 16 \\
+3  &   6  &  -5 &   11
+\end{pmatrix}
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We get
+$$\begin{pmatrix}
+1  &   2  &  -2   &  2 \\
+2  &   4  &  -1   & 16 \\
+3  &   6  &  -5 &   11
+\end{pmatrix}
+\sim
+\begin{pmatrix}
+1  &   2  &  -2   &  2 \\
+0  &   0  &  3   & 12 \\
+0  &   0  &  1 &   5
+\end{pmatrix}
+\sim
+\begin{pmatrix}
+1  &   2  &  -2   &  2 \\
+0  &   0  &  1   & 4 \\
+0  &   0  &  0 &   1
+\end{pmatrix}
+\sim
+\begin{pmatrix}
+1  &   2  &  0   &  0 \\
+0  &   0  &  1   & 0 \\
+0  &   0  &  0 &   1
+\end{pmatrix}
+$$
+:::::::
+:::::
+
+(b) 
+$$\begin{pmatrix} 1 & 2 & 3 & 4 \\ 2 & 5 & 7 & 13 \\ 3 & 7 & 10 & 18\end{pmatrix}$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$\begin{pmatrix}1   & 0   &  1  &   0 \\  0  &  1  &  1  &  0 \\ 0  &  0  &  0  &  1\end{pmatrix}$$
+:::::::
+:::::
+
+:::
+
+::: {#exr-}
+What are the pivot columns of the following matrix?
+$$\begin{pmatrix}1 & 2 & 4 \\ 2 & 4 & 9 \\ -2 & -4 & 1 \\ -3 & -6 & 0\end{pmatrix}$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$
+\begin{pmatrix}
+1 & 2 & 4 \\ 2 & 4 & 9 \\ -2 & -4 & 1 \\ -3 & -6 & 0
+\end{pmatrix}
+\sim
+\begin{pmatrix}
+1 & 2 & 4 \\ 0 & 0 & 1 \\ 0 & 0 & 9 \\ 0 & 0 & 12
+\end{pmatrix}
+\sim\begin{pmatrix}
+1 & 2 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & 0
+\end{pmatrix}
+$$
+We see that column 1 and 3 er are pivot columns.
+:::::::
+:::::
+
+:::
+
+
+
+::: {#exr- name='A product of elementary matrices'}
+
+What is the product
+$$
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 5 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 3 & 1 \end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 4 & 0 & 1 \end{pmatrix}
+\begin{pmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
+$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$$\begin{pmatrix} 1 & 0 & 0 \\ 10 & 3 & 1 \\ 10 & 5 & 0 \end{pmatrix}$$
+:::::::
+:::::
+
+:::
+
+
+
+
+
+::: {#exr-} 
+Let $A\in\mathbb{R}^{3\times 3}$. Suppose that the system $A\mathbf{x} = \begin{pmatrix}1\\0\\2\end{pmatrix}$ has the solution 
+$\mathbf{x}=\begin{pmatrix} 5\\6\\-3\end{pmatrix}$, and that the system $A\mathbf{y} = \begin{pmatrix}0\\4\\0\end{pmatrix}$ 
+has the solution $\mathbf{y}=\begin{pmatrix} 3\\-1\\2 \end{pmatrix}$. 
+What is then the solution of the system $A\mathbf{z}=\begin{pmatrix} 2\\8\\4\end{pmatrix}$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$
+\begin{pmatrix} 2\\8\\4\end{pmatrix}
+=
+2\begin{pmatrix}1\\0\\2\end{pmatrix}
++
+2\begin{pmatrix} 0\\4\\0\end{pmatrix}.
+$$
+The solution of the last system is therefore
+$$
+2\begin{pmatrix}5\\6\\-3\end{pmatrix} + 2\begin{pmatrix} 3\\-1\\2\end{pmatrix} = \begin{pmatrix} 16 \\10 \\ -2\end{pmatrix}.
+$$
+:::::::
+:::::
+:::
+
+
+::: {#exr-}
+Above we programmed the first three row operations in @exm-gauss1. 
+Write code that applies the last row operations as well. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The last row operations can be programmed as follows
+```{python}
+A[2,:] = A[2,:] + 8*A[1,:]
+A[2,:]=(-5)*A[2,:]
+A[0,:]=A[0,:]-A[2,:]
+A[1,:] = A[1,:] +(2/5)*A[2,:]
+A[0,:] = A[0,:] + 2*A[1,:]
+```
+:::::::
+:::::
+:::
+
+
+
+::: {#exr- name='Farkas lemma'}
+Show that the system $A\mathbf{x}=\mathbf{b}$ (with $m$ equations and $n$ unknowns) has a solution if and only if there is no $\mathbf{c}\in\mathbb{R}^m$ so that 
+$\mathbf{c}^TA=\mathbf{0}$ and $\mathbf{c}^T\mathbf{b}=1$. This result is also called *Farkas lemma*\index{Farkas lemma}. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We prove $1.\Rightarrow 2.$ first. 
+Suppose $\mathbf{x}$ is a solution to the system, and assume for contradiction there exists a $\mathbf{c}$ so that $\mathbf{c}^TA=\mathbf{0}$ and $\mathbf{c}^T\mathbf{b}=1$. \index{Proof by contradiction!Farkas lemma}
+Then $\mathbf{c}^TA\mathbf{x}=\mathbf{c}^T\mathbf{b}$ says that
+$$0x_1 + 0x_2 + \cdots + 0x_n = 1,$$
+which is impossible. Thus, there can be no such $\mathbf{c}$, and this proves $1.\Rightarrow 2.$. 
+
+We prove $2.\Rightarrow 1.$ contrapositively. \index{Proof by contrapositivity!Farkas lemma}
+Assume thus that the system does not have a solution. The augmented matrix must then have the last column as a pivot column, and the last row says that  
+$$0x_1 + 0x_2 + \cdots + 0x_n = 1.$$
+This equation can be obtained as a linear combination of the rows of $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$, 
+i.e., there exists a vector $\mathbf{c}$ so that $\mathbf{c}^TA=\mathbf{0}$ and $\mathbf{c}^T\mathbf{b}=1$, so that such a $\mathbf{c}$ exists. This is the negation of 2., and this proves $2.\Rightarrow 1.$.
+:::::::
+:::::
+:::

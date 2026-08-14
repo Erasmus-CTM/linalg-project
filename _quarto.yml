@@ -1,0 +1,6 @@
+project:
+  type: default
+
+filters:
+  - pyodide-interaktiv
+  - quizdown

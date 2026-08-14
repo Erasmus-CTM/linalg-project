@@ -1,0 +1,136 @@
+---
+title: "Foils for Chapter 2 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: beamer
+echo: true
+classoption: "notheorems"
+---
+
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+# Matrices and matrix multiplication
+
+Some useful matrices:
+
+- $\mathbf{0}$: The matrix with all zeros
+- $\mathbf{1}$: The matrix with all ones.
+- $\text{diag}(\mathbf{a})$: The diagonal matrix with the vector $\mathbf{a}$ on the diagonal.
+- $I_n$: The diagonal matrix with ones on the diagonal
+
+---
+
+## Vectorised operations on matrices
+
+If $A$ and $B$ are both $m\times n$ then
+
+* $A+B$ is the matrix with component $(i,j)$ being $a_{ij}+b_{ij}$, 
+* $A-B$ is the matrix with component $(i,j)$ being $a_{ij}-b_{ij}$, 
+* $tA$ is the matrix with component $(i,j)$ being $ta_{i,j}$ (where $t$ is a scalar).
+
+---
+
+## Matrix-vector multiplication
+
+Let $A$ be an $m\times n$-matrix, and $\mathbf{x}$ a column vector with $n$ components. 
+We define
+$$
+\begin{aligned}
+A\mathbf{x} &= 
+\begin{pmatrix} 
+a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n \\
+a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n \\
+\vdots \\
+a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n\end{pmatrix} \\
+&= x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots + x_n\mathbf{a}_n.
+\end{aligned}
+$$
+
+---
+
+## Matrix-matrix multiplication
+
+If $A$ is an $m\times n$ matrix, and $X$ an $n\times k$-matrix, we define $AX$ as the $m\times k$-matrix
+$$
+AX = \begin{pmatrix} AX_{:,1} & AX_{:,2} & \cdots & AX_{:,k} \end{pmatrix} 
+$$
+
+---
+
+## Properties of matrix multiplication
+
+Let $A$, $B$, and $C$ be matrices. The following hold 
+
+1. $(AB)C=A(BC)$
+2. $A(B+C)=AB+AC$
+3. $(B+C)A=BA+CA$
+4. For all scalars $s$ we have that $s(AB)=(sA)B=A(sB)$.
+5. If $A$ is $m\times n$ then $AI_n=A$ and $I_mA=A$
+
+---
+
+## Linear transformations and matrix multiplication
+
+$\mathbf{F}:\mathbb{R}^n\to\mathbb{R}^m$ is called *linear* if
+
+1. $\mathbf{F}(\mathbf{a}_1+\mathbf{a}_2)=\mathbf{F}(\mathbf{a}_1) + \mathbf{F}(\mathbf{a}_2)$
+for all $\mathbf{a}_1,\mathbf{a}_2\in\mathbb{R}^n$,
+2. $\mathbf{F}(c\mathbf{a})=c\mathbf{F}(\mathbf{a})$ for all $\mathbf{a}\in\mathbb{R}^n$, scalars $c$
+
+::: {#prp-}
+$\mathbf{F}:\mathbb{R}^n\to\mathbb{R}^m$ is linear if and only if 
+$\mathbf{F}(\mathbf{x})=A\mathbf{x}$ for all $\mathbf{x}\in\mathbb{R}^n$
+for some $m\times n$ matrix $A$. More precisely,
+$$ 
+A=\begin{pmatrix} \mathbf{F}(\mathbf{e}_1) & \mathbf{F}(\mathbf{e}_2) & \cdots & \mathbf{F}(\mathbf{e}_n) \end{pmatrix},
+$$
+where $\mathbf{e}_i$ was the column vector with $1$ in component $i$, and $0$ otherwise. 
+:::
+
+---
+
+## The matrix of the projection operator
+
+The projection operator $\text{proj}_{\mathbf{b}}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is linear (follows from the properties of the scalar product). 
+The matrix of $\text{proj}_{\mathbf{b}}$ is 
+\begin{align*}
+\frac{\mathbf{b}}{|\mathbf{b}|} \left(\frac{\mathbf{b}}{|\mathbf{b}|}\right)^T.
+\end{align*}
+Such matrices are called *projection matrices*.
+If $\mathbf{b}$ has length $1$, the matrix is $\mathbf{b}\mathbf{b}^T$. 
+
+---
+
+## The matrix of a rotation
+The mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with angle $\theta$ has matrix
+$$A=\begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}$$
+since
+\begin{align*}
+\mathbf{F}(\mathbf{e}_1) &= \begin{pmatrix}\cos\theta \\ \sin\theta \end{pmatrix} \\ 
+\mathbf{F}(\mathbf{e}_2) &= \begin{pmatrix}\cos(\theta+\pi/2) \\ \sin(\theta+\pi/2) \end{pmatrix}
+=\begin{pmatrix}-\sin\theta \\ \cos\theta \end{pmatrix}. 
+\end{align*}
+
+
+
+
+
+
+---
+
+## Plotting polynomials
+
+---
+
+## Block matrices
+
+If we have four matrices $A$, $B$, $C$, $D$, we write
+$$
+\left(\begin{array}{c|c} A & B \\ \hline C & D \end{array}\right)
+$$
+for the matrix where the components in these four matrices are placed over, under, to the left, or to the right of each other as indicated. 
+Lines are used to separate the blocks. We call this a *block matrix*. 
