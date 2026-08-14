@@ -36,10 +36,10 @@ jobs:
 
       - name: Render all book variants
         run: |
-          quarto render --profile book,student    --output-dir _site/book-student
-          quarto render --profile book,instructor  --output-dir _site/book-instructor
-          quarto render --profile projects,student --output-dir _site/projects-student
-          quarto render --profile projects,instructor --output-dir _site/projects-instructor
+          quarto render --to html --profile book,student    --output-dir _site/book-student
+          quarto render --to html --profile book,instructor  --output-dir _site/book-instructor
+          quarto render --to html --profile projects,student --output-dir _site/projects-student
+          quarto render --to html --profile projects,instructor --output-dir _site/projects-instructor
 
       - name: Create landing page index
         run: |
