@@ -303,7 +303,7 @@ In this exercise we set $A=\begin{pmatrix} 2 & -1 & 1 \\ 0 & 1 & 4 \\ 1 & -2 & -
 ::::::: {.callout-important title='Solution' collapse="true"}
 Gaussian elimination gives:
 \begin{align*}
-\lefteqn{\begin{pmatrix} 2 & -1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 4 & 0 & 1 & 0 \\ 1 & -2 & -6 & 0 & 0 & 1\end{pmatrix}} \\
+&\begin{pmatrix} 2 & -1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 4 & 0 & 1 & 0 \\ 1 & -2 & -6 & 0 & 0 & 1\end{pmatrix} \\
 &\stackrel{I\leftrightarrow III}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1 \\ 0 & 1 & 4 & 0 & 1 & 0 \\ 2 & -1 & 1 & 1 & 0 & 0 \end{pmatrix} 
 \stackrel{III-2I}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1\\ 0 & 1 & 4 & 0 & 1 & 0 \\ 0 & 3 & 13 & 1 & 0 & -2 \end{pmatrix} \\
 &\stackrel{III-3II}{\sim} \begin{pmatrix} 1 & -2 & -6 & 0 & 0 & 1\\ 0 & 1 & 4 & 0 & 1 & 0 \\ 0 & 0 & 1 & 1 & -3 & -2 \end{pmatrix} 
@@ -350,7 +350,7 @@ $\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$.
 ::::::: {.callout-important title='Solution' collapse="true"}
 We have that
 \begin{align*}
-\lefteqn{\begin{pmatrix} a & b \\ c & d \end{pmatrix} \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}} \\ 
+&\begin{pmatrix} a & b \\ c & d \end{pmatrix} \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix} \\ 
 &= \frac{1}{ad-bc} \begin{pmatrix} ad-bc & -ab+ab \\ cd - cd & -bc+ad\end{pmatrix} = \frac{1}{ad-bc}\begin{pmatrix}ad-bc & 0 \\ 0 & ad-bc \end{pmatrix} = I_n.
 \end{align*}
 It follows that $\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1}=\frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$ when $ad-bc\neq 0$. 

@@ -1300,7 +1300,7 @@ We get
 \end{align*}
 and
 \begin{align*}
-\lefteqn{\int_{x_0}^{x_3} (x-x_0)(x-x_1)(x-x_2)\,dx} \\
+&\int_{x_0}^{x_3} (x-x_0)(x-x_1)(x-x_2)\,dx \\
 &= [\frac{1}{2}(x-x_0)^2(x-x_1)(x-x_2)]_{x_0}^{x_3} - \frac{1}{2}\int_{x_0}^{x_3} (x-x_0)^2((x-x_1) + (x-x_2))\,dx \\
 &= 9h^4 - \frac{1}{6}  [(x-x_0)^3((x-x_1) + (x-x_2))]_{x_0}^{x_3} + \frac{1}{6}\int_{x_0}^{x_3} 2(x-x_0)^3\,dx \\
 &= 9h^4 -\frac{27}{2}h^4 + \frac{1}{24}[(x-x_0)^4]_{x_0}^{x_3} \\

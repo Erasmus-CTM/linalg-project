@@ -270,10 +270,10 @@ The matrix
 $$
 V=
 \begin{pmatrix}
-1 & x_1 & \hdots & x_1^n  \\
-1 & x_2 & \hdots & x_2^n \\
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
 \vdots & \vdots & \ddots & \vdots \\
-1 & x_m & \hdots & x_m^n
+1 & x_m & \cdots & x_m^n
 \end{pmatrix}
 $$ {#eq-pol12new}
 is called a *Vandermonde matrix*\index{Vandermonde matrix!definition}, and $x_1,\dots,x_m$ are called its *generators*\index{Vandermonde matrix!generators}. 
@@ -605,7 +605,7 @@ Let us take a look at some useful linear transformations, and find their matrice
 ::: {#exm-projeksjonmatr name='Projections'}
 From the properties of the scalar product it follows that the projection operator $\text{proj}_{\mathbf{b}}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is linear. The matrix of $\text{proj}_{\mathbf{b}}$ is 
 \begin{align*}
-\lefteqn{\begin{pmatrix} \text{proj}_{\mathbf{b}}(\mathbf{e}_1) & \text{proj}_{\mathbf{b}}(\mathbf{e}_2) & \cdots & \text{proj}_{\mathbf{b}}(\mathbf{e}_n) \end{pmatrix}} \\
+&\begin{pmatrix} \text{proj}_{\mathbf{b}}(\mathbf{e}_1) & \text{proj}_{\mathbf{b}}(\mathbf{e}_2) & \cdots & \text{proj}_{\mathbf{b}}(\mathbf{e}_n) \end{pmatrix} \\
 &= \begin{pmatrix} \frac{\mathbf{e}_1\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} & \frac{\mathbf{e}_2\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} & \cdots & \frac{\mathbf{e}_n\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}\end{pmatrix}
 = \begin{pmatrix} \frac{b_1}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|} & \frac{b_2}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|}\end{pmatrix} \\
 &= \begin{pmatrix} \frac{\mathbf{b}}{|\mathbf{b}|}\frac{b_1}{|\mathbf{b}|} & \frac{\mathbf{b}}{|\mathbf{b}|}\frac{b_2}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|}\end{pmatrix}
@@ -687,10 +687,10 @@ By the definition of matrix-vector-multiplication, this can be written
 $$
 \begin{pmatrix} q_1(x_1) \\ q_1(x_2) \\ \vdots \\ q_1(x_m) \end{pmatrix} = 
 \begin{pmatrix}
-1 & x_1 & \hdots & x_1^n  \\
-1 & x_2 & \hdots & x_2^n \\
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
 \vdots & \vdots & \ddots & \vdots \\
-1 & x_m & \hdots & x_m^n
+1 & x_m & \cdots & x_m^n
 \end{pmatrix}
 \begin{pmatrix} c_0 \\ c_1 \\ \vdots \\ c_n \end{pmatrix},
 $$ {#eq-pol1}
@@ -699,10 +699,10 @@ If we now have another polynomial, $q_2(x)=d_0+d_1x+\cdots+d_nx^n$, we can in th
 $$
 \begin{pmatrix} q_2(x_1) \\ q_2(x_2) \\ \vdots \\ q_2(x_m) \end{pmatrix} = 
 \begin{pmatrix}
-1 & x_1 & \hdots & x_1^n  \\
-1 & x_2 & \hdots & x_2^n \\
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
 \vdots & \vdots & \ddots & \vdots \\
-1 & x_m & \hdots & x_m^n
+1 & x_m & \cdots & x_m^n
 \end{pmatrix}
 \begin{pmatrix} d_0 \\ d_1 \\ \vdots \\ d_n \end{pmatrix}.
 $$ {#eq-pol2}
@@ -710,10 +710,10 @@ By the definition of matrix multiplication @eq-pol1 and @eq-pol2 can be assemble
 $$
 \begin{pmatrix} q_1(x_1) & q_2(x_1) \\ q_1(x_2) & q_2(x_2) \\ \vdots & \vdots \\ q_1(x_m) & q_2(x_m) \end{pmatrix} = 
 \begin{pmatrix}
-1 & x_1 & \hdots & x_1^n  \\
-1 & x_2 & \hdots & x_2^n \\
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
 \vdots & \vdots & \ddots & \vdots \\
-1 & x_m & \hdots & x_m^n
+1 & x_m & \cdots & x_m^n
 \end{pmatrix}
 \begin{pmatrix} c_0 & d_0 \\ c_1 & d_1 \\ \vdots & \vdots \\ c_n & d_n \end{pmatrix},
 $$ {#eq-pol12}

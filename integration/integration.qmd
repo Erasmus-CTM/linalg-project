@@ -969,7 +969,7 @@ For $f(x)=bx^3+cx^2+dx+e$ the integral becomes
 $$\int_{a-h}^{a+h} f(x)dx = b\int_{a-h}^{a+h} x^3dx+c\int_{a-h}^{a+h} x^2dx+d\int_{a-h}^{a+h} xdx+e\int_{a-h}^{a+h} 1dx.$$
 The method now becomes
 \begin{align*}
-\lefteqn{\frac{h}{3}(f(a-h)+4f(a)+f(a+h))}\\
+&\frac{h}{3}(f(a-h)+4f(a)+f(a+h))\\
 &=b\frac{h}{3}((a-h)^3+4a^3+(a+h)^3)+c\frac{h}{3}((a-h)^2+4a^2+(a+h)^2)\\
 &+d\frac{h}{3}((a-h)+4a+(a+h))+e\frac{h}{3}(1+4+1)
 \end{align*}
@@ -1139,7 +1139,7 @@ $$
 $$
 Integrating $p_2(x)$ gives
 \begin{align*}
-\lefteqn{\left[ f(a)(x-a) + \frac{f(m)-f(a)}{2h}(x-a)^2  \right]_a^b  + \frac{f(a)-2f(m)+f(b)}{2h^2}\frac{2}{3}h^3} \\
+&\left[ f(a)(x-a) + \frac{f(m)-f(a)}{2h}(x-a)^2  \right]_a^b  + \frac{f(a)-2f(m)+f(b)}{2h^2}\frac{2}{3}h^3 \\
 &= 2f(a)h + 2(f(m)-f(a))h  + \frac{f(a)-2f(m)+f(b)}{h}\frac{1}{3}h \\
 &= h\left( 2f(m) + \frac{1}{3}(f(a)-2f(m)+f(b)) \right) \\
 &= \frac{h}{3}  \left(  6f(m) + f(a)-2f(m)+f(b) \right) \\
@@ -1206,7 +1206,7 @@ $$
 $$
 Inserting this is the expression above we get
 \begin{align*}
-\lefteqn{2h\left( f(a) + \begin{pmatrix} 1 & \frac{4}{3} \end{pmatrix}\begin{pmatrix} 2 & -1/2 \\ -1 & 1/2 \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix} \right) } \\
+&2h\left( f(a) + \begin{pmatrix} 1 & \frac{4}{3} \end{pmatrix}\begin{pmatrix} 2 & -1/2 \\ -1 & 1/2 \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix} \right) \\
 &= 2h\left( f(a) + \begin{pmatrix} \frac{2}{3} & \frac{1}{6} \end{pmatrix}\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a)\end{pmatrix}  \right) \\
 &= 2h\left( \left(1-\frac{2}{3}-\frac{1}{6}\right)f(a) + \frac{2}{3}f(a+h) + \frac{1}{6}f(a+2h) \right) \\
 &= \frac{h}{3}(f(a)+4f(a+h)+f(a+2h)).
@@ -1219,9 +1219,9 @@ For $n=3$ @thm-derivert-approksimasjon gives
 \end{align*}
 Inserting this is the expression we get
 \begin{align*} 
-\lefteqn{3h\left( f(a) + \begin{pmatrix} \frac{3}{2} & 3 & \frac{27}{4} \end{pmatrix}
+&3h\left( f(a) + \begin{pmatrix} \frac{3}{2} & 3 & \frac{27}{4} \end{pmatrix}
 \begin{pmatrix} 3   & -3/2 &   1/3 \\ -5/2  &  2   & -1/2\\ 1/2  & -1/2  &  1/6\end{pmatrix}
-\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h)-f(a) \end{pmatrix}\right) } \\
+\begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h)-f(a) \end{pmatrix}\right) \\
 &=  3h\left(f(a) + \begin{pmatrix} \frac{3}{8}    & \frac{3}{8} &  \frac{1}{8} \end{pmatrix} \begin{pmatrix}f(a+h)-f(a) \\ f(a+2h) - f(a) \\ f(a+3h)-f(a) \end{pmatrix}\right) \\
 &= 3h\left( \left((1-\frac{3}{8}-\frac{3}{8}-\frac{1}{8}\right)f(a) + \frac{3}{8}f(a+h) + \frac{3}{8} f(a+2h) + \frac{1}{8}f(a+3h) \right) \\
 &= \frac{3h}{8}(f(a)+3f(a+h)+3f(a+2h)+f(a+3h)).

@@ -227,7 +227,7 @@ np.minimum(a,b)
 ```
 In particular we have that 
 \begin{align*}
-\lefteqn{\max\left( \left(a_1,a_2,...,a_n \right),\left(b_1,b_2,...,b_n \right)\right) } \\
+&\max\left( \left(a_1,a_2,...,a_n \right),\left(b_1,b_2,...,b_n \right)\right) \\
 &= \left( \max(a_1,b_1),\max(a_2,b_2),...,\max(a_n,b_n) \right).
 \end{align*}
 Multiplication and taking powers are also vectorised:

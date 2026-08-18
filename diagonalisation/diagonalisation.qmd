@@ -426,7 +426,7 @@ The initial condition gives the equation
 $$\begin{pmatrix} 1 \\ 1 \\ 1 \end {pmatrix} = \begin{pmatrix} 1 & 1 & 0 \\ i & -i & 0 \\ 0 & 0 & 1\end{pmatrix} \begin{pmatrix} C \\ D \\ E \end{pmatrix},$$
 which has the solution $C=(1-i)/2$, $D=(1+i)/2=\overline{C}$, $E=1$. This gives
 \begin{align*}
-\lefteqn{Ce^{(1+i)t}\begin{pmatrix} 1 \\ i \\ 0 \end{pmatrix} + De^{(1-i)t}\begin{pmatrix} 1 \\ -i \\ 0 \end{pmatrix}  + E e^{t}\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}} \\
+&Ce^{(1+i)t}\begin{pmatrix} 1 \\ i \\ 0 \end{pmatrix} + De^{(1-i)t}\begin{pmatrix} 1 \\ -i \\ 0 \end{pmatrix}  + E e^{t}\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \\
 &= \frac{1-i}{2}e^{(1+i)t}\begin{pmatrix} 1 \\ i \\ 0 \end{pmatrix} + \overline{\frac{1-i}{2}}e^{(1-i)t}\overline{\begin{pmatrix} 1 \\ i \\ 0 \end{pmatrix}} 
 + e^t\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \\
 &= 2\Re\left(  \frac{1-i}{2} e^{(1+i)t}\begin{pmatrix} 1 \\ i \\ 0 \end{pmatrix} \right) + e^{t}\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \\

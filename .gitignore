@@ -38,3 +38,10 @@ luac.out
 *.i*86
 *.x86_64
 *.hex
+/.quarto/
+
+build-book-instructor
+build-book-student
+build-projects-instructor
+build-projects-student
+build-beamer

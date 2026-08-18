@@ -856,7 +856,7 @@ We see that this coincides with the three point method for the second derivative
 All cubic polynomials have a fourth derivative of $0$, and the truncation error is thus $0$ ($M_4=0$).
 Alternatively we can substitute $f(x)=x^3$ in the formula:
 \begin{align*}
-\lefteqn{\frac{f(a-h)-2f(a)+f(a+h)}{2h}} \\
+&\frac{f(a-h)-2f(a)+f(a+h)}{2h} \\
 &= \frac{(a-h)^3-2a^3+(a+h)^3}{h^2} \\
 &= \frac{a^3-3a^2h+3ah^2-h^3-2a^3+a^3+3a^2h+3ah^2+h^3}{h^2} \\
 &= \frac{6ah^2}{h^2} = 6a,

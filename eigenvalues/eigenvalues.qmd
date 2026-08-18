@@ -74,15 +74,15 @@ np.roots(np.array([-1,6,-11,6]))
 
 Alternatively one can find the roots by trial and error. Then we probably first will find the root $\lambda_1=1$. 
 The two other roots can be found by first applying polynomial division
-$$ \arraycolsep=0pt
-\begin{array}{rlrlrlrrl} 
-(-  &\lambda^3&    +6&\lambda^2&  -11&\lambda& +   &6.  &):(\lambda-1)=-\lambda^2+5\lambda -6\\
- -( -&\lambda^3&    + &\lambda^2)&       &            &       &    &\\ \hline
- &      &                   5&\lambda^2&-11   &\lambda&       &    & \\ 
- &      &                 -(5&\lambda^2&-5    &\lambda)&      &    &\\ \hline
- &      &                     &                &-6     &\lambda& +    &6  &  \\
- &      &                     &                &- (-6  &\lambda&+     &6  &) \\ \hline
- &      &                     &                &         &             &       &0 &,
+$$
+\begin{array}{rrrrl} 
+(-\lambda^3&          +6\lambda^2&     -11\lambda& +   6   &):(\lambda-1)=-\lambda^2+5\lambda -6\\
+ -( -\lambda^3&       + \lambda^2)&                      &           &\\ \hline
+ &                               5\lambda^2&    -11\lambda&           & \\ 
+ &                            -(5\lambda^2&     -5\lambda)&           &\\ \hline
+ &                                                 &   -6\lambda& +   6  &  \\
+ &                                                 &- (-6\lambda&+    6  &) \\ \hline
+ &                                                 &                    &      0   &
 \end{array}
 $$
 so that

@@ -334,7 +334,7 @@ When expanding the determinant along the last row we get the minors
 $$1,-\lambda,\lambda^2,...,(-1)^{n-1}\lambda^{n-1},$$
 so that the determinant is
 \begin{align*}
-\lefteqn{ \sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} } \\
+& \sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} \\
 &= (-1)^n \sum_{k=1}^{n-1} a_{k-1} \lambda^{k-1}    +   (-1)^n\lambda^n (a_{n-1}\lambda^{n-1} +\lambda^n)  \\
 &= (-1)^n \sum_{k=1}^n a_{k-1} \lambda^{k-1} + (-1)^n\lambda^n \\
 &= (-1)^n p(\lambda).
@@ -383,15 +383,14 @@ $$
 
 Suppose that $\lambda$ is a root in $p(t)$, i.e., an eigenvalue for $C(p)$. We have that
 \begin{align*}
-\lefteqn{
-\left(\begin{array}{rrrrr} 
+&\left(\begin{array}{rrrrr} 
   0 & 1 & 0 & \cdots & 0 \\ 
   0 & 0 & 1 & \cdots & 0 \\ 
   \vdots & \vdots & \vdots & \vdots & \vdots \\ 
   0 & 0 & 0 & \cdots & 1 \\ 
   -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
 \end{array}\right)
-\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} } \\
+\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} \\
 &= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ -a_0-a_1\lambda-a_2\lambda^2 - \cdots - a_{n-1}\lambda^{n-1} \end{pmatrix}
 = \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n-p(\lambda) \end{pmatrix}
 = \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n \end{pmatrix} \\
