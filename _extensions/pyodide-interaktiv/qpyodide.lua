@@ -746,6 +746,37 @@ import ast, sys, traceback
 
 _ns = {}
 
+# Real Python has no display protocol of its own, so plt.show() by default
+# tries to pop up an interactive window using whatever GUI backend happens
+# to be installed -- disruptive during an unattended render, and the figure
+# would never end up in the rendered document anyway. Mirror what the
+# browser-side Pyodide worker does (see PY_SETUP in
+# qpyodide-document-engine-initialization.js): force the non-interactive
+# Agg backend and turn plt.show() into "save every open figure to a PNG,
+# print its path on a marker line, close it". The Lua side (see
+# extractAutoexecFigures()) pulls those marker lines back out of the
+# captured stdout and turns them into real embedded images. Wrapped in
+# try/except so cells that never touch matplotlib still work on an
+# interpreter that doesn't have it installed.
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    from matplotlib import pyplot as _qpyautoexec_plt
+
+    def _qpyautoexec_show(*args, **kwargs):
+        import os, tempfile
+        for num in _qpyautoexec_plt.get_fignums():
+            fig = _qpyautoexec_plt.figure(num)
+            fd, path = tempfile.mkstemp(suffix=".png", prefix="qpyautoexec_fig_")
+            os.close(fd)
+            fig.savefig(path, bbox_inches="tight")
+            _qpyautoexec_plt.close(fig)
+            print("<<<QPYAUTOEXEC_FIG:%s>>>" % path)
+
+    _qpyautoexec_plt.show = _qpyautoexec_show
+except Exception:
+    pass
+
 def _run(i, path, label):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -782,10 +813,82 @@ def _run(i, path, label):
 
 ]]
 
+-- Extract the top-level module names referenced via `import X` / `from X
+-- import Y` across every opted-in cell's source (e.g. `scipy.linalg` ->
+-- `scipy`; a submodule import says nothing extra about whether the
+-- top-level package is installed). Used to test candidate interpreters
+-- below for whether they actually have what the cells need, not just
+-- whether they exist.
+local function extractImportedModules(cellSources)
+  local seen = {}
+  local modules = {}
+
+  local function addModule(name)
+    local top = name:match("^([%w_]+)")
+    if top and not seen[top] then
+      seen[top] = true
+      table.insert(modules, top)
+    end
+  end
+
+  for _, src in ipairs(cellSources) do
+    for line in src:gmatch("([^\r\n]+)") do
+      local fromModule = line:match("^%s*from%s+([%w_%.]+)%s+import")
+      if fromModule then
+        addModule(fromModule)
+      else
+        local importList = line:match("^%s*import%s+(.+)$")
+        if importList then
+          importList = importList:gsub("#.*$", "")
+          for entry in importList:gmatch("[^,]+") do
+            local name = entry:match("^%s*([%w_%.]+)")
+            if name then
+              addModule(name)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  return modules
+end
+
+-- Whether interpreter `cmd` exists on PATH AND can import every module in
+-- `modules` (an empty list only proves existence). Never throws.
+local function candidateSatisfiesImports(cmd, modules)
+  if #modules == 0 then
+    local ok = pcall(pandoc.pipe, cmd, { "--version" }, "")
+    return ok
+  end
+  local checkScript = "import " .. table.concat(modules, ", ")
+  local ok = pcall(pandoc.pipe, cmd, { "-c", checkScript }, "")
+  return ok
+end
+
+-- Pull "<<<QPYAUTOEXEC_FIG:path>>>" marker lines (one per matplotlib figure
+-- captured by the plt.show() override in autoexecDriverPrelude) back out of
+-- one cell's raw captured stdout. Returns the remaining text with those
+-- marker lines removed, plus an ordered list of image paths.
+local function extractAutoexecFigures(text)
+  local images = {}
+  local keptLines = {}
+  for line in (text .. "\n"):gmatch("(.-)\n") do
+    local path = line:match("^<<<QPYAUTOEXEC_FIG:(.-)>>>$")
+    if path then
+      table.insert(images, path)
+    else
+      table.insert(keptLines, line)
+    end
+  end
+  return table.concat(keptLines, "\n"), images
+end
+
 -- Run every opted-in cell's cleaned source in ONE Python subprocess, in
 -- document order, sharing one namespace -- mirroring how the interactive
 -- Pyodide runtime in the browser keeps state across cells. Returns a list
--- of per-cell output strings, or nil if no interpreter could be found.
+-- of per-cell { text = <stdout text>, images = <list of PNG paths> }
+-- tables, or nil if no interpreter could be found.
 local function runAutoexecCellsForReal(cellSources)
   if #cellSources == 0 then
     return {}
@@ -817,13 +920,40 @@ local function runAutoexecCellsForReal(cellSources)
   df:write(table.concat(driverLines, "\n"))
   df:close()
 
+  -- Multiple Python installs on the same machine are common (venvs, conda
+  -- envs, Windows Store stubs, ...), and merely existing on PATH says
+  -- nothing about which one actually has the packages the cells import
+  -- (e.g. a venv with numpy installed shadows only "python.exe" on
+  -- Windows, not "python3.exe", so an existence-only check can silently
+  -- pick a different, unrelated interpreter). Prefer whichever candidate
+  -- can resolve every import the opted-in cells need; only fall back to
+  -- "first one that merely exists" if none of them fully qualify, so cells
+  -- still run and surface a real traceback naming the actual missing
+  -- module instead of doing nothing.
   local candidates = { "python3", "python" }
-  local combinedOutput = nil
+  local requiredModules = extractImportedModules(cellSources)
+
+  local chosenCmd = nil
   for _, cmd in ipairs(candidates) do
-    local ok, result = pcall(pandoc.pipe, cmd, { driverPath }, "")
+    if candidateSatisfiesImports(cmd, requiredModules) then
+      chosenCmd = cmd
+      break
+    end
+  end
+  if chosenCmd == nil then
+    for _, cmd in ipairs(candidates) do
+      if candidateSatisfiesImports(cmd, {}) then
+        chosenCmd = cmd
+        break
+      end
+    end
+  end
+
+  local combinedOutput = nil
+  if chosenCmd ~= nil then
+    local ok, result = pcall(pandoc.pipe, chosenCmd, { driverPath }, "")
     if ok then
       combinedOutput = result
-      break
     end
   end
 
@@ -848,13 +978,16 @@ local function runAutoexecCellsForReal(cellSources)
   for i = 1, #cellSources do
     local marker = "<<<QPYAUTOEXEC_END_" .. i .. ">>>\n"
     local startPos, endPos = rest:find(marker, 1, true)
+    local rawText
     if startPos then
-      outputs[i] = rest:sub(1, startPos - 1)
+      rawText = rest:sub(1, startPos - 1)
       rest = rest:sub(endPos + 1)
     else
-      outputs[i] = rest
+      rawText = rest
       rest = ""
     end
+    local text, images = extractAutoexecFigures(rawText)
+    outputs[i] = { text = text, images = images }
   end
 
   return outputs
@@ -910,10 +1043,14 @@ local function enablePyodideCodeCell(el)
     autoexecIndex = autoexecIndex + 1
 
     if autoexecResults ~= nil then
-      local outputText = (autoexecResults[autoexecIndex] or ""):gsub("%s+$", "")
+      local cellResult = autoexecResults[autoexecIndex] or { text = "", images = {} }
+      local outputText = (cellResult.text or ""):gsub("%s+$", "")
       local blocks = { pandoc.CodeBlock(cellCode, pandoc.Attr(el.attr.identifier, { "python" }, {})) }
       if outputText ~= "" then
         table.insert(blocks, pandoc.CodeBlock(outputText, pandoc.Attr("", { "cell-output", "cell-output-stdout" }, {})))
+      end
+      for _, imagePath in ipairs(cellResult.images or {}) do
+        table.insert(blocks, pandoc.Para({ pandoc.Image({}, imagePath:gsub("\\", "/")) }))
       end
       return pandoc.Div(blocks, pandoc.Attr("", { "cell" }, {}))
     end
