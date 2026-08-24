@@ -2,5 +2,7 @@ project:
   type: default
 
 filters:
-  - pyodide-interaktiv
   - quizdown
+  - pyodide-interaktiv
+pyodide:
+  pdf-fallback: true

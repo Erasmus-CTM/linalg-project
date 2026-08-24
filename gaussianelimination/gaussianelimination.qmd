@@ -5,7 +5,7 @@
 {{< include ../_imports.py >}}
 ```
 
-A general systems with $m$ equations and $n$ unknowns has the form
+A general system with $m$ equations and $n$ unknowns has the form
 \begin{align*}
 \begin{array}{lllll}
 a_{11}x_1 &+ a_{12}x_2 &+ \cdots &+ a_{1n}x_n &= b_1 \\
@@ -20,7 +20,7 @@ To explain this further, suppose that the variables $x_1,...,x_n$ already have b
 1. $x_{n+1}$ does not appear in the remaining equations. Then $x_{n+1}$ has been eliminated as well, and we proceed with the elimination of $x_{n+2}$.
 2. $x_{n+1}$ appears in at least one of the remaining equations. We do the following:
     (a) Take one of the equations where $x_{n+1}$ appears, and place this first among the remaining equations. 
-    (b) Scale this equation so that there is a $1$ in front of $x_{n+1}$. We shall call this a leading one *leading one*\index{Leading one} (there should be no contribution left of $x_{n+1}$ in this equation).
+    (b) Scale this equation so that there is a $1$ in front of $x_{n+1}$. We shall call this a *leading one*\index{Leading one} (there should be no contribution left of $x_{n+1}$ in this equation).
     (c) Add multiples of this equation to the other remaining equations so that $x_{n+1}$ gets eliminated. 
     
     We have now eliminated $x_{n+1}$, and proceed with the elimination of $x_{n+2}$.
@@ -45,7 +45,7 @@ x_1& -2x_2& + x_3=& 3 \\
 \end{array}
 $$
 We also need to ensure that there is a leading one in the first equation, but this is already the case.
-We now eliminate $x_1$ in the second equation by subtracting 4 times the first equation (vi mark in red what we eliminate). Then we get
+We now eliminate $x_1$ in the second equation by subtracting 4 times the first equation (we mark in red what we eliminate). Then we get
 $$
 \begin{array}{rrrr}
 x_1& -2x_2& + x_3=& 3 \\
@@ -108,7 +108,7 @@ These are also called *pivot variables*\index{Pivot!variable}.
 We also call the position of a leading one a *pivot element*\index{Pivot!element}. $\clubsuit$
 :::
 
-Ti simplify what we did above it can be useful to gather the coefficients and the right hand side in a matrix - 
+To simplify what we did above it can be useful to gather the coefficients and the right hand side in a matrix - 
 without writing down equality signs and variable names. 
 The matrix $\begin{pmatrix}A & \mathbf{b}\end{pmatrix}$ is called the *augmented matrix*\index{Augmented matrix} 
 of the system $A\mathbf{x}=\mathbf{b}$. 
@@ -122,27 +122,28 @@ An equation can be thought of as a row, a column as the coefficients associated 
 The columns in $A$ which have a pivot element are called *pivot columns*\index{Pivot!column}. 
 In the same way, the rows in $A$ which have a pivot element are called *pivot rows*\index{Pivot!row}. 
 If we let $\sim$ denote the operations we did above, everything can be written more compactly as: 
+
 $$
-\begin{aligned} 
+\begin{aligned}
 \begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
 &\sim
 \begin{pmatrix} 1 & -2 & 1 & 3 \\ \textcolor{red}{4} & -3 & 2 & 8 \\ 0 & -8 & 3 & 6 \end{pmatrix}
 \sim
-\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 5 & -2 & -4 \\ 0 & -8 & 3 & 6 \end{pmatrix} \nonumber \\ 
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 5 & -2 & -4 \\ 0 & -8 & 3 & 6 \end{pmatrix} \\
 &\sim
 \begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & \textcolor{red}{-8} & 3 & 6 \end{pmatrix}
 \sim
-\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & 0 & -\frac{1}{5} & -\frac{2}{5} \end{pmatrix} \nonumber \\
+\begin{pmatrix} 1 & -2 & 1 & 3 \\ 0 & 1 & -\frac{2}{5} & -\frac{4}{5} \\ 0 & 0 & -\frac{1}{5} & -\frac{2}{5} \end{pmatrix} \\
 &\sim
 \begin{pmatrix} 1 & -2 & \textcolor{red}{1} & 3 \\ 0 & 1 & \textcolor{red}{-\frac{2}{5}} & -\frac{4}{5} \\ 0 & 0 & 1 & 2 \end{pmatrix}
 \sim
-\begin{pmatrix} 1 & \textcolor{red}{-2} & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix} \nonumber \\
+\begin{pmatrix} 1 & \textcolor{red}{-2} & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix} \\
 &\sim
 \begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}
 \end{aligned}
-$$ {#eq-rowred1}
-After the first five operations the matrix is on echelon form. 
-The last matrix is on reduced echelon form. 
+$$ {#eq-rowrednew}
+
+After the first five operations the matrix is on echelon form. The last matrix is on reduced echelon form. 
 
 We can bring a general matrix to reduced echelon form with the function 
 `rref` in the class `sym.Matrix`\index{python!sym.Matrix}. If we test this on the matrix above we get
@@ -155,17 +156,16 @@ C
 We see that we obtained the same matrix. 
 This is not obvious, since there are many different ways to bring a matrix to reduced echelon form, 
 and each such can in principle lead to different reduced forms. 
-
-We shall later see that the reduced echelon form is unique - 
+Later we shall see, however, that the reduced echelon form is unique - 
 regardless of the operations, we will always end up with the same reduced echelon form.
 
-In @eq-rowred1 we indicated the operations we did. Let us establish some notation for the first operations.
+In @eq-rowrednew we indicated the operations we did. Let us establish some notation for the first operations.
 
 1. The first operation swapped row 1 and 3. We will write this as $I\leftrightarrow III$. 
 2. The second operation subtracted 4 times row 1 in row 2. We will write this as $II-4I$. 
 3. The third operation multiplied row $2$ with $1/5$. We will write this as $II\cdot(1/5)$.
 
-With the help of this notation @eq-rowred1 can be rewritten as follows: 
+With the help of this notation @eq-rowrednew can be rewritten as follows: 
 \begin{align*}
 \begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
 &\stackrel{I\leftrightarrow III}{\sim}
@@ -183,7 +183,7 @@ With the help of this notation @eq-rowred1 can be rewritten as follows:
 &\stackrel{I+2II}{\sim}
 \begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}
 \end{align*}
-The system was thus brought to reduced row ev´chelon form with help of three types of operations:
+The system was thus brought to reduced row echelon form with help of three types of operations:
 
 1. Add a multiple of one row to another,
 2. multiply a row with a constant $\neq 0$,

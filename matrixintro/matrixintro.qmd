@@ -1,8 +1,11 @@
 # Vectors {#sec-vektorer}
 
 
-```{python}
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
 #| include: false
+#| echo: false
 {{< include ../_imports.py >}}
 ```
 
@@ -18,15 +21,16 @@ Later we will also study $\mathbb{C}^n$, the set of vectors with $n$ complex com
 When creating vectors in Python square brackets are used to indicate the start and end of the vector, 
 and comma to separate the components: 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 a = np.array([2,4,6,8,10,12,14,16])
-a
+print(a)
 ```
 
 A vector can be defined in many different ways:
 
-```{python}
-np.linspace(0,1,6)
+```{pyodide-python}
+print(np.linspace(0,1,6))
 ```
 
 More generally `np.linspace(a,b,n)` gives the vector $\left\{ a+ \frac{k(b-a)}{n-1}\right\}_{k=0}^{n-1}$, \index{python!np.linspace}
@@ -34,12 +38,12 @@ i.e., the vector with $n$ components in increasing order from the interval $[a,b
 and distances between neighbouring points are all equal. 
 We can also create new vectors in the following ways: \index{python!np.arange}
 
-```{python}
-np.arange(1,7)
+```{pyodide-python}
+print(np.arange(1,7))
 ```
 
-```{python}
-np.arange(1,7,2)
+```{pyodide-python}
+print(np.arange(1,7,2))
 ```
 
 Python supports a *colon-notation* which can be used to extract a set of indices into a vector:
@@ -53,41 +57,41 @@ Note in particular that \verb|1:6:2| does not contain the right end point 6.
 If $\mathbf{a}=(a_1,a_2,...,a_n)$, and `I` is a set of non-negative indices $<n$, then `a(I)` 
 returns a vector with the values found at the indices given by `I`:
 
-```{python}
-a[0:6]
+```{pyodide-python}
+print(a[0:6])
 ```
 Indices start at $0$, contrary to indexing in mathematics where they start at $1$. 
 If we want to retrieve every second index in the same range of indices we can write.
-```{python}
-a[0:6:2]
+```{pyodide-python}
+print(a[0:6:2])
 ```
 There is also a special notation to extract the last part of a vector:
 
-```{python}
-a[3:]
+```{pyodide-python}
+print(a[3:])
 ```
 
 \verb|3:| here means "all indices $\geq 3$". 
 Thus, you don't need to know how long the vector is, in order to extract the last part of it! 
 Note also the special syntax for extracting the last entry in a vector:
-```{python}
-a[-1]
+```{pyodide-python}
+print(a[-1])
 ```
 
 ::: {#exm- name='max, min, sum, and prod'}
 One can write as follows if one needs to find the maximum, minimum, sum, or product of all components in a vector: 
 \index{python!np.max} \index{python!np.min} \index{python!np.sum} \index{python!np.prod}
-```{python}
-np.max(a)
+```{pyodide-python}
+print(np.max(a))
 ```
-```{python}
-np.min(a)
+```{pyodide-python}
+print(np.min(a))
 ```
-```{python}
-np.sum(a)
+```{pyodide-python}
+print(np.sum(a))
 ```
-```{python}
-np.prod(a)
+```{pyodide-python}
+print(np.prod(a))
 ```
 $\clubsuit$
 :::
@@ -138,19 +142,23 @@ t\mathbf{a}           &= 2(1,2,3) = (2\cdot 1,2\cdot 2,2\cdot 3) = (2,4,6).
 \end{align*} 
 This can be verified as follows:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 a = np.array([1,2,3])
 b = np.array([4,5,6])
 t = 2
-a + b
 ```
 
-```{python}
-a-b
+```{pyodide-python}
+print(a + b)
 ```
 
-```{python}
-t*a
+```{pyodide-python}
+print(a-b)
+```
+
+```{pyodide-python}
+print(t*a)
 ```
 
 Note the difference between writing `a+b`, and `sum(a)`. 
@@ -180,37 +188,37 @@ Addition of a vector and a scalar is also allowed. This is computed as
 $$\mathbf{a}+t=(a_1+t,a_2+t,...,a_n+t).$$
 Note that this is not defined mathematically. 
 
-```{python}
-a+t
+```{pyodide-python}
+print(a+t)
 ```
 
 ::: {#exm- name='Vectorised functions'}
 Most functions in Python are vectorised: \index{python!np.sqrt}\index{python!np.abs}\index{python!np.sin}\index{python!np.cos}
 
-```{python}
-np.sqrt(np.array([1,4,9,16]))
+```{pyodide-python}
+print(np.sqrt(np.array([1,4,9,16])))
 ```
 
-```{python}
-np.abs(np.array([-2,-1,1,2]))
+```{pyodide-python}
+print(np.abs(np.array([-2,-1,1,2])))
 ```
 
-```{python}
-np.sin(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi]))
+```{pyodide-python}
+print(np.sin(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi])))
 ```
 
-```{python}
-np.cos(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi]))
+```{pyodide-python}
+print(np.cos(np.array([0,np.pi/2,np.pi,3*np.pi/2,2*np.pi])))
 ```
 
 The code below verifies that the logarithm and the exponential functions are inverse functions: \index{python!np.exp} \index{python!np.log}
 
-```{python}
-np.exp(np.log(np.array([1,2,3])))
+```{pyodide-python}
+print(np.exp(np.log(np.array([1,2,3]))))
 ```
 
-```{python}
-np.log(np.exp(np.array([0,1,2])))
+```{pyodide-python}
+print(np.log(np.exp(np.array([0,1,2]))))
 ```
 
 $\clubsuit$
@@ -218,12 +226,12 @@ $\clubsuit$
 
 ::: {#exm- name='Vectorised binary functions'}
 max and min can be used in the same way as + and -, if one instead passes two arguments: \index{python!np.maximum} \index{python!np.minimum}
-```{python}
-np.maximum(a,b)
+```{pyodide-python}
+print(np.maximum(a,b))
 ```
 
-```{python}
-np.minimum(a,b)
+```{pyodide-python}
+print(np.minimum(a,b))
 ```
 In particular we have that 
 \begin{align*}
@@ -232,20 +240,20 @@ In particular we have that
 \end{align*}
 Multiplication and taking powers are also vectorised:
 
-```{python}
-a*b
+```{pyodide-python}
+print(a*b)
 ```
 
-```{python}
-a**b
+```{pyodide-python}
+print(a**b)
 ```
 
 $\clubsuit$
 :::
 
 There are many other operations which can be applied to vectors. As an example, they can be placed after one-another:\index{python!np.block}
-```{python}
-np.block([a,b])
+```{pyodide-python}
+print(np.block([a,b]))
 ```
 
 Since vector addition is vectorised, vectors inherit properties from the real numbers: 
@@ -285,11 +293,8 @@ We also see that $\mathbf{y}(0)=\mathbf{x}_1$, and $\mathbf{y}(1)=\mathbf{x}_2$.
 
 Up to now all vectors and scalars have been real, but they may just as well have been complex. 
 From now on we will also consider complex vectors and scalars. 
-The complex number $2+3i$ can be computed as 
-```{python}
-2+3j
-```
-`1j` represents the imaginary unit $i$. `3j` gives the complex number $3i$. Using `j` alone will produce an error message, unless $j$ is defined as a variable elsewhere. 
+The complex number $2+3i$ can be computed as `2+3j`. 
+`1j` represents the imaginary unit $i$. `3j` gives the complex number $3i$. Writing `j` by itself produces an error, unless $j$ is defined as a variable elsewhere. 
 
 
 ## Length, scalar product, and projection
@@ -369,15 +374,18 @@ which reduces to the definition given by @eq-lengdedef when $\mathbf{a}$ is real
 Inside the square root here we take lengths of complex numbers, so that the result becomes $\geq 0$, and $0$ only when $\mathbf{a}=\mathbf{0}$. 
 The length of a vector can be computed as follows.\index{python!np.linalg,norm}
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 a=np.array([3,4])
-np.linalg.norm(a)
+```
+```{pyodide-python}
+print(np.linalg.norm(a))
 ```
 
 This can also be computed as follows
 
-```{python}
-np.sqrt(np.sum(np.abs(a)**2))
+```{pyodide-python}
+print(np.sqrt(np.sum(np.abs(a)**2)))
 ```
 
 Here four operations are combined. With $\mathbf{a}=(a_1,a_2,...,a_n)$, these are, in the following order:
@@ -437,18 +445,22 @@ and the scalar product of the two is
 \end{align*}
 You get the complex scalar product by writing `np.vdot(a,b)`\index{python!np.vdot}, but here there is a small difference:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 a = np.array([2j,1+1j,3])
 b = np.array([1+2j,-1,2-1j])
-np.vdot(a,b)
+```
+
+```{pyodide-python}
+print(np.vdot(a,b))
 ```
 
 So here a slightly different definition is used than @eq-skalarproduktdef2. 
 `np.vdot` actually computes the complex scalar product of $\mathbf{a}$ and $\mathbf{b}$ as 
 $\overline{a_1}b_1+\cdots+\overline{a_n}b_n$, as is easily checked:\index{python!np.conj}
 
-```{python}
-np.sum(np.conj(a)*b)
+```{pyodide-python}
+print(np.sum(np.conj(a)*b))
 ```
 These two competing definitions of the complex scalar product stem from different science traditions: 
 In the mathematics literature it is usual to conjugate the second vector, while in the physics literature it is common to conjugate the first vector. `np.vdot` thus follows the literature in physics.
@@ -518,8 +530,8 @@ This result is also called the *best approximation theorem*.
 
 $\text{proj}_\mathbf{b}(\mathbf{a})$ can be computed as follows
 
-```{python}
-np.vdot(b,a)*b/np.linalg.norm(b**2)
+```{pyodide-python}
+print(np.vdot(b,a)*b/np.linalg.norm(b**2))
 ```
 
 Note that the order of $\mathbf{a}$ and $\mathbf{b}$ has been changed inside the scalar product here. 
@@ -834,8 +846,8 @@ $$
 &= \begin{pmatrix} -1 \\ -11 \\ 13 \end{pmatrix}
 \end{aligned}
 $$
-```{python}
-np.array([2,1,4]) + 3*np.array([-1,-4,3])
+```{pyodide-python}
+print(np.array([2,1,4]) + 3*np.array([-1,-4,3]))
 ```
 :::::::
 :::::
@@ -853,8 +865,8 @@ $$
 &= \begin{pmatrix} 1 - i \\ -1 + 2i \\ 3 + 2i\end{pmatrix}.
 \end{aligned}
 $$
-```{python}
-np.array([-1j,-1,3]) + 1j*np.array([-1j,2,2])
+```{pyodide-python}
+print(np.array([-1j,-1,3]) + 1j*np.array([-1j,2,2]))
 ```
 :::::::
 :::::
@@ -903,8 +915,8 @@ Compute the lengths of the vectors
 \begin{align*}
 |(3,4,5)|&=\sqrt{3^2+4^2+5^2}=\sqrt{9+16+25}=\sqrt{50} = 5\sqrt{2}
 \end{align*}
-```{python}
-np.linalg.norm(np.array([3,4,5]))
+```{pyodide-python}
+print(np.linalg.norm(np.array([3,4,5])))
 ```
 :::::::
 :::::
@@ -917,8 +929,8 @@ np.linalg.norm(np.array([3,4,5]))
 |(i,-i,1,-1)|&=\sqrt{|i|^2+|-i|^2+|1|^2+|-1|^2} \\
 &= \sqrt{1^2+(-1)^2+1+1} = \sqrt{4}=2.
 \end{align*}
-```{python}
-np.linalg.norm(np.array([1j,-1j,1,-1]))
+```{pyodide-python}
+print(np.linalg.norm(np.array([1j,-1j,1,-1])))
 ```
 :::::::
 :::::
@@ -1138,12 +1150,10 @@ $$
 ::: {#exr-primenumbers}
 Consider the following code. What does the code do? Justify your answer. Consult the `numpy` documentation on the function `np.where`.
 ```{pyodide-python}
-import numpy as np
-
 a = np.arange(0,100); a[0] = -1; a[1]=-1
 for k in range(2,10):
     a[(2*k)::k] = -1
-a[np.where(a!=-1)]
+print(a[np.where(a!=-1)])
 ```
 
 ::::: {.content-visible when-profile="instructor"}

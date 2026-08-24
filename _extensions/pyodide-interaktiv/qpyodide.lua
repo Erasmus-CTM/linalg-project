@@ -1,17 +1,17 @@
 ----
---- qpyodide.lua – Pandoc-Lua-Filter der Extension `pyodide-interaktiv`
+--- qpyodide.lua – Pandoc Lua filter of the `pyodide-interaktiv` extension
 ---
---- Sauberer Rework von coatless-quarto/pyodide mit integriertem,
---- anbieter-neutralem KI-Feedback (OpenAI-kompatible APIs).
+--- Clean rework of coatless-quarto/pyodide with integrated,
+--- provider-neutral AI feedback (OpenAI-compatible APIs).
 ---
---- Der Filter sammelt alle `{pyodide-python}`-Codeblöcke ein, ersetzt sie durch
---- Einfüge-Marker und injiziert die JS/CSS-Dateien der Extension genau einmal
---- pro Dokument. Alles läuft vollständig clientseitig (Pyodide/WebAssembly).
+--- The filter collects all `{pyodide-python}` code blocks, replaces them with
+--- insertion markers, and injects the extension's JS/CSS files exactly once
+--- per document. Everything runs entirely client-side (Pyodide/WebAssembly).
 ---
---- Injizierte Dateien (Reihenfolge ist relevant):
+--- Injected files (order matters):
 ---   in-header : qpyodide-styling.css
----               qpyodide-document-settings.js   (Template, Platzhalter werden ersetzt)
----               qpyodide-locales.js             (UI-Texte je Sprache; definiert QP_L)
+---               qpyodide-document-settings.js   (template, placeholders get replaced)
+---               qpyodide-locales.js             (UI text per language; defines QP_L)
 ---               qpyodide-document-status.js
 ---               qpyodide-feedback.js
 ---               qpyodide-document-engine-initialization.js
@@ -93,6 +93,15 @@ local feedbackStorage = "local"
 local feedbackHints = "true"
 
 ----
+--- Setup variables for non-interactive output formats (PDF, docx, ...)
+
+-- Whether `{pyodide-python}` cells fall back to plain, Python-highlighted
+-- source in formats where the Pyodide/WASM runtime never runs. Off by
+-- default -- opt in via `pyodide: pdf-fallback: true` document-wide, or
+-- `#| pdf-fallback: true` on an individual cell.
+local pdfFallback = "false"
+
+----
 --- Setup variables for tracking number of code cells
 
 -- Define a counter variable
@@ -110,6 +119,8 @@ local qPyodideDefaultCellOptions = {
   ["read-only"] = "false",
   ["output"] = "true",
   ["comment"] = "",
+  ["code-fold"] = "",
+  ["pdf-fallback"] = "",
   ["label"] = "",
   ["autorun"] = "",
   ["classes"] = "",
@@ -271,6 +282,13 @@ local function setPyodideInitializationOptions(meta)
     feedbackHints = pandoc.utils.stringify(pyodide["feedback-hints"])
   end
 
+  -- Document-wide default for the PDF/non-interactive fallback. Default:
+  -- false (unchanged legacy behavior). Overridable per cell via
+  -- `#| pdf-fallback: ...`.
+  if isVariablePopulated(pyodide['pdf-fallback']) then
+    pdfFallback = pandoc.utils.stringify(pyodide["pdf-fallback"])
+  end
+
   -- Attempt to install different packages.
   if isVariablePopulated(pyodide["packages"]) then
     -- Create a custom list
@@ -314,10 +332,10 @@ end
 
 local function initializationPyodide()
 
-  -- Zellcode als JSON in ein Inline-<script> schreiben: Enthaelt der Code die
-  -- Zeichenfolge "</script>", beendet der HTML-Parser das Skript mittendrin und
-  -- der Rest der Seite erscheint als Text. "</" wird deshalb zu "<\/" maskiert
-  -- (in JSON und JavaScript identisch, im HTML aber harmlos).
+  -- Write cell code as JSON into an inline <script>: if the code contains
+  -- the string "</script>", the HTML parser ends the script tag mid-way and
+  -- the rest of the page shows up as text. "</" is therefore escaped to
+  -- "<\/" (identical in JSON and JavaScript, but harmless in HTML).
   local cellDetails = quarto.json.encode(qPyodideCapturedCodeBlocks)
   cellDetails = cellDetails:gsub("</", "<\\/")
 
@@ -400,20 +418,22 @@ local function ensurePyodideSetup()
   -- Otherwise, let's include the initialization script _once_
   hasDonePyodideSetup = true
 
-  -- COI Service Worker: Datei in den Site-Root kopieren und im Browser registrieren.
-  -- Aktiviert SharedArrayBuffer (und damit echtes input()) auf HTTPS-Hosts wie
-  -- GitHub Pages, ohne Server-seitige COOP/COEP-Header-Konfiguration.
+  -- COI service worker: copy the file into the site root and register it in
+  -- the browser. Enables SharedArrayBuffer (and thus real input()) on HTTPS
+  -- hosts like GitHub Pages, without server-side COOP/COEP header config.
   --
-  -- Wichtig: io.open() mit einem relativen Pfad schreibt relativ zum Verzeichnis
-  -- des GERADE gerenderten Dokuments, nicht zum Projekt-Root. Bei Website-Projekten
-  -- mit Unterordnern (z. B. Kapitel_1/, Kapitel_2/, ...) landet die Datei sonst
-  -- verstreut im Quellbaum (z. B. Qmd-Files/Kapitel_1/coi-serviceworker.js) statt
-  -- im tatsächlichen Output-Verzeichnis - der von Quarto korrekt relativ
-  -- umgeschriebene <script src="/coi-serviceworker.js">-Verweis (siehe unten) läuft
-  -- dann ins Leere (404), obwohl der Pfad im HTML stimmt. quarto.project.output_directory
-  -- zeigt auf das tatsächliche Output-Verzeichnis des aktiven Profils (z. B. docs/de);
-  -- dahin schreiben behebt das. Bei Einzeldokumenten ohne Projekt (quarto.project
-  -- ist dann nil) bleibt der bisherige dokument-relative Pfad als Fallback.
+  -- Important: io.open() with a relative path writes relative to the
+  -- directory of the document CURRENTLY being rendered, not to the project
+  -- root. In website projects with subfolders (e.g. Chapter_1/, Chapter_2/,
+  -- ...), the file would otherwise end up scattered across the source tree
+  -- (e.g. Qmd-Files/Chapter_1/coi-serviceworker.js) instead of in the actual
+  -- output directory - the <script src="/coi-serviceworker.js"> reference
+  -- (rewritten correctly and relatively by Quarto, see below) then points
+  -- nowhere (404), even though the path in the HTML is correct.
+  -- quarto.project.output_directory points to the active profile's actual
+  -- output directory (e.g. docs/de); writing there fixes this. For
+  -- standalone documents without a project (quarto.project is then nil),
+  -- the previous document-relative path remains as a fallback.
   local coiContent = readTemplateFile("coi-serviceworker.js")
   if coiContent then
     local coiPath = "coi-serviceworker.js"
@@ -482,6 +502,91 @@ local function qPyodideJSCellInsertionCode(counter)
   return insertionLocation .. noscriptWarning
 end
 
+-- Bridge to Quarto's own resolved document/project/profile-level options
+-- (`code-fold:` today; the same primitive works for any other key Quarto
+-- resolves the same way, e.g. `echo`, `eval`, `warning`, `code-summary`).
+--
+-- Quarto resolves these (project + profile + document, with format-level
+-- defaulting) into a `param()` lookup that its own *core* filters (bundled
+-- in main.lua) call as a bare global -- but that global is only injected
+-- into main.lua's Lua state, not into the separate sandbox extension
+-- filters run in (confirmed empirically: `param` is undefined here, while
+-- `_G.param` still resolves to the same function via the shared top-level
+-- `_G` table). There is no documented public replacement for this in the
+-- extension Lua API as of Quarto 1.8 (`quarto.metadata.get` exists but
+-- does not return format params such as `code-fold`). Reached defensively
+-- so a future Quarto release that removes this can only make resolved
+-- values fall back to "not set", never error out.
+local function readDocumentQuartoParam(name)
+  local paramFn = rawget(_G, "param")
+  if type(paramFn) ~= "function" then
+    return nil
+  end
+  local ok, value = pcall(paramFn, name)
+  if not ok then
+    return nil
+  end
+  return value
+end
+
+local function stringifyQuartoParam(value)
+  if value == nil then
+    return nil
+  elseif type(value) == "boolean" or type(value) == "number" then
+    return tostring(value)
+  elseif type(value) == "string" then
+    return value
+  end
+  local ok, result = pcall(pandoc.utils.stringify, value)
+  if ok then
+    return result
+  end
+  return nil
+end
+
+-- Resolve one Quarto-native option for a cell: the cell's own `#| <name>:`
+-- override takes precedence over Quarto's document/project/profile-level
+-- default for the same key; `fallback` applies when neither is set.
+-- Returns the resolved value lowercased (raw strings/booleans/numbers
+-- only -- callers interpret the result themselves, same as Quarto's own
+-- `foldAttribute()`/`attribute()` helpers do for their respective option).
+local function resolveQuartoParam(name, cellOverride, fallback)
+  local raw
+
+  if isVariablePopulated(cellOverride) then
+    raw = cellOverride
+  else
+    raw = stringifyQuartoParam(readDocumentQuartoParam(name))
+  end
+
+  if raw == nil or raw == "" then
+    return fallback
+  end
+
+  return raw:lower()
+end
+
+-- Resolve the initial fold state ("hide" = start collapsed, "show" = start
+-- expanded) for one pyodide cell, mirroring Quarto's own `foldAttribute()`
+-- (see share/filters/main.lua -> foldcode.lua) so that this extension picks
+-- up the exact same `code-fold` setting Quarto's native code-fold uses.
+--
+-- Precedence:
+--   1. `#| code-fold: ...` set directly on the cell
+--   2. Quarto's own `code-fold:` -- document YAML, a profile, or the
+--      project's `_quarto.yml`.
+--   3. Neither set -> "show" (previous, unconditional default is preserved)
+local function resolveFoldState(cellOverride)
+  local resolved = resolveQuartoParam("code-fold", cellOverride, "show")
+
+  if resolved == "true" or resolved == "1" or resolved == "hide" then
+    return "hide"
+  else
+    -- Covers "false", "0", "show", "none", and anything unrecognized.
+    return "show"
+  end
+end
+
 -- Extract Quarto code cell options from the block's text
 local function extractCodeBlockOptions(block)
 
@@ -519,16 +624,47 @@ local function extractCodeBlockOptions(block)
   return cellCode, cellOptions
 end
 
+-- Interpret a `pdf-fallback` value (document- or cell-level, always a raw
+-- string coming out of YAML/`#|` parsing) as on/off.
+local function isPdfFallbackEnabled(value)
+  if isVariableEmpty(value) then
+    return false
+  end
+  local normalized = tostring(value):lower()
+  return normalized == "true" or normalized == "python" or normalized == "1"
+end
 
 -- Transform a {pyodide-python} code block into a Pyodide interactive editor.
 local function enablePyodideCodeCell(el)
 
-  -- Only process HTML output; skip markdown previews in VS Code / RStudio
-  if not (el.attr and (quarto.doc.is_format("html") or quarto.doc.is_format("markdown"))) then
+  -- Not a Pyodide cell: leave untouched regardless of output format.
+  if not (el.attr and el.attr.classes:includes("{pyodide-python}")) then
     return el
   end
 
-  if not el.attr.classes:includes("{pyodide-python}") then
+  -- Non-interactive output formats (PDF, docx, ...): the client-side
+  -- Pyodide/WASM runtime never runs here, and Quarto's own execution
+  -- engines already skipped this block during the compute phase (that's
+  -- the whole point of the non-standard "pyodide-python" language tag) --
+  -- so there is no computed output to show. Opt-in via
+  -- `pyodide: pdf-fallback: true` (document-wide) or `#| pdf-fallback:
+  -- true` (per cell, overrides the document default) to present the
+  -- source as normal, properly highlighted Python instead of the raw,
+  -- unstyled `{pyodide-python}` block; the `#|` cell-option comments that
+  -- a real Python engine would otherwise have hidden are stripped either
+  -- way. Off by default: the block passes through unchanged.
+  if not (quarto.doc.is_format("html") or quarto.doc.is_format("markdown")) then
+    local cellCode, cellOptions = extractCodeBlockOptions(el)
+
+    local fallback = pdfFallback
+    if isVariablePopulated(cellOptions["pdf-fallback"]) then
+      fallback = cellOptions["pdf-fallback"]
+    end
+
+    if isPdfFallbackEnabled(fallback) then
+      return pandoc.CodeBlock(cellCode, pandoc.Attr(el.attr.identifier, {"python"}, {}))
+    end
+
     return el
   end
 
@@ -541,6 +677,11 @@ local function enablePyodideCodeCell(el)
 
   -- Convert cell-specific option commands into attributes
   cellCode, cellOptions = extractCodeBlockOptions(el)
+
+  -- Resolve the initial fold state against Quarto's own `code-fold`
+  -- (document/project/profile), with the cell's own `#| code-fold:` taking
+  -- precedence. Overwrites the raw option with the resolved "hide"/"show".
+  cellOptions["code-fold"] = resolveFoldState(cellOptions["code-fold"])
 
   -- Modify the counter variable each time this is run to create
   -- unique code cells

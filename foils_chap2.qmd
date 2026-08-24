@@ -13,51 +13,400 @@ classoption: "notheorems"
 {{< include _imports.py >}}
 ```
 
-# Matrices and matrix multiplication
+## Matrices and matrix multiplication
 
-Some useful matrices:
+---
+
+## Creating matrices with Python
+
+```{python}
+A = np.array([[1,2,3]])
+B = np.array([[1],[2],[3]])
+```
+
+* $A$ is a row vector (a $1\times 3$-matrix), 
+* $B$ a column vector (a $3\times 1$-matrix). 
+
+Rows and columns will be indexed from $0$ and upwards, as with vectors: 
+
+```{python}
+A[0,1]
+```
+
+```{python}
+B[1,0]
+```
+---
+
+
+The $3\times 4$-matrix $A=\begin{pmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 8 \\ 9 & 10 & 11 & 12 \end{pmatrix}$:
+```{python}
+A = np.array([[1,2,3,4],[5,6,7,8],[9,10,11,12]])
+```
+The dimensions of $A$:
+```{python}
+m, n = np.shape(A)
+m, n
+```
+
+* $\mathbf{a}_{i,:}$ means the row vector obtained from row $i$ in $A$, 
+* $\mathbf{a}_{:,j}$ the column vector obtained from column $j$ in $A$. 
+
+```{python}
+#| eval: false
+A[i,:]
+A[:,j]
+```
+
+* Square brackets indicate the part of the matrix we want.
+* Colon stands for "all components". 
+
+---
+
+## Extracting a *sub-matrix*  of a matrix: 
+To extract all components from row 1 and 3, which also are in column 1, 3, and 4:
+```{python}
+A[np.ix_([0,2],[0,2,3])]
+```
+
+Note the differences in the following two calls:
+```{python}
+print(A[1,:])
+```
+```{python}
+print(A[[1],:])
+```
+The latter should be used if the result is to be used in matrix computations.
+
+---
+
+## The transpose
+
+The *transpose* of the $m\times n$-matrix $A$ is the $n\times m$-matrix with component $(i,j)$ being $a_{j,i}$. 
+We write $A^T$ for the transpose of $A$. 
+
+For $A=\begin{pmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 8 \\ 9 & 10 & 11 & 12 \end{pmatrix}$ 
+we get 
+$A^T=\begin{pmatrix} 1 & 5 & 9 \\ 2 & 6 & 10 \\ 3 & 7 & 11 \\ 4 & 8 & 12 \end{pmatrix}$.
+
+Matrices are easily transposed as follows:
+
+```{python}
+A.T
+```
+If $A=A^T$, $A$ is called *symmetric*.
+
+---
+
+## Properties of the transpose
+
+\begin{align*}
+(A+B)^T &= A^T + B^T \\
+(A-B)^T &=A^T-B^T \\
+\left(A^T\right)^T&=A \\
+(sA)^T&=sA^T
+\end{align*}
+
+---
+
+## Some useful matrices
 
 - $\mathbf{0}$: The matrix with all zeros
 - $\mathbf{1}$: The matrix with all ones.
 - $\text{diag}(\mathbf{a})$: The diagonal matrix with the vector $\mathbf{a}$ on the diagonal.
 - $I_n$: The diagonal matrix with ones on the diagonal
 
+These can be obtained as follows:
+```{python}
+#| eval: false
+np.zeros((m,n)) # Creates an mxn matrix of zeros
+np.ones((m,n))  # Creates an mxn matrix of ones
+np.diag(a)      # Creates a diagonal matrix with the components 
+                # of a on the diagonal.
+np.eye(n)       # Creates an nxn identity matrix
+```
+
 ---
 
-## Vectorised operations on matrices
+## Operations that give meaning both for vectors and matrices:
 
-If $A$ and $B$ are both $m\times n$ then
+```{python}
+np.max(A,axis=0)
+```
 
-* $A+B$ is the matrix with component $(i,j)$ being $a_{ij}+b_{ij}$, 
-* $A-B$ is the matrix with component $(i,j)$ being $a_{ij}-b_{ij}$, 
-* $tA$ is the matrix with component $(i,j)$ being $ta_{i,j}$ (where $t$ is a scalar).
+```{python}
+np.min(A,axis=0)
+```
+
+```{python}
+np.sum(A,axis=0)
+```
+
+```{python}
+np.prod(A,axis=0)
+```
+
+Difference from vector version: operations are performed column by column.
 
 ---
 
-## Matrix-vector multiplication
+## Matrix addition- and subtraction are defined component-wise.
 
-Let $A$ be an $m\times n$-matrix, and $\mathbf{x}$ a column vector with $n$ components. 
-We define
+---
+
+## Example
+Compute $3\begin{pmatrix} 1 & 4 \\ 2 & 1 \end{pmatrix} +2\begin{pmatrix} -1 & 2 \\ -2 & 1 \end{pmatrix}$.
+
+---
+
+## Vectorised functions for matrices.
+
+`sqrt`, `abs`, `exp`, and `log`, are vectorised for matrices as well. 
+The same is the case for trigonometric functions:
 $$
-\begin{aligned}
-A\mathbf{x} &= 
+\sin\begin{pmatrix} 0 & \pi/2 \\ \pi & 3\pi/2 \end{pmatrix}
+= \begin{pmatrix} \sin 0 & \sin(\pi/2) \\ \sin\pi & \sin(3\pi/2) \end{pmatrix}
+= \begin{pmatrix} 0 & 1 \\ 0 & -1 \end{pmatrix}
+$$
+
+```{python}
+np.sin(np.array([[0,np.pi/2],[np.pi,3*np.pi/2]]))
+```
+---
+
+## `max` and `min` are also vectorised for matrices.
+```{python}
+A = np.array([[1,2,3],[4,5,6]])
+B = np.array([[4,5,6],[1,2,3]])
+np.maximum(A,B)
+```
+
+```{python}
+np.minimum(A,B)
+```
+
+---
+
+## Multiplication and taking powers:
+
+```{python}
+A*B
+```
+
+```{python}
+A**B
+```
+
+---
+
+## Special Python syntax
+
+* If `A` is a matrix and `b` is a scalar, `A + b` in Python returns
+$$
 \begin{pmatrix} 
-a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n \\
-a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n \\
-\vdots \\
-a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n\end{pmatrix} \\
-&= x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots + x_n\mathbf{a}_n.
-\end{aligned}
+a_{11} + b & a_{12} + b & \cdots & a_{1n} + b \\
+a_{21} + b & a_{22} + b & \cdots & a_{2n} + b \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} + b & a_{m2} + b & \cdots & a_{mn} + b
+\end{pmatrix}
 $$
+* `1/A` returns the matrix with components $1/a_{ij}$. 
+* If $A$ is a column vector (`a`), $B$ a row vector (`b`), `a + b` returns
+$$
+\begin{pmatrix} 
+a_1 + b_1 & a_1 + b_2 & \cdots & a_1 + b_n \\
+a_2 + b_1 & a_2 + b_2 & \cdots & a_2 + b_n \\
+\vdots & \vdots & \ddots & \vdots \\
+a_m + b_1 & a_m + b_2 & \cdots & a_m + b_n
+\end{pmatrix},
+$$
+i.e., the matrix with components $(i,j)$ equal to $a_i+b_j$! 
 
 ---
 
-## Matrix-matrix multiplication
+## The Hilbert matrix
+The *Hilbert matrix* $H_n$ is the $n\times n$-matrix with components 
+$$h_{kl}=1/(k+l-1),$$
+where $1\leq k,l\leq n$. In particular 
+$$
+H_4=\begin{pmatrix} 1 & 1/2 & 1/3 & 1/4 \\ 1/2 & 1/3 & 1/4 & 1/5 \\ 1/3 & 1/4 & 1/5 & 1/6 \\ 1/4 & 1/5 & 1/6 & 1/7 \end{pmatrix}.
+$$
+To obtain this Hilbert matrix in Python: First write
+```{python}
+y = np.arange(1,5)
+y
+```
+to get a vector with 4 components (no interpretation in rows and columns). 
+
+---
+
+To *reshape* `y` to a row vector (a $1\times 4$-matrix) or a column vector (a $4\times 1$-matrix):
+```{python}
+y.reshape((1,-1))
+```
+```{python}
+y.reshape((-1,1))
+```
+$-1$ here means that the number of rows/columns is calculated automatically, from the requirement that there should be only one row/column.
+
+---
+
+The Hilbert matrix is now
+```{python}
+x = y.reshape((1,-1))
+1/(x + x.T - 1)
+```
+To reshape a row/column vector back to a vector (without interpretation in rows/columns):
+```{python}
+x.reshape(-1)
+```
+
+---
+
+## The Vandermonde matrix
+The matrix
+$$
+V=
+\begin{pmatrix}
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & x_m & \cdots & x_m^n
+\end{pmatrix}
+$$
+is called a *Vandermonde matrix*, $x_1,\dots,x_m$ are called its *generators*. 
+
+If we collect the generators of the vandermonde matrix in the column vector `x`, and the powers $0$,...,$n$ in the row vector `p`, we obtain the Vandermonde matrix from
+```{python}
+#| eval: false
+p = np.arange(0,n+1).reshape((1,-1));
+V = x**p
+```
+
+---
+
+
+## The discrete Fourier transform
+
+Matrices can also have complex components: The *DFT matrix*, $F_N$, is the $N\times N$-vandermonde matrix with generators $\{e^{-2\pi ik/N}\}_{k=0}^{N-1}$. 
+
+$\text{DFT}_N$ thus has components $e^{-2\pi ikn/N}$, where $0\leq k,n<N$. 
+
+It can be obtained with the code
+```{python}
+#| eval: false
+p = np.arange(0,N).reshape((1,-1))
+F = np.exp( -2*np.pi*1j*p.T*p )
+```
+Here there is vectorised multiplication of a column vector with a row vector in the exponent, giving us all possible values for $kn$. 
+The exponential function is also vectorised, i.e., $e^A$ gives the matrix with components $(k,n)$ equal to $e^{a_{kn}}$. 
+
+---
+
+## Definition of matrix-vector multiplication
+
+---
+
+This means that the system
+$$
+\begin{array}{lllll}
+a_{11}x_1 &+ a_{12}x_2 &+ \cdots &+ a_{1n}x_n &= b_1 \\
+a_{21}x_1 &+ a_{22}x_2 &+ \cdots &+ a_{2n}x_n &= b_2 \\
+\vdots        & \vdots         & \vdots    & \vdots         & \vdots\\
+a_{m1}x_1 &+ a_{m2}x_2 &+ \cdots &+ a_{mn}x_n &= b_m
+\end{array}
+$$ {#eq-likningsform}
+more compactly can be written as $A\mathbf{x}=\mathbf{b}$. $A$ is called the *coefficient matrix* of the system.
+
+* $A\mathbf{x}$ is defined if and only if  the number of columns in $A$ equals the number of components in $\mathbf{x}$, 
+* $A\mathbf{x}$ then can be interpreted as $m$ scalar products (between the rows in $A$, and $\mathbf{x}$). 
+
+--- 
+
+## Example
+
+Let us compute $A\mathbf{x}$ when $A=\begin{pmatrix} 2 & 1 & -2 \\ 3 & 0 & -1 \\ 7 & -4 &2\end{pmatrix}$ 
+and $\mathbf{x}=\begin{pmatrix}3 \\ -1 \\ -2\end{pmatrix}$ (well-defined since the number of columns in $A$  
+equals the number of components in $\mathbf{x}$). 
+
+---
+
+## Definition of matrix-matrix multiplication
+
+We want to solve @eq-likningsform for different right hand sides $\mathbf{b}_1,...,\mathbf{b}_k$:
+\begin{align*}
+A\mathbf{x}_1 &= \mathbf{b}_1 & 
+A\mathbf{x}_2 &= \mathbf{b}_2 &
+& \cdots &
+ A\mathbf{x}_k &= \mathbf{b}_k
+\end{align*}
+We seek a compact notation also for the collection of these systems.
 
 If $A$ is an $m\times n$ matrix, and $X$ an $n\times k$-matrix, we define $AX$ as the $m\times k$-matrix
 $$
 AX = \begin{pmatrix} AX_{:,1} & AX_{:,2} & \cdots & AX_{:,k} \end{pmatrix} 
 $$
+Column $i$ in the matrix equation $AX=B$ is thus exactly the system $A\mathbf{x}_i = \mathbf{b}_i$.
+
+---
+
+## Inner form of a matrix product
+
+From the definition of the matrix-vector product: 
+$$ 
+(AX)_{ij} = (AX_{:,j})_i = \sum_{r=1}^n a_{ir}x_{rj}. 
+$$ {#eq-indreformprod}
+which is how we normally compute the product of two matrices.
+
+---
+
+## Example
+Compute the matrix product
+\begin{align*}
+\begin{pmatrix} 2 & 4 & 3 \\ 1 & -1 & 3 \end{pmatrix}\begin{pmatrix} 2 & -1 \\ 4 & 1 \\ 2 & -1\end{pmatrix}
+\end{align*}
+
+---
+
+## Verification with Python
+
+```{python}
+A = np.array([[2,4,3],[1,-1,3]])
+B = np.array([[2,-1],[4,1],[2,-1]])
+A @ B
+```
+
+---
+
+## Interpretation in terms of the scalar product: 
+
+* Let $A$ have rows $\mathbf{a}_1$ and $\mathbf{a}_2$, 
+* $B$ have columns $\mathbf{b}_1$ and $\mathbf{b}_2$. 
+
+We compute 
+
+$\mathbf{a}_1\cdot\mathbf{b}_1$:
+
+$\mathbf{a}_1\cdot\mathbf{b}_2$: 
+
+$\mathbf{a}_2\cdot\mathbf{b}_1$: 
+
+$\mathbf{a}_2\cdot\mathbf{b}_2$:
+
+---
+
+## The outer product
+Let $\mathbf{a}\in\mathbb{R}^m$ and $\mathbf{x}\in\mathbb{R}^n$ be column vectors. We have that
+\begin{align*}
+\mathbf{a}\mathbf{x}^T&=\begin{pmatrix} a_1 \\ a_2 \\ \vdots \\ a_m \end{pmatrix}\begin{pmatrix}x_1 & x_2 & \cdots & x_n\end{pmatrix} = 
+\begin{pmatrix}
+a_1x_1 & a_1x_2 & \cdots & a_1x_n \\
+a_2x_1 & a_2x_2 & \cdots & a_2x_n \\
+\vdots & \vdots & \ddots & \vdots \\
+a_mx_1 & a_mx_2 & \cdots & a_mx_n \\
+\end{pmatrix}
+\end{align*}
+$\mathbf{a}\mathbf{x}^T$ is called the *outer product* of $\mathbf{a}$ and $\mathbf{x}$.
 
 ---
 
@@ -72,6 +421,38 @@ Let $A$, $B$, and $C$ be matrices. The following hold
 5. If $A$ is $m\times n$ then $AI_n=A$ and $I_mA=A$
 
 ---
+
+## Some observations
+
+* If we multiply many matrices, 1. here implies that  it does not matter which ''neighbouring matrices'' we multiply first.
+* It therefore does not matter where we set the parenthesis in matrix multiplication. 
+* Therefore, the parenthesis are usually omitted, i.e., one writes $ABC$ instead of $(AB)C=A(BC)$). 
+* We can, however, not change the order of the matrices: 
+\begin{align*}
+\begin{pmatrix} 1 & 0\\ 0 & 0 \end{pmatrix} \begin{pmatrix} 0 & 0 \\ 1 & 0\end{pmatrix} &= \begin{pmatrix} 0 & 0\\ 0 & 0 \end{pmatrix} \\
+\begin{pmatrix} 0 & 0 \\ 1 & 0\end{pmatrix} \begin{pmatrix} 1 & 0\\ 0 & 0 \end{pmatrix} &= \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}.
+\end{align*}
+
+---
+
+## Proofs:
+
+---
+
+## Outer form of matrix multiplication
+
+We use the notation $\mathbf{a}_{:r}$ for column $r$ in $A$, and $\mathbf{x}_{r:}$ for row $r$ in $X$:
+We have that
+\begin{align*}
+AX&=\sum_{r=1}^k \mathbf{a}_{:r}\mathbf{x}_{r:}.
+\end{align*}
+
+---
+
+## Proof: 
+
+---
+
 
 ## Linear transformations and matrix multiplication
 
@@ -93,36 +474,149 @@ where $\mathbf{e}_i$ was the column vector with $1$ in component $i$, and $0$ ot
 
 ---
 
+## Proof: 
+
+---
+
 ## The matrix of the projection operator
 
-The projection operator $\text{proj}_{\mathbf{b}}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is linear (follows from the properties of the scalar product). 
-The matrix of $\text{proj}_{\mathbf{b}}$ is 
-\begin{align*}
-\frac{\mathbf{b}}{|\mathbf{b}|} \left(\frac{\mathbf{b}}{|\mathbf{b}|}\right)^T.
-\end{align*}
-Such matrices are called *projection matrices*.
-If $\mathbf{b}$ has length $1$, the matrix is $\mathbf{b}\mathbf{b}^T$. 
+The projection operator $\text{proj}_{\mathbf{b}}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ 
+is linear in $\mathbf{a}$ (follows from properties of the scalar product). We compute the matrix of $\text{proj}_{\mathbf{b}}$:
 
 ---
 
 ## The matrix of a rotation
-The mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with angle $\theta$ has matrix
-$$A=\begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}$$
-since
-\begin{align*}
-\mathbf{F}(\mathbf{e}_1) &= \begin{pmatrix}\cos\theta \\ \sin\theta \end{pmatrix} \\ 
-\mathbf{F}(\mathbf{e}_2) &= \begin{pmatrix}\cos(\theta+\pi/2) \\ \sin(\theta+\pi/2) \end{pmatrix}
-=\begin{pmatrix}-\sin\theta \\ \cos\theta \end{pmatrix}. 
-\end{align*}
-
-
-
-
-
+Consider the mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with angle $\theta$.
+We compute its matrix: 
 
 ---
 
 ## Plotting polynomials
+
+* Matrix multiplication can be used naturally to plot polynomials. 
+* The function `plt.plot` plots curves in the plane.
+* Common syntax for `plt.plot` takes arguments `x` and `y`, containing the $x$- and $y$-coordinates of the plot points. 
+
+
+Let us plot the polynomials
+\begin{align*} q_1(x)&=x & q_2(x)&=x^2 & q_3(x)&=x^3 \end{align*}
+together, using $m$ points in the interval $[0,1]$:
+
+---
+
+```{python}
+#| include: false
+m=100
+```
+```{python}
+#| label: fig-simpleplot
+#| fig-cap: "Plot of the polynomials $q_1(x)=x$, $q_2(x)=x^2$, and $q_3(x)=x^3$."
+x = np.linspace(0,1,m).reshape((-1,1))
+plt.plot(x, x)
+plt.plot(x, x**2)
+plt.plot(x, x**3)
+plt.legend(['q_1','q_2','q_3'])
+```
+
+---
+
+The `plt.plot` commands above can also be assembled into one call:
+```{python}
+#| eval: false
+plt.plot(x, x, x, x**2, x, x**3)
+```
+---
+
+## Stacking the polynomial coefficients in a vector: 
+Let the first polynomial be 
+$$q_1(x)=c_0+c_1x+\cdots+c_nx^n,$$
+and plot points $x_1$,...,$x_m$. We write
+$$
+\begin{aligned}
+q_1(x_1) &= c_0+x_1c_1+\cdots+x_1^nc_n \\
+q_1(x_2) &= c_0+x_2c_2+\cdots+x_2^nc_n \\
+&\vdots \\
+q_1(x_m) &= c_0 + x_mc_1 +\cdots + x_m^nc_n.
+\end{aligned}
+$$
+By the definition of matrix-vector-multiplication:
+$$
+\begin{pmatrix} q_1(x_1) \\ q_1(x_2) \\ \vdots \\ q_1(x_m) \end{pmatrix} = 
+\begin{pmatrix}
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & x_m & \cdots & x_m^n
+\end{pmatrix}
+\begin{pmatrix} c_0 \\ c_1 \\ \vdots \\ c_n \end{pmatrix},
+$$ {#eq-pol1}
+where we recognise a Vandermonde matrix.
+
+---
+
+Add another polynomial, $q_2(x)=d_0+d_1x+\cdots+d_nx^n$:
+$$
+\begin{pmatrix} q_2(x_1) \\ q_2(x_2) \\ \vdots \\ q_2(x_m) \end{pmatrix} = 
+\begin{pmatrix}
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & x_m & \cdots & x_m^n
+\end{pmatrix}
+\begin{pmatrix} d_0 \\ d_1 \\ \vdots \\ d_n \end{pmatrix}.
+$$ {#eq-pol2}
+By the definition of matrix multiplication this can be assembled into
+$$
+\begin{pmatrix} q_1(x_1) & q_2(x_1) \\ q_1(x_2) & q_2(x_2) \\ \vdots & \vdots \\ q_1(x_m) & q_2(x_m) \end{pmatrix} = 
+\begin{pmatrix}
+1 & x_1 & \cdots & x_1^n  \\
+1 & x_2 & \cdots & x_2^n \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & x_m & \cdots & x_m^n
+\end{pmatrix}
+\begin{pmatrix} c_0 & d_0 \\ c_1 & d_1 \\ \vdots & \vdots \\ c_n & d_n \end{pmatrix},
+$$ {#eq-pol12}
+and in the same way if we have even more polynomials. 
+
+---
+
+Computing the Vandermonde matrix:
+
+```{python}
+#| include: false
+n = 3
+```
+```{python}
+#| output: false
+p = np.arange(0,n+1).reshape((1,-1))
+V = x**p
+```
+
+We collect the coefficients of the three polynomials $q_1$, $q_2$, and $q_3$, in column vectors `q1`, `q2`, and `q3`, 
+and compute @eq-pol12:
+```{python}
+#| output: false
+q1 = np.array([[0],[1],[0],[0]])
+q2 = np.array([[0],[0],[1],[0]])
+q3 = np.array([[0],[0],[0],[1]])
+Y = V @ np.block([q1,q2,q3])
+```
+This gives a matrix with three columns, where 
+
+* column 1 contains values for $q_1$, 
+* column 2 for $q_2$, 
+* column 3 for $q_3$.
+
+---
+
+## Plotting the polynimials
+
+```{python}
+#| output: false
+plt.plot(x, Y)
+plt.legend(['q_1','q_2','q_3'])
+```
+This is a new syntax for the `plt.plot`-function. 
 
 ---
 
@@ -134,3 +628,61 @@ $$
 $$
 for the matrix where the components in these four matrices are placed over, under, to the left, or to the right of each other as indicated. 
 Lines are used to separate the blocks. We call this a *block matrix*. 
+
+What requirements are there on the matrices used to assemble a block matrix?
+
+---
+
+## Creating a block matrix: 
+```{python}
+#| eval: false
+np.block([[A,B],[C,D]])
+```
+
+---
+
+## Example
+
+Let
+\begin{align*}
+A &=\begin{pmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{pmatrix} &
+B &= \begin{pmatrix} 2 & 2 \\ 2 & 2 \end{pmatrix} &
+C &= \begin{pmatrix} 3 & 3 & 3 \\ 3 & 3 & 3 \\ 3 & 3 & 3 \end{pmatrix} &
+D &= \begin{pmatrix} 4 & 4 \\  4 & 4 \\ 4 &4 \end{pmatrix}
+\end{align*}
+What is then $\left(\begin{array}{c|c} A & B \\ \hline C & D \end{array}\right)$?
+
+---
+
+## Verification
+
+```{python}
+A = np.array([[1,1,1],[1,1,1]])
+B = np.array([[2,2],[2,2]])
+C = np.array([[3,3,3],[3,3,3],[3,3,3]])
+D = np.array([[4,4],[4,4],[4,4]])
+np.block([[A,B],[C,D]])
+```
+---
+
+What are the requirements for the product 
+$$
+\left(\begin{array}{c|c} A & B \\ \hline C & D \end{array}\right)
+\left(\begin{array}{c|c} E & F \\ \hline G & H \end{array}\right)
+$$ {#eq-blockmatrixprod}
+of two block matrices to give meaning?
+
+Can be computed as
+```{python}
+#| eval: false
+np.block([[A,B],[C,D]]) @ np.block([[E,F],[G,H]])
+```
+Can also be computed with ordinary matrix multiplication:
+$$
+\left(\begin{array}{c|c} AE+BG & AF+BH \\ \hline CE+DG & CF+DH \end{array}\right)
+$$
+
+```{python}
+#| eval: false
+np.block([[A@E +B@G,A@F+B@H],[C@E+D@G,C@F+D@H]]) 
+```

@@ -14,6 +14,9 @@ format:
         \printindex
   html:
     theme: cosmo
+    pyodide:
+      cell-options:
+        autorun: true
 
   
 book:
