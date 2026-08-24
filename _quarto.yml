@@ -6,3 +6,4 @@ filters:
   - pyodide-interaktiv
 pyodide:
   pdf-fallback: true
+  pdf-autoexec: true
