@@ -613,14 +613,16 @@ Let us take a look at some useful linear transformations, and find their matrice
 
 ::: {#exm-projeksjonmatr name='Projections'}
 From the properties of the scalar product it follows that the projection operator $\text{proj}_{\mathbf{b}}(\mathbf{a})=\frac{\mathbf{a}\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$ is linear. The matrix of $\text{proj}_{\mathbf{b}}$ is 
-\begin{align*}
+$$
+\begin{aligned}
 &\begin{pmatrix} \text{proj}_{\mathbf{b}}(\mathbf{e}_1) & \text{proj}_{\mathbf{b}}(\mathbf{e}_2) & \cdots & \text{proj}_{\mathbf{b}}(\mathbf{e}_n) \end{pmatrix} \\
 &= \begin{pmatrix} \frac{\mathbf{e}_1\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} & \frac{\mathbf{e}_2\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b} & \cdots & \frac{\mathbf{e}_n\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}\end{pmatrix}
 = \begin{pmatrix} \frac{b_1}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|} & \frac{b_2}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|}\end{pmatrix} \\
 &= \begin{pmatrix} \frac{\mathbf{b}}{|\mathbf{b}|}\frac{b_1}{|\mathbf{b}|} & \frac{\mathbf{b}}{|\mathbf{b}|}\frac{b_2}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|}\frac{\mathbf{b}}{|\mathbf{b}|}\end{pmatrix}
 = \frac{\mathbf{b}}{|\mathbf{b}|} \begin{pmatrix} \frac{b_1}{|\mathbf{b}|} & \frac{b_2}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|} \end{pmatrix}
 = \frac{\mathbf{b}}{|\mathbf{b}|} \left(\frac{\mathbf{b}}{|\mathbf{b}|}\right)^T.
-\end{align*}
+\end{aligned}
+$$
 The second last equality used the definition of matrix multiplication, while the last equality used that
 $\frac{\mathbf{b}}{|\mathbf{b}|} = \begin{pmatrix} b_1/|\mathbf{b}| \\ b_2/|\mathbf{b}| \\ \vdots \\ b_n/|\mathbf{b}|\end{pmatrix}$, so that  
 $\left(\frac{\mathbf{b}}{|\mathbf{b}|}\right)^T = \begin{pmatrix} \frac{b_1}{|\mathbf{b}|} & \frac{b_2}{|\mathbf{b}|} & \cdots & \frac{b_n}{|\mathbf{b}|} \end{pmatrix}$. 
@@ -664,7 +666,6 @@ together, with $m$ points distributed over the interval $[0,1]$, this can be ach
 
 ```{pyodide-python}
 #| autorun: true
-#| include: false
 m=100
 ```
 ```{pyodide-python}
@@ -1091,7 +1092,7 @@ $$
 = \begin{pmatrix}4+20+9\\2-5-6\\-6-5+3\end{pmatrix} = \begin{pmatrix}33\\-9\\-8\end{pmatrix}
 $$
 ```{pyodide-python}
-A = np.array([[2,4,3],[1,-1,-2],[-3,-1,1]]) 
+A = np.array([[2,4,3],[1,-1,-2],[-3,-1,1]])
 B = np.array([[2],[5],[3]])
 print(A @ B)
 ```
