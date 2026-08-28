@@ -5,7 +5,11 @@
 #| pdf-fallback: true
 #| autorun: true
 #| include: false
-#| echo: false
+{{< include ../_imports.py >}}
+```
+
+```{python}
+#| include: false
 {{< include ../_imports.py >}}
 ```
 
@@ -1149,7 +1153,9 @@ $$
 
 ::: {#exr-primenumbers}
 Consider the following code. What does the code do? Justify your answer. Consult the `numpy` documentation on the function `np.where`.
-```{pyodide-python}
+```{python}
+#| output: false
+# pyodide: 
 a = np.arange(0,100); a[0] = -1; a[1]=-1
 for k in range(2,10):
     a[(2*k)::k] = -1

@@ -41,8 +41,8 @@ book:
         - approximation/approximation.qmd
         - differentiation/differentiation.qmd
         - integration/integration.qmd
-    - part: "Advanced linear algebra"
-      chapters:
-        - leastsquares/leastsquares.qmd
-        - svd/svdbook.qmd
-        - numeigenvals/numeigenvals.qmd
+    #- part: "Advanced linear algebra"
+      #chapters:
+        #- leastsquares/leastsquares.qmd
+        #- svd/svdbook.qmd
+        #- numeigenvals/numeigenvals.qmd

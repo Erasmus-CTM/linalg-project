@@ -1,5 +1,12 @@
 # The inverse matrix {#sec-invers}
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -109,11 +116,13 @@ Let us find the inverse matrix of $A=\begin{pmatrix} 2 & 3 & 1 \\ 1 & 4 & 1 \\ 2
 \end{align*}
 We read out the last 3 columns as $A^{-1}=\begin{pmatrix} 1 & -1/2 & -1/4 \\ 0 & 1/2 & -1/4 \\ -1 & -1/2 & 5/4 \end{pmatrix}$. 
 We can verify the result with the built-in function for computing the inverse: \index{python!np.linalg.inv}
-```{python}
+```{pyodide-python}
+#| autorun: true
 np.linalg.inv([[2,3,1],[1,4,1],[2,4,2]])
 ```
 We can also verify the answer symbolically:
-```{python}
+```{pyodide-python}
+#| autorun: true
 sym.Matrix([[2,3,1],[1,4,1],[2,4,2]]).inv()
 ```
 
@@ -503,7 +512,7 @@ Let $A$ be an invertible matrix. Write code which verifies that, when $\mathbf{b
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code generates a random $A$ and $\mathbf{b}$, and compares the two expressions.
-```{python}
+```{pyodide-python}
 #| output: false
 A = np.random.rand(5, 5)
 b = np.random.rand(5,1)

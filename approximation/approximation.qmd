@@ -1,5 +1,12 @@
 # Interpolation {#sec-app}
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -120,6 +127,7 @@ it is more efficient to do as in the code, instead of computing $\mathbf{c}=V^{-
 ```{python}
 #| lst-cap: "Code for finding points of the interpolating polynomial, adapted to canonical form"
 #| lst-label: lst-findpoints
+# pyodide: autorun
 def points_canonical(xsp, fsp):
     numpoints = xsp.shape[0] - 1
     n = np.arange(0,numpoints+1).reshape((1,-1))
@@ -168,11 +176,13 @@ A plot of this polynomial is shown in @fig-quadintex. The code verifies that the
 ```{python}
 #| fig-cap: "Three interpolation point and the corresponding quadratic interpolation polynomial."
 #| label: fig-quadintex
+# pyodide: autorun
 xsp = np.array([[0],[1],[2]])
 fsp = np.array([[1],[3],[2]])
 x, p = points_canonical(xsp, fsp)
 plt.plot(x,p)
 plt.plot(x,1+7*x/2-3*x**2/2,'--')
+plt.show()
 ```
 
 $\clubsuit$
@@ -185,6 +195,7 @@ At start we set this to `points_canonical`. In the next section we will replace 
 ```{python}
 #| lst-cap: "Code for the plotting the interpolating polynomials"
 #| lst-label: lst-plotint
+# pyodide: autorun
 def plot_p_n(f, a, b, nvals, points_p_n):
     x=[]
     for n in nvals:
@@ -201,8 +212,10 @@ $p_2$, $p_3$, and $p_4$, for $f(x)=\cos(2\pi x)$, given a uniform partition of $
 ```{python}
 #| label: fig-plotintpol
 #| fig-cap: "The interpolating polynomials $p_2$, $p_3$, and $p_4$, for $f(x)=\\cos(2\\pi x)$. $f$ is also shown."
+# pyodide: autorun
 plot_p_n( lambda x: np.cos(2*np.pi*x),  
          0, 1, [2,3,4,5], points_canonical)
+plt.show()         
 ```
 
 
@@ -296,6 +309,7 @@ The first `for`-loop applies forward substitution to find $c_0,c_1,...,c_n$.
 ```{python}
 #| lst-cap: "Code to find values of the interpolating polynomial, adapted to Newton form"
 #| lst-label: lst-pointsnewton
+# pyodide: autorun
 def points_newton(xsp, fsp):
     numpoints = np.shape(xsp)[0] - 1
     x = np.linspace(xsp[0], xsp[-1], 100).reshape((-1,1))
@@ -360,7 +374,9 @@ The interpolating polynomial is now a parabola, see @fig-tansec.
 
 ```{python}
 #| label: fig-tansec
+# pyodide: autorun
 plot_p_n(np.exp, 0, 2, [1,2], points_newton)
+plt.show()
 ```
 
 $\clubsuit$
@@ -424,7 +440,9 @@ We see that the approximation becomes better when we increase $n$.
 ```{python}
 #| fig-cap: "Interpolation of $f(x)=\\sin(x)$ with polynomials of different degrees."
 #| label: fig-sinint
-plot_p_n(np.sin, 0, 4, [1,2,3,4], points_newton) 
+# pyodide: autorun
+plot_p_n(np.sin, 0, 4, [1,2,3,4], points_newton)
+plt.show()
 ```
 
 
@@ -451,7 +469,9 @@ c_0&=0, & c_1&=1, & c_2,&=-(1-\sqrt{2}/2), & c_3&=(3+\sqrt{3}-3\sqrt{2})/6.
 ```{python}
 #| label: fig-sqrtcub
 #| fig-cap: "The function $f(x)=\\sqrt x$ (solid line) and the cubic interpolant in the four points $0$, $1$, $2$, and $3$."
-plot_p_n(np.sqrt, 0, 3, [3], points_newton) 
+# pyodide: autorun
+plot_p_n(np.sqrt, 0, 3, [3], points_newton)
+plt.show()
 ```
 $\clubsuit$
 :::
@@ -471,8 +491,10 @@ are shown in @fig-runge.
 ```{python}
 #| fig-cap: "Interpolation of the Runge function $f(x)=1/(1+x^2)$ on the interval $[-5,5]$."
 #| label: fig-runge
+# pyodide: autorun
 plot_p_n(lambda x: 1/(1+x**2), -5, 5, [10,20], points_newton)
 plt.axis([-5,5,-0.5,2])
+plt.show()
 ```
 
 Observe what happens when the degree increases: 
@@ -597,7 +619,8 @@ The period is then `T=1/freq`, and the number of samples per period is `freq_s/f
 In the following we will plot the sound samples against time. First we will plot sounds over one period. 
 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 freq_s = 44100
 freq = 440
 T= 1/freq
@@ -609,7 +632,8 @@ We pick $M=2N+1$ function values uniformly on $[0,T]$, so that $t_k=kT/M$, $0\le
 We set
 $$\mathbf{f}=(f(0\cdot T/M),f(1\cdot T/M),...,f((M-1)T/M)).$$ 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 N=20
 M=2*N+1
 tsp = np.linspace(0,T-T/M,M).reshape((-1,1))
@@ -621,12 +645,14 @@ $$
 The following function returns samples of the square wave at concrete instances in time in 
 one period.
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 def square_wave(t, T):
     return 2*(t < T/2).astype(int) -1
 ```
 We obtain the samples of the square wave at the interpolation points and the plot points as follows.
-```{python}
+```{pyodide-python}
+#| autorun: true
 fsp = square_wave(tsp, T) # samples from one period
 f = square_wave(t, T) # plot points
 ```
@@ -658,27 +684,33 @@ where $F_M$ is the DFT matrix from @exm-fouriermatrix. Moreover, $p(t)$ is a rea
 
 The proof is a bit technical, so we defer it to the end of the section. Let us first consider how this result can be implemented. 
 The theorem says that the coefficients of the interpolating function can be obtained as\index{python!np.fft.fft}
-```{python}
+```{pyodide-python}
+#| autorun: true
 c = np.fft.fft(fsp, axis = 0)/M
 ```
 We want the components in `c` to come in the same order as $(c_{-N},...,c_{-1},c_0,...,c_N)$, so we swap the two halves of this vector:\index{python!np.block}
-```{python}
+```{pyodide-python}
+#| autorun: true
 c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
 ``` 
 
 @eq-this-is-real can now be written as a matrix-vector product, and we obtain plot points of $p$ with the following implmentation.\index{python!np.real}
-```{python}
+```{pyodide-python}
+#| autorun: true
 n = np.arange(-N,N+1).reshape((1,-1))
 p = np.real( np.exp(2*np.pi*1j*n*t/T) @ c )
 ```
 We can plot this together with the square wave itself as follows.
-```{python}
+```{pyodie-python}
+#| autorun: true
 plt.plot( t, p)
 plt.plot( t, f)
 plt.legend([f"f(t), M={M}",'f(t)'])
+plt.show()
 ```
 In order to listen to a set of samples as a sound we need the following function
-```{python}
+```{pyodide-python}
+#| autorun: true
 def audiowrite(filename, f, freq_s):
     ofile = wave.open(filename, 'w')
     ofile.setsampwidth(2)
@@ -691,7 +723,8 @@ def audiowrite(filename, f, freq_s):
     ofile.close()
 ```    
 We now generate sounds corresponding to a sine, a square wave and its interpolant (we set the sounds to last three seconds).
-```{python}
+```{pyodide-python}
+#| autorun: true
 numsec=3
 
 t = np.linspace(0,numsec,samples_per_period*numsec*freq)
@@ -709,7 +742,7 @@ The sound samples of the interpolant were scaled so that they are between -1 and
 This was necessary since the plot showed that the values of the interpolant exceeded 1, although the square wave did not. 
 
 Finally we write sound data to file:
-```{python}
+```{pyodide-python}
 #| eval: false
 audiowrite('sine.wav', sine, freq_s)
 audiowrite('square.wav', f, freq_s)
@@ -834,7 +867,7 @@ There exist many polynomials of degree $\leq n$ which interpolate a given functi
 In this exercise we will look at code which computes the matrix we need to find the canonical form of the interpolating polynomial. 
 @lst-plotint computed the Vandermonde matrix with the code
 
-```{python}
+```{pyodide-python}
 #| eval: false
 p = np.arange(0,n+1).reshape((1,-1))
 A = x**p
@@ -842,7 +875,7 @@ A = x**p
 
 Compare this with the following alternative code:
 
-```{python}
+```{pyodide-python}
 #| eval: false
 A[:,0] = np.ones((n+1,1))
 for k in range(1,n+1):
@@ -946,7 +979,7 @@ s&=&c_0 + xs.
 $$
 After this we get that $s=p_n(x)$. The code can look as follows.
 
-```{python}
+```{pyodide-python}
 #| eval: false
 s = c[n]
 for k in range(n-1,-1,-1):
@@ -1314,10 +1347,9 @@ and
 
 ::: {#exr-progtriwave}
 Fill out the code below so that it generalises the code developed in @sec-trigpol. 
-```{pyodide-python}
-import numpy as np
-import matplotlib.pyplot as plt
-
+```{python}
+#| eval: false
+# pyodide:
 def plot_trig_approx(f, Nvals):
     ...
     

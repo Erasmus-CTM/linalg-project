@@ -1,9 +1,17 @@
 # Matrices and matrix multiplication
 
 ```{pyodide-python}
+#| pdf-fallback: true
 #| autorun: true
+#| include: false
 {{< include ../_imports.py >}}
 ```
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 
 In a vector all components are listed sequentially. In a *matrix*\index{Matrix} they are listed in two directions: vertically and horizontally. 
 We will use uppercase letters to represent matrices. If $A$ is a matrix one writes $a_{ij}$ for the component in row $i$ and column $j$, 
@@ -27,10 +35,12 @@ $A$ is a row vector (or a $1\times 3$-matrix), $B$ a column vector (or a $3\time
 We will as before write $a_i$ for the components in a vector, regardless of whether it is a row vector or a column vector. Rows and columns will be indexed from $0$ and upwards, just as for vectors:
 
 ```{pyodide-python}
+#| autorun: true
 print(A[0,1])
 ```
 
 ```{pyodide-python}
+#| autorun: true
 print(B[1,0])
 ```
 In many math books it is common to interpret a vector as a column vector, if nothing else is said. 
@@ -664,14 +674,12 @@ The `plt.plot` function accepts many variants. For instance, if we want to plot 
 \begin{align*} q_1(x)&=x & q_2(x)&=x^2 & q_3(x)&=x^3 \end{align*}
 together, with $m$ points distributed over the interval $[0,1]$, this can be achieved as follows:
 
-```{pyodide-python}
-#| autorun: true
-m=100
-```
-```{pyodide-python}
-#| autorun: true
+
+```{python}
 #| label: fig-simpleplot
 #| fig-cap: "Plot of the polynomials $q_1(x)=x$, $q_2(x)=x^2$, and $q_3(x)=x^3$."
+# pyodide: autorun
+m = 100
 x = np.linspace(0,1,m).reshape((-1,1))
 plt.plot(x, x)
 plt.plot(x, x**2)
@@ -755,7 +763,7 @@ Y = V @ np.block([q1,q2,q3])
 This gives a matrix with three columns, where column 1 contains values for $q_1$, column 2 for $q_2$, and column 3 for $q_3$.
 The polynomials can now be plotted together by writing
 ```{pyodide-python}
-#| output: false
+#| eval: false
 plt.plot(x, Y)
 plt.legend(['q_1','q_2','q_3'])
 ```
@@ -767,7 +775,7 @@ This is a new syntax for the `plt.plot`-function, where
 If `x` is a column vector and `Y` a matrix with as many rows as `x` and 3 columns, then `plt.plot(x,Y)` is the same as writing
 ```{pyodide-python}
 #| autorun: true
-#| output: false
+#| eval: false
 plt.plot(x, V @ q1, x, V @ q2, x, V @ q3)
 ```
 This also applies more generally if we have more columns with polynomials: 

@@ -1,5 +1,12 @@
 # Orthogonally diagonalisable matrices. Condition numbers.
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -272,11 +279,13 @@ The code below plots condition numbers for $n\times n$ Hilbert matrices, for dif
 ```{python}
 #| label: fig-cond
 #| fig-cap: "Condition numbers of $n\\times n$ Hilbert matrices, for different values of $n$"
+# pyodide: autorun
 nvals = np.arange(1,21)
 ch = np.zeros(20)
 for k in nvals:
     ch[k-1] = np.linalg.cond(hilbert(k))
 plt.semilogy(nvals,ch)
+plt.show()
 ```
 
 Here we used the command `cond(A)` \index{python!np.linalg.cond}, which returns the condition number of a matrix.

@@ -1,5 +1,12 @@
 # Diagonalisation and Systems of differential equations.
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -85,11 +92,13 @@ The solutions we get by choosing $C_i\in\{1.5,2,2.5\}$ (9 solutions) are shown i
 ```{python}
 #| label: fig-phaseplot
 #| fig-cap: "Plot of nine solutions to the system with matrix $A=\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$."
+# pyodide: autorun
 t = np.linspace(-2,2,100)
 for C1 in [1.5,2,2.5]:
     for C2 in [1.5,2,2.5]:
         plt.plot( -C1*np.exp(-t) + C2*np.exp(t) , \
                    C1*np.exp(-t) + C2*np.exp(t) )
+plt.show()
 ```
 
 $\clubsuit$
@@ -160,6 +169,8 @@ finds $C$, computes $C\mathbf{p}=\mathbf{c}+i\mathbf{d}$, and then the solution 
 
 
 ```{python}
+# pyodide: autorun
+
 def findcomps(A,t_0,x_0):
     D,P=np.linalg.eig(A)
     C = np.linalg.solve(P, x_0)
@@ -191,25 +202,31 @@ We have used the initial value $\mathbf{x}(2)=(2,3)$, so that all solutions star
 
 ```{python}
 #| label: fig-diffeq1
+# pyodide: autorun
 t_0 = 2
 x_0 = np.array([[2],[3]])
 A_1 = np.array([[0.1,1],[-1,0.1]])
 t, x, y, a, c_1, d_1 = findcomps(A_1,t_0,x_0)
 plt.plot(x.T,y.T)
+plt.show()
 ```
 
 ```{python}
 #| label: fig-diffeq2
+# pyodide: autorun
 A_2 = np.array([[1,1],[-1,-0.1]])
 t, x, y, a, c_1, d_1 = findcomps(A_2,t_0,x_0)
 plt.plot(x.T,y.T)
+plt.show()
 ```
 
 ```{python}
 #| label: fig-diffeq3
+# pyodide: autorun
 A_3 = np.array([[0,1],[-1,0]])
 t, x, y, a, c_1, d_1 = findcomps(A_3,t_0,x_0)
 plt.plot(x.T,y.T)
+plt.show()
 ```
 
 One can also plot $t$ against $x_i(t)$. Doing this one can visualise all components in the same plot, also when $n>2$.
@@ -223,10 +240,12 @@ These are also included in the plot.
 ```{python}
 #| label: fig-complexeigs
 #| fig-cap: "Plot of $x_1(t)$ for the system with matrix $A_1$. The upper and lower bounds from @eq-nedreogovre are also shown."
+# pyodide: autorun
 t, x, y, a, c_1, d_1 = findcomps(A_1,t_0,x_0)
 plt.plot(t.T,x.T)
 plt.plot(t.T,2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
 plt.plot(t.T,-2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
+plt.show()
 ```
 $\clubsuit$
 :::

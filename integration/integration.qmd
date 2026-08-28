@@ -1,8 +1,18 @@
 # Numerican integration {#sec-integration}
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
+{{< include midpointn.py >}}
+{{< include trapezoidaln.py >}}
+{{< include simpsonn.py >}}
 ```
 
 In numerical differentiation known function values are used to find approximations to the derivative.
@@ -159,12 +169,10 @@ The midpoint method with one sub-interval (@fig-midapp1), and five sub-intervals
 :::
 An implementation of the midpoint method can be as follows.
 
-```{python}
-def midpointn(f, a, b, n):
-    h = (b - a)/n
-    return h*sum( f(a + h/2 + np.arange(0,n)*h))
+```{pyodide-python}
+#| autorun: true
+{{< include midpointn.py >}}
 ```
-
 
 
 The midpoint method gives only an approximation, and will produce a small error. 
@@ -374,10 +382,9 @@ With some more computation one can show that  the trapezoidal rule has an error 
 
 An implementation of the trapezoidal rule can be as follows.
 
-```{python}
-def trapezoidaln(f, a, b, n):
-    h = (b - a)/n
-    return h*( (f(a) + f(b))/2 + sum( f(a + np.arange(1,n)*h)))
+```{pyodide-python}
+#| autorun: true
+{{< include trapezoidaln.py >}}
 ```
 
 
@@ -420,11 +427,9 @@ which goes a bit outside the curriculum).
 
 An implementation of Simpson's method can be as follows
 
-```{python}
-def simpsonn(f, a, b, n):
-    h = (b - a)/(2*n)
-    return h*( f(a) + f(b) + 2*sum( f(a+2*h*np.arange(1,n) ))  \
-                    + 4*sum( f(a+h+2*h*np.arange(0,n))))/3
+```{pyodide-python}
+#| autorun: true
+{{< include simpsonn.py >}}
 ```
 
  
@@ -640,6 +645,7 @@ Here we can use the `sum`-command the following way to find $\underline{I}(\Pi)$
 
 ```{python}
 #| lst-cap: "Computation of the upper/lower-integral"
+# pyodide: autorun
 def int_vals(n):
     l = (1/n)*np.sum(np.exp(   np.arange(0,n)/n ))
     u = (1/n)*np.sum(np.exp( np.arange(1,n+1)/n ))
@@ -649,8 +655,10 @@ def int_vals(n):
 ```
 
 Running the code you get 
-```{python}
+```{pyodide-python}
+#| autorun: true
 l,u,l_err,u_err=int_vals(10)
+print(l,u,l_err,u_err)
 ```
 
 :::::::
@@ -663,13 +671,14 @@ $3\times 10^{-3}$.
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 We run the following code
-```{python}
+```{pyodide-python}
+#| autorun: true
 n = 1
 l,u,l_err,u_err=int_vals(n)
 while l_err > 3*10**(-3):
     n += 1
     l,u,l_err,u_err = int_vals(n)
-n
+print(n)
 ```
 
 :::::::
@@ -718,8 +727,9 @@ $$\int_0^1 e^x\, dx=e-1.$$
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code solves the exercise.
-```{python}
-midpointn(np.exp,0,1,10)
+```{pyodide-python}
+#| autorun: true
+print(midpointn(np.exp,0,1,10))
 ```
 :::::::
 :::::
@@ -760,12 +770,14 @@ Repeat @exr-sinmidpoint and @exr-estimateh for the trapezoidal rule.
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 Code which solves @exr-sinmidpoint are as follows:
-```{python}
-trapezoidaln(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6)
+```{pyodide-python}
+#| autorun: true
+print(trapezoidaln(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6))
 ```
 Code which solves @exr-estimateh:
-```{python}
-trapezoidaln(np.exp,0,1,10)
+```{pyodide-python}
+#| autorun: true
+print(trapezoidaln(np.exp,0,1,10))
 ```
 The error is bounded by
 $$
@@ -838,12 +850,14 @@ Repeat @exr-sinmidpoint and @exr-estimateh with Simpson's method.
 $h\le 1.8\times 10^{-2}$
 
 Code which solves @exr-sinmidpoint:
-```{python}
-simpsonn(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6)
+```{pyodide-python}
+#| autorun: true
+print(simpsonn(lambda x : np.sin(x)/(1+x**2), 0, np.pi/2, 6))
 ```
 Code which solves @exr-estimateh:  
-```{python}
-simpsonn(np.exp,0,1,10)
+```{pyodide-python}
+#| autorun: true
+print(simpsonn(np.exp,0,1,10))
 ```
 :::::::
 :::::

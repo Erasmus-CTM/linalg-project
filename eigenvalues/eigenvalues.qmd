@@ -1,5 +1,12 @@
 # Eigenvalues and eigenvectors
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -68,8 +75,9 @@ We first get
 Most of us do not remember the formula for the solution to a third degree equation, so it is not obvious how to proceed. 
 One can find the roots of a polynomial with help of the command `roots`. This takes the coefficients of the polynomial as input:
 
-```{python}
-np.roots(np.array([-1,6,-11,6]))
+```{pyodide-python}
+#| autorun: true
+print(np.roots(np.array([-1,6,-11,6])))
 ```
 
 Alternatively one can find the roots by trial and error. Then we probably first will find the root $\lambda_1=1$. 
@@ -152,17 +160,19 @@ Instead we can use the command `np.linalg.eig`\index{python!np.linalg.eig} which
 
 If we test `np.linalg.eig` on the example above we get
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = np.array([[1,2,4],[-3,6,7],[2,-2,-1]])
 D, P = np.linalg.eig(A)
-D, P
+print(D, P)
 ```
 
 We observe several things here. Firstly, decimal numbers are returned, not integers. 
 This is the case since a numerical algorithm is used to find the roots of the characteristic polynomial. Secondly, consider the following:
 
-```{python}
-P.T@P
+```{pyodide-python}
+#| autorun: true
+print(P.T@P)
 ```
 
 Since $P^TP$ returns all possible scalar products between the columns in $P$, this shows two things:
@@ -177,9 +187,10 @@ We will soon prove that this is the case also more generally for eigenvectors co
 We would like to get exact expressions for eigenvalues and eigenvectors as well.
 This can be achieved by converting to symbolic variables: 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[1,2,4],[-3,6,7],[2,-2,-1]])
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 
 We see that the components in the eigenvectors are fractions, and that there are no decimal numbers. 
@@ -591,9 +602,10 @@ $$A-4I_3 = \begin{pmatrix} -3 & 0 & 0 \\ 0 & -1 & 1 \\ 0 & 1 & -1\end{pmatrix}
 \sim \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & -1 \\ 0 & 0 & 0 \end{pmatrix}, $$
 so that $(0,1,1)$ is a particular eigenvector.
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[1,0,0],[0,3,1],[0,1,3]])
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 :::::::
 :::::
@@ -610,9 +622,10 @@ A-2iI_2 = \begin{pmatrix} -2i & -4 \\ 1 & -2i \end{pmatrix} \sim \begin{pmatrix}
 $$
 so that $(2i,1)$ is a particular eigenvector. But then $(-2i,1)$ is a particular eigenvector for $\lambda_2=-2i$. 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[0,-4],[1,0]])
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 :::::::
 :::::
@@ -639,9 +652,10 @@ so that $(-x_2,x_2)$ is a general eigenvector. A particular eigenvector is $\mat
 Eigenvalue for $\lambda_2=1$:
 $$ A-I_2= \begin{pmatrix} -0.3 & 0.6 \\ 0.3 & -0.6 \end{pmatrix} \sim \begin{pmatrix} 1 & -2 \\ 0 & 0 \end{pmatrix},$$
 so that $(2x_2,x_2)$ is a general eigenvector. A particular eigenvector is $\mathbf{v}_2=(2,1)$.
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[7,6],[3,4]])/10
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 :::::::
 :::::
@@ -679,9 +693,10 @@ $$A-6I_2 = \begin{pmatrix} 0 & 2 \\ 0 & 0\end{pmatrix} \sim \begin{pmatrix} 0 &
 so that $(1,0)$ is a particular eigenvector. This vector spans a space of dimension one, so that 
 there is no basis for $\mathbb{R}^2$ consisting of eigenvectors for $A$.
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[6,2],[0,6]])
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 :::::::
 :::::
@@ -718,9 +733,10 @@ I-A = \begin{pmatrix} 0.3 & -0.8 \\ -0.3 & 0.8\end{pmatrix}
 $$
 $\mathbf{v}_2=\begin{pmatrix} 8 \\ 3 \end{pmatrix}$ is a particular eigenvector.
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 A = sym.Matrix([[7,8],[3,2]])/10
-A.eigenvals(), A.eigenvects()
+print(A.eigenvals(), A.eigenvects())
 ```
 :::::::
 :::::

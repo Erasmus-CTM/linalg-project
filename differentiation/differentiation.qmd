@@ -1,5 +1,12 @@
 # Numerical differentiation {#sec-differentiation}
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -74,6 +81,7 @@ The Newton quotient thus coincides with the point method based on $a$ and $a+h$ 
 #| fig-cap: "The secant (in red) of a function (in black) in the points $a$ and $a+h$, as well as the tangent in $a$ (blue)."
 #| label: fig-secapp
 #| echo: false
+# pyodide: autorun
 x=np.linspace(0,2,100)
 f = np.sqrt
 a=0.3
@@ -91,6 +99,7 @@ plt.text(a+h+0.05,0.05,'a+h')
 plt.plot([a,a],[0,f(a)],'k')
 plt.plot([a+h,a+h],[0,f(a+h)],'k')
 plt.axis([0,2,0,ktan*(2-a) + f(a)])
+plt.show()
 ```
 
 The truncation error for the Newton quotient is
@@ -142,6 +151,7 @@ A better estimate could be obtained by finding $\max_x|f''(x)|$ over a small int
 ```{python}
 #| fig-cap: "The truncation error of the  Newton quotient when $f(x)=\\sin x$ at the point $x=0.5$, for $h\\in [10^{-6},10^0]$. The plot is logarithmic. "
 #| label: fig-plotnewtonwithoutg
+# pyodide: autorun
 f = np.sin
 fd = np.cos
 a = 0.5
@@ -149,6 +159,7 @@ h = 10**(-np.arange(0,6,0.1).reshape(-1,1))
 efh = fd(a) - (f(a+h)-f(a))/h
 plt.loglog(h, np.abs(efh), 'k.', h, h/2, 'r')
 plt.legend(['Error','Bound on error'])
+plt.show()
 ```
 
 The plot looks like a line with slope $1$. Since the plot is logarithmic, this agrees with the approximation
@@ -189,6 +200,7 @@ This is illustrated in @fig-newtsymdef,
 #| fig-cap: "The secant based on $a-h$ and $a+h$ (in red) of a function $f$ (in black), as well as the tangent in $a$ (in blue). The parabola interpolating $f$ in $a-h$, $a$, and $a+h$ are also shown (in black)"
 #| label: fig-newtsymdef
 #| echo: false
+# pyodide: autorun
 x = np.linspace(0,2,100)
 f = np.sqrt
 a=0.9
@@ -218,6 +230,7 @@ plt.plot([a,a],[0,f(a)],'k')
 plt.plot([a+h,a+h],[0,f(a+h)],'k')
 plt.plot([a-h,a-h],[0,f(a-h)],'k')
 plt.axis([0,2,0,ktan*(2-a) + f(a)])
+plt.show()
 ```
 
 
@@ -362,9 +375,10 @@ m_4 & m_4^2 & m_4^3& m_4^4
 \end{align*}
 It is smart to find the inverse matrix symbolically here:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 V = sym.Matrix([[-2,4,-8,16],[-1,1,-1,1],[1,1,1,1],[2,4,8,16]])
-V.inv()
+print(V.inv())
 ```
 
 The expression above therefore becomes
@@ -436,6 +450,7 @@ The truncation error bounds are plotted against each other as follows.
 #| lst-cap: "Comparison of truncation errors"
 #| label: fig-loglogtestcomp
 #| fig-cap: "loglog plot of the estimates of the truncation errors for the four methods we have considered, for $f(x)=\\sin x$ in $x=0.5$, and  for $h\\in [10^{-6},10^0]$."
+# pyodide: autorun
 a=0.5
 h = 10**(-np.arange(0,6,0.1))
 plt.loglog(h, np.abs(np.sin(a)*h/2),
@@ -444,6 +459,7 @@ plt.loglog(h, np.abs(np.sin(a)*h/2),
                h, np.abs(np.sin(a)*h**2/12))
 plt.legend(['Newton','Symmetric Newton',
             'Four points','second derivative'])
+plt.show()
 ```
 
 Note that, if $|E_1(f;a,h)|\approx Ch^p$, we have that
@@ -881,7 +897,8 @@ Can you from this decide which approximation is best?
 ::::::: {.callout-important title='Solution' collapse="true"}
 We can draw the graph together with the secants as follows:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 x = np.arange(0,6,0.05)
 f = lambda x:  (-x**2+10*x-5)/4
 plt.plot(x,f(x))

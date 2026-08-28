@@ -1,5 +1,12 @@
 # Gaussian elimination and reduced echelon form
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -148,9 +155,10 @@ After the first five operations the matrix is on echelon form. The last matrix i
 We can bring a general matrix to reduced echelon form with the function 
 `rref` in the class `sym.Matrix`\index{python!sym.Matrix}. If we test this on the matrix above we get
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 C, cols = sym.Matrix([[0,-8,3,6],[4,-3,2,8],[1,-2,1,3]]).rref()
-C
+print(C)
 ```
 
 We see that we obtained the same matrix. 
@@ -191,7 +199,7 @@ The system was thus brought to reduced row echelon form with help of three types
 
 These are called *elementary row operations*\index{Elementary!row operation}, and are easily implemented:
 
-```{python}
+```{pyodide-python}
 #| eval: false
 A[j,:] = A[j,:] + c*A[i,:]
 A[i,:] = c*A[i,:]
@@ -199,7 +207,8 @@ A[[i,j],:] = A[[j,i], :]
 ```
 
 The 3 first operations from @exm-gauss1 can in particular be programmed as follows:
-```{python}
+```{pyodide-python}
+#| eval: false
 A=np.array([[0,-8,3,6],[4,-3,2,8],[1,-2,1,3]])
 A[[0,2],:] = A[[2,0],:]
 A[1,:] = A[1,:] - 4*A[0,:]
@@ -484,7 +493,7 @@ It follows that $A\mathbf{x}_1=\mathbf{b}_1$ as before has the solution $\mathbf
 ## Implementation of Gaussian elimination {#sec-kodegaussel}
 Let $A$ be an $m\times n$-matrix. 
 Gaussian elimination is a bit complicated to implement, but consider the following code which is a skeleton for bringing a matrix to echelon form: 
-```{python}
+```{pyodide-python}
 #| eval: false
 piv = np.zeros(m).astype(int) # Stores the positions of the pivots.
 i, j = 0, 0
@@ -512,19 +521,19 @@ If the search in the current column fails (the `if`-statement succeeds), the sea
 
 If the search in the current column succeeds, the `else`-statement is executed. Let us comment on how to implement the next three lines. 
 If the nonzero (which is in row $k$) was found below the current row (row $i$), these rows are swapped:
-```{python}
+```{pyodide-python}
 #| eval: false
 A[[k,i]] = A[[i,k]]
 ```
 We then create a leading one at position (`i`,`j`):
-```{python}
+```{pyodide-python}
 #| eval: false
 A[i,j:] = A[i,j:]/A[i,j]
 ```
 (i.e., $\mathbf{a}_i = \mathbf{a}_i/a_{ij}$, where $\mathbf{a}_i$ is row $i$ in $A$). 
 Note here that we only modified column $j$ and upwards in row $i$. We did not need to divide with $a_{ij}$ for columns $1,...,j-1$, as the entries here are zero.
 In column `j` we can zero out component $k$ by subtracting a multiple of row `i`:
-```{python}
+```{pyodide-python}
 #| eval: false
 A[k,j:] = A[k,j:] - A[k,j] * A[i,j:]
 ```
@@ -540,7 +549,7 @@ $$
 We here find $A_{(i+1):,:}$ on the left hand side, and on the right hand side the product  
 $$\begin{pmatrix} a_{(i+1)j} \\ a_{(i+2)j} \\ \vdots \\ a_{mj}\end{pmatrix} \mathbf{a}_i = A_{(i+1):,j}\mathbf{a}_i$$
 This means that we can program this as
-```{python}
+```{pyodide-python}
 #| eval: false
 A[(i+1):,j:] = A[(i+1):,j:] - A[(i+1):,[j]] @ A[[i],j:]
 ```
@@ -561,7 +570,7 @@ $$
 On the right hand side we recognise the product
 $$\begin{pmatrix} a_{1j} \\ a_{2j} \\ \vdots \\ a_{(i-1)j}\end{pmatrix} \mathbf{a}_i = A_{:(i-1),j}\mathbf{a}_i$$
 so that this can be programmed as
-```{python}
+```{pyodide-python}
 #| eval: false
 j = piv[i]
 A[:(i-1),j:] = A[:(i-1),j:] - A[:(i-1),[j]] @ A[[i], j:]
@@ -1061,7 +1070,8 @@ Write code that applies the last row operations as well.
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The last row operations can be programmed as follows
-```{python}
+```{pyodide-python}
+#| eval: false
 A[2,:] = A[2,:] + 8*A[1,:]
 A[2,:]=(-5)*A[2,:]
 A[0,:]=A[0,:]-A[2,:]
