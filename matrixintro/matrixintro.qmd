@@ -665,14 +665,14 @@ $i\mathbf{x}+3\mathbf{y}$ is then
 > We have that
 $$
 \begin{aligned}
-i\mathbf{x}+3\mathbf{y} &= i \begin{pmatrix} 3i \\ 2+i \\ 3-i \end{pmatrix} + 3\begin{pmatrix} 1-2i \\ 2-3i \\ 2+4i \end{pmatrix} 
+i\mathbf{x} + 3\mathbf{y} &= i \begin{pmatrix} 3i \\ 2+i \\ 3-i \end{pmatrix} + 3\begin{pmatrix} 1-2i \\ 2-3i \\ 2+4i \end{pmatrix} 
 = \begin{pmatrix} -3 \\ -1+2i \\ 1+3i \end{pmatrix} + \begin{pmatrix} 3-6i \\ 6-9i \\ 6+12i\end{pmatrix} \\
 &= \begin{pmatrix} -3+3-6i \\ -1+2i+6-9i \\ 1+3i+6+12i \end{pmatrix} = \begin{pmatrix} -6i \\ 5-7i \\ 7+15i\end{pmatrix}.
 \end{aligned}
 $$
 
-1. [ ] $$\begin{pmatrix}2-5i \\\\ 3+4i \\\\ 6+14i \end{pmatrix}$$
-1. [ ] $$\begin{pmatrix} -6i \\\\ 6+6i \\\\ 6+12i \end{pmatrix}$$
+1. [ ] \[ \begin{pmatrix} 2 - 5i \\\\ 3 + 4i \\\\ 6 + 14i \end{pmatrix} \]
+1. [ ] $$ \begin{pmatrix} -6i \\\\ 6 + 6i \\\\ 6 + 12i \end{pmatrix} $$
 1. [ ] $$\begin{pmatrix} 6i \\ 2+6i \\ 2+5i \end{pmatrix}$$
 1. [x] $$\begin{pmatrix} -6i \\ 5-7i \\ 7+15i \end{pmatrix}$$
 1. [ ] $$\begin{pmatrix} 1+i \\ 3-2i \\ 6+10i \end{pmatrix}$$ 
