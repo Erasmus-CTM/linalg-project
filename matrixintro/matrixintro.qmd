@@ -671,8 +671,8 @@ i\mathbf{x} + 3\mathbf{y} &= i \begin{pmatrix} 3i \\ 2+i \\ 3-i \end{pmatrix} +
 \end{aligned}
 $$
 
-1. [ ] \( \begin{pmatrix} 2 - 5i \\\\ 3 + 4i \\\\ 6 + 14i \end{pmatrix} \)
-1. [ ] \( \begin{pmatrix} -6i \\\\ 6 + 6i \\\\ 6 + 12i \end{pmatrix} \)
+1. [ ] $$ \begin{pmatrix} 2 - 5i \\ 3 + 4i \\ 6 + 14i \end{pmatrix} $$
+1. [ ] $$ \begin{pmatrix} -6i \\ 6 + 6i \\ 6 + 12i \end{pmatrix} $$
 1. [ ] $$\begin{pmatrix} 6i \\ 2+6i \\ 2+5i \end{pmatrix}$$
 1. [x] $$\begin{pmatrix} -6i \\ 5-7i \\ 7+15i \end{pmatrix}$$
 1. [ ] $$\begin{pmatrix} 1+i \\ 3-2i \\ 6+10i \end{pmatrix}$$ 

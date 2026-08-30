@@ -1,0 +1,27 @@
+# Site Settings
+title: My Quizdown Site
+description: Interactive quizzes powered by quizdown-js
+
+# URL Settings (CRITICAL FOR MAC VS GITHUB PAGES PARITY)
+# 1. On GitHub Pages, your site usually lives at username.github.io/repository-name
+# 2. Set 'baseurl' to your EXACT repository name (include the leading slash, no trailing slash)
+# 3. Leave 'url' blank or use your domain; 'jekyll serve' will override this locally automatically
+baseurl: "/linalg-project"
+url: ""
+
+# Build Settings
+markdown: kramdown
+theme: jekyll-theme-minimal # Or whatever GitHub Pages theme you are using
+
+# Ensure that configuration assets and dotfiles do not get ignored mismatchingly
+include:
+  -  ".nojekyll"
+
+# Exclude local development tracking configuration elements
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - .jekyll-cache/
+  - .sass-cache/
