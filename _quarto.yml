@@ -7,3 +7,6 @@ filters:
 pyodide:
   pdf-fallback: true
   pdf-autoexec: true
+
+website: 
+  site-url: "https://erasmus-ctm.github.io/linalg-project/"
