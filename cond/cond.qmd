@@ -51,7 +51,7 @@ When $P^{-1}=P^T$, the outer form of matrix multiplication gives
 $$
 PDP^T = \sum_{k=1}^n \lambda_k P_{:k}(P_{:k})^T
 $$
-Since the columns in $P$ have length $1$, this says that $A$ can be written as a (weighted) sum of  
+Since the columns in $P$ have length $1$, this says that $A$ can be written as a (weighted) sum of 
 projection matrices (see @exm-projeksjonmatr). 
 
 

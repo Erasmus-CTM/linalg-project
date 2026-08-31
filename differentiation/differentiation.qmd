@@ -300,12 +300,12 @@ $$ {#eq-firsttorewrite0}
 :::
 
 You are not supposed to remember this result! 
-The point is that we from this actually can read out, and write code to code to find the approximations $p_n^{(k)}(a)$ to all the derivatives!
+The point is that we from this actually can read out, and write code to find the approximations $p_n^{(k)}(a)$ to all the derivatives!
 We obtain the approximations by solving a system 
 involving a Vandermonde matrix.\index{Vandermonde matrix!in numerical differentiation} 
 
 ::: {.proof}
-$p_n$ equals its own Taylor series of degree $\leq n$ om $a$, i.e., that
+$p_n$ equals its own Taylor series of degree $\leq n$ about $a$, i.e.,
 $$p_n(x) = p_n(a)+p_n'(a) (x-a)+\cdots + \frac{p_n^{(n)}(a)}{n!}(x-a)^n.$$
 Evaluating this in $x=a+m_ih$ we get that
 $$f(a+m_ih) = f(a)+p_n'(a) m_ih+\cdots + \frac{p_n^{(n)}(a)}{n!}m_i^nh^n,$$
@@ -314,7 +314,7 @@ $$
 f(a+m_ih) - f(a) = \begin{pmatrix} m_i & m_i^2 & \cdots & m_i^n \end{pmatrix} 
 \begin{pmatrix} hp_n'(a) \\ h^2p_n^{(2)}(a)/2! \\ \vdots \\ h^np_n^{(n)}(a)/n! \end{pmatrix} 
 $$
-for $i=1,2,\dots,n$ qw assemble this to
+for $i=1,2,\dots,n$ we assemble this to
 \begin{align*}
 \begin{pmatrix}
 m_1 & m_1^2 & \cdots & m_1^n \\
@@ -436,7 +436,7 @@ Each time $h$ is divided by 10 we see that
 
 * for the Newton quotient, the truncation error is reduced by a factor of about $10$. This is as expected since the truncation error 
 was shown to be $M_2\frac{h}{2}$.
-* for the symmetric Newton quotient, the error gets reduced by a factor of about 100. This is as also expected since the truncation error 
+* for the symmetric Newton quotient, the error gets reduced by a factor of about 100. This is also as expected since the truncation error 
 was shown to be $M_3\frac{h^2}{6}$.
 * for the four point method, the error gets reduced by a factor of about 10000. This follows from that the truncation error 
 satisfies $|E_1(f;a,h)|\leq\frac{M_5}{18}h^4$, which we state without proof. 
@@ -635,7 +635,7 @@ and also that which gives the simplest expression for the truncation error, in t
 
 
 ::: {#exr-verifythis}
-Show that @eq-verifythis1 @eq-verifythis2 are correct.
+Show that @eq-verifythis1 and @eq-verifythis2 are correct.
 :::
 
 ::: {#exr-}
@@ -794,7 +794,7 @@ $\approx CM_3h^2$ also here.
 
 
 ::: {#exr-}
-This exercise illustrates another method way to derive methods for numerical differentiation.
+This exercise illustrates another way to derive methods for numerical differentiation.
 
 (a) Suppose we want to derive a method for approximating $f'(a)$ on the form
 $$
@@ -890,8 +890,8 @@ In this exercise we will compare the symmetric Newton quotient with the two asym
 $$
 f(x)=\frac{-x^{2}+10x-5}{4}
 $$
-over the interval $[0,6]$, together with the three secants corresponding to the three approximations to the derivative from (a) (use $a=3$ and $h=2$).
-Can you from this decide which approximation is best?
+over the interval $[0,6]$, together with the three secants corresponding to the Newton quotient and its left-sided variant, as well as the symmetric Newton quotient. Use $a=3$ and $h=2$.
+Which secant gives the best approximation?
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}

@@ -69,7 +69,7 @@ a_{21} & a_{23} & \cdots & a_{2n} \\
 a_{31} & a_{33} & \cdots & a_{3n} \\ 
 \vdots & \vdots & \vdots & \vdots \\
 a_{n1} & a_{n3} & \cdots & a_{nn}
-\end{array}\right| \nonumber \\ 
+\end{array}\right| \\ 
 &+\cdots + (-1)^{n+1} a_{1n}
 \left| \begin{array}{cccc} 
 a_{21} & a_{22} & \cdots & a_{2(n-1)} \\ 

@@ -400,7 +400,7 @@ If $A$ has two equal rows we can apply an elementary row operation to obtain a m
 This is then not invertible, and $A$ is then not invertible either. 
 
 In the case when $A$ has a column of zeros or two equal columns, $A^T$ has a row of zeros or two equal rows. 
-From what we just have shown, $A^T$ is not invertible.  
+From what we just have shown, $A^T$ is not invertible. 
 From @exr-ainvatinv it follows that $A$ is not invertible either.
 :::::::
 :::::

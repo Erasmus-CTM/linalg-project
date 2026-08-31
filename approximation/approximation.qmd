@@ -694,7 +694,7 @@ We want the components in `c` to come in the same order as $(c_{-N},...,c_{-1},c
 c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
 ``` 
 
-@eq-this-is-real can now be written as a matrix-vector product, and we obtain plot points of $p$ with the following implmentation.\index{python!np.real}
+@eq-this-is-real can now be written as a matrix-vector product, and we obtain plot points of $p$ with the following code.\index{python!np.real}
 ```{pyodide-python}
 #| autorun: true
 n = np.arange(-N,N+1).reshape((1,-1))
@@ -1043,12 +1043,12 @@ $f(x)$ & 1 & 0 & 2 & 1\\
 \end{tabular}
 \end{center}
 
-(a) Write the cubic polynomial which interpolate in these points as
+(a) Write the cubic polynomial which interpolates in these points as
 \begin{align*}
 p_3(x)=&\,c_0(x-1)(x-3)(x-4)+c_1x(x-3)(x-4)\\
 &+c_2x(x-1)(x-4)+c_3x(x-1)(x-3),
 \end{align*}
-and find the coefficients from the interpolation conditions. Dette This is called the  *Lagrange form* of the interpolating polynomial.
+and find the coefficients from the interpolation conditions. This is called the  *Lagrange form* of the interpolating polynomial.
 
 ::::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -1065,7 +1065,7 @@ $$p_3(x)= -\frac{(x-1)(x-3)(x-4)}{12}-\frac{x(x-1)(x-4)}{3} + \frac{x(x-1)(x-3)}
 :::::::
 :::::
 
-(b) Find the Newton form of the interpolating polynomial .
+(b) Find the Newton form of the interpolating polynomial.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -1313,9 +1313,9 @@ Q_n(x) = (x-x_0)(x-x_1)\cdots(x-x_n)
 $$
 is central in the Newton form, and in the proof of @eq-interpolation-error-estimate. 
 In the next chapters we will differentiate and integrate this interpolating polynomial, 
-and we will therefore need to defferentiate and integrate $Q_n$ as well. 
+and we will therefore need to differentiate and integrate $Q_n$ as well. 
 
-(a) Show that $Q^{(n+1)}/x)=(n+1)!$
+(a) Show that $Q^{(n+1)}(x)=(n+1)!$
 (b) A special case we will consider is when the $x_i$'s are a uniform partition, i.e., $x_i-x_{i-1}=h$ for all $i$. 
 Compute $\int_{x_0}^{x_2}Q_1(x)\,dx$ and $\int_{x_0}^{x_3}Q_2(x)\,dx$ when the partition is uniform.
 
@@ -1363,7 +1363,7 @@ plt.show()
 ```
 The input should be a function `func`, and a vector `Nvals` containing different values for $N$. 
 The function and all the interpolants should all be plotted all together. 
-Run the code for the listed code for the *triangle wave*\index{Triangle wave}, and compare the resulting plot with that of the square wave
+Run the code for the listed code for the *triangle wave*\index{Triangle wave}, and compare the resulting plot with that of the square wave.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}

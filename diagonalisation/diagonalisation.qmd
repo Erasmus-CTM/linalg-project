@@ -16,9 +16,9 @@ With a *linear first order system of differential equations with constant coeffi
 we mean a system of the form
 $$
 \begin{aligned}
-x_1'(t) &= a_{11}x_1(t) + a_{12}x_2(t) + \cdots + a_{1n}x_n(t) \nonumber \\
-x_2'(t) &= a_{21}x_1(t) + a_{22}x_2(t) + \cdots + a_{2n}x_n(t) \nonumber \\
-\vdots & \nonumber \\
+x_1'(t) &= a_{11}x_1(t) + a_{12}x_2(t) + \cdots + a_{1n}x_n(t) \\
+x_2'(t) &= a_{21}x_1(t) + a_{22}x_2(t) + \cdots + a_{2n}x_n(t) \\
+\vdots & \\
 x_n'(t) &= a_{n1}x_1(t) + a_{n2}x_2(t) + \cdots + a_{nn}x_n(t),
 \end{aligned}
 $$ {#eq-orden1system}
@@ -78,7 +78,7 @@ $\begin{pmatrix} C_1e^{\lambda_1 t_0} \\ C_2e^{\lambda_2 t_0} \end{pmatrix}$ is 
 But then $C_1$ and $C_2$ are also unique and real. 
 :::
 
-::: {#exm- name='reelle egenverdier'}
+::: {#exm- name='real eigenvalues'}
 Set $A=\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}$. 
 $A$ has eigenvalues $\lambda_1=-1$ and $\lambda_2=1$, with corresponding eigenvectors $\mathbf{p}_1=(-1,1)$ and $\mathbf{p}_2=(1,1)$. 
 The general solution @eq-genlosn1 is thus 

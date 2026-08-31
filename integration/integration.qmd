@@ -303,7 +303,7 @@ This algorithm is also called the *Newton--Cotes method*. With help of the analy
 ::: {#thm-}
 Let $n,k\geq 1$ and let $f\colon[a,b]\to\mathbb{R}$ be a function with $k+1$ continuous derivatives. Then the error in the Newton--Cotes method of order $k$ with step length $h=(b-a)/n$ satisfies
 $$
-    |I-I(h)| \leq \frac{(b-a)M_{k+1}}{(k+1)!} h^{k+1}.
+|I-I(h)| \leq \frac{(b-a)M_{k+1}}{(k+1)!} h^{k+1}.
 $$ {#eq-newton-cotes-feil}
 
 :::
