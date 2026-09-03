@@ -170,7 +170,6 @@ finds $C$, computes $C\mathbf{p}=\mathbf{c}+i\mathbf{d}$, and then the solution 
 
 ```{python}
 # pyodide: autorun
-
 def findcomps(A,t_0,x_0):
     D,P=np.linalg.eig(A)
     C = np.linalg.solve(P, x_0)

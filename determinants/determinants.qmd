@@ -378,8 +378,8 @@ $A=\begin{pmatrix} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 &
 We see quickly that the row/column with most zeros is column $2$. Expanding along this we get
 \begin{align*}
 \left|\begin{array}{cccc} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 & 2 & 3 \end{array}\right|
-&= (-1)^{3+2} \left|\begin{array}{ccc} 2 & 2 & 3 \\  1 & 0 & 2  \\ -1 & 2 & 3 \end{array}\right| 
-= -\left( 
+&= (-1)^{3+2} \left|\begin{array}{ccc} 2 & 2 & 3 \\  1 & 0 & 2  \\ -1 & 2 & 3 \end{array}\right| \\
+&= -\left( 
 (-1)^{2+1}\left|\begin{array}{cc} 2 & 3 \\ 2 & 3 \end{array}\right| 
 +(-1)^{2+3}2\left|\begin{array}{cc} 2 & 2 \\ -1 & 2 \end{array}\right| 
 \right) \\
@@ -592,8 +592,8 @@ The vector product can also be computed with help of the command `cross`:
 
 ```{pyodide-python}
 #| autorun: true
-a1 = [1,3,2]
-a2 = [2,-1,3]
+a1 = np.array([1,3,2])
+a2 = np.array([2,-1,3])
 print(np.cross(a1,a2))
 ```
 $\clubsuit$

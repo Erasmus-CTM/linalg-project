@@ -701,7 +701,7 @@ n = np.arange(-N,N+1).reshape((1,-1))
 p = np.real( np.exp(2*np.pi*1j*n*t/T) @ c )
 ```
 We can plot this together with the square wave itself as follows.
-```{pyodie-python}
+```{pyodide-python}
 #| autorun: true
 plt.plot( t, p)
 plt.plot( t, f)

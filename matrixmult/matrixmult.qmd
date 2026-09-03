@@ -28,20 +28,18 @@ a vertical segment a *column vector*\index{Column vector}.
 A vector can be interpreted both as a row vector, and as a column vector. In the code
 ```{pyodide-python}
 #| autorun: true
-A = np.array([[1,2,3]])
-B = np.array([[1],[2],[3]])
+row = np.array([[1,2,3]])
+col = np.array([[1],[2],[3]])
 ```
-$A$ is a row vector (or a $1\times 3$-matrix), $B$ a column vector (or a $3\times 1$-matrix).  
+`row` is a row vector (or a $1\times 3$-matrix), `col` a column vector (or a $3\times 1$-matrix).  
 We will as before write $a_i$ for the components in a vector, regardless of whether it is a row vector or a column vector. Rows and columns will be indexed from $0$ and upwards, just as for vectors:
 
 ```{pyodide-python}
-#| autorun: true
-print(A[0,1])
+print(row[0,1])
 ```
 
 ```{pyodide-python}
-#| autorun: true
-print(B[1,0])
+print(col[1,0])
 ```
 In many math books it is common to interpret a vector as a column vector, if nothing else is said. 
 When writing $\mathbf{a}=(a_1,a_2,...,a_n)$ we shall therefore interpret $\mathbf{a}$ as a column vector. 
@@ -49,13 +47,11 @@ When writing $\mathbf{a}=(a_1,a_2,...,a_n)$ we shall therefore interpret $\mathb
 The $3\times 4$-matrix $A=\begin{pmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 8 \\ 9 & 10 & 11 & 12 \end{pmatrix}$ is obtained by writing
 ```{pyodide-python}
 #| autorun: true
-A = np.array([[1,2,3,4],[5,6,7,8],[9,10,11,12]])
+A = np.array([[1,2,3],[4,5,6]])
 ```
 To find the dimensions of $A$ write \index{python!np.shape}
 ```{pyodide-python}
-#| autorun: true
-m, n = np.shape(A)
-print(m, n)
+print(np.shape(A))
 ```
 Sometimes we will write $\mathbf{a}_{i,:}$ for the row vector obtained from row $i$ in $A$, 
 and $\mathbf{a}_{:,j}$ for the column vector obtained from column $j$ in $A$. 
@@ -75,9 +71,9 @@ print(A[[1],:])
 The latter should be used if the result is to be used in computations involving matrices.
 
 There is also a more general syntax for extracting a *sub-matrix*  of a matrix. 
-The code below extracts a $2\times 3$-matrix consisting of all components from row 1 and 3, which also are in column 1, 3, and 4. 
+The code below extracts a $1\times 2$-matrix consisting of all components from row 2, which also are in column 1 and 3. 
 ```{pyodide-python}
-print(A[np.ix_([0,2],[0,2,3])])
+print(A[np.ix_([1],[0,2])])
 ```
 
 
@@ -94,7 +90,7 @@ print(A.T)
 
 If $A=A^T$, $A$ is said to be *symmetric*. In particular 
 $$
-A = \begin{pmatrix} 5 & 2 & 3 \\ 2 & 6 & 4 \\ 3 & 4 & 7\end{pmatrix}.
+\begin{pmatrix} 5 & 2 & 3 \\ 2 & 6 & 4 \\ 3 & 4 & 7\end{pmatrix}.
 $$
 is symmetric. Symmetric matrices are always square, and the components are symmetric about the diagonal.
 The diagonal in this example consists of the numbers $5,6,7$. 
@@ -272,12 +268,12 @@ from the requirement that there should be only one row/column.
 The Hilbert matrix can now be obtained as 
 ```{pyodide-python}
 #| autorun: true
-x = y.reshape((1,-1))
-print(1/(x + x.T - 1))
+z = y.reshape((1,-1))
+print(1/(z + z.T - 1))
 ```
 If we, the other way, would like to convert a row- or column vector back to a vector (without interpretation of rows/columns), this can also be done with the help of `reshape`:
 ```{pyodide-python}
-print(x.reshape(-1))
+print(z.reshape(-1))
 ```
 We will return to the Hilbert matrix later, as it will turn out to be quite vulnerable to roundoff errors on a computer. 
 As a result it is difficult to use numerically. $\clubsuit$
@@ -332,13 +328,13 @@ If one wants to compute the matrix-vector multiplication $F_N\mathbf{x}$ (i.e., 
 These two things return the same, but the shape is either that of a vector, or that of a matrix:
 ```{pyodide-python}
 #| autorun: true
-x = np.array([1,2,3,4])
-print(np.fft.fft(x))
+x_0 = np.array([1,2,3,4])
+print(np.fft.fft(x_0))
 ```
 ```{pyodide-python}
 #| autorun: true
-x = x.reshape((-1,1))
-print(np.fft.fft(x, axis=0))
+x_0 = x_0.reshape((-1,1))
+print(np.fft.fft(x_0, axis=0))
 ```
 Many other functions in `numpy` accept this form where the inputs and output are *flattened* to vectors. 
 Since we will heavily use linear algebra notation, we will usually reshape the input to a column vector before we multiply with a matrix to get the resulting column vector. 
@@ -473,9 +469,9 @@ It is common to write out these calculations as follows.
 We can verify this with the built-in method for matrix multiplication.
 
 ```{pyodide-python}
-A = np.array([[2,4,3],[1,-1,3]])
-B = np.array([[2,-1],[4,1],[2,-1]])
-print(A @ B)
+A_0 = np.array([[2,4,3],[1,-1,3]])
+B_0 = np.array([[2,-1],[4,1],[2,-1]])
+print(A_0 @ B_0)
 ```
 
 Matrix multiplication can also be interpreted in terms of the scalar product: Above we computed 4 scalar products: 
@@ -741,12 +737,9 @@ $$ {#eq-pol12}
 and in the same way if we have even more polynomials. The Vandermonde matrix on the right side can be computed as follows:
 
 ```{pyodide-python}
-#| include: false
-n = 3
-```
-```{pyodide-python}
 #| autorun: true
 #| output: false
+n = 3
 p = np.arange(0,n+1).reshape((1,-1))
 V = x**p
 ```
@@ -820,11 +813,11 @@ This is easily verified:
 
 ```{pyodide-python}
 #| autorun: true
-A = np.array([[1,1,1],[1,1,1]])
-B = np.array([[2,2],[2,2]])
-C = np.array([[3,3,3],[3,3,3],[3,3,3]])
-D = np.array([[4,4],[4,4],[4,4]])
-print(np.block([[A,B],[C,D]]))
+A_00 = np.array([[1,1,1],[1,1,1]])
+A_01 = np.array([[2,2],[2,2]])
+A_10 = np.array([[3,3,3],[3,3,3],[3,3,3]])
+A_11 = np.array([[4,4],[4,4],[4,4]])
+print(np.block([[A_00,A_01],[A_10,A_11]]))
 ```
 
 $\clubsuit$
@@ -1088,9 +1081,9 @@ $$
 = \begin{pmatrix}4+20+9\\2-5-6\\-6-5+3\end{pmatrix} = \begin{pmatrix}33\\-9\\-8\end{pmatrix}
 $$
 ```{pyodide-python}
-A = np.array([[2,4,3],[1,-1,-2],[-3,-1,1]])
-B = np.array([[2],[5],[3]])
-print(A @ B)
+A_1 = np.array([[2,4,3],[1,-1,-2],[-3,-1,1]])
+B_1 = np.array([[2],[5],[3]])
+print(A_1 @ B_1)
 ```
 :::::::
 :::::
@@ -1104,9 +1097,9 @@ $$
 = \begin{pmatrix} -1+9 & 0 + 6 \\ -2+12 & 0+8\end{pmatrix} = \begin{pmatrix} 8 & 6 \\ 10 & 8 \end{pmatrix}
 $$
 ```{pyodide-python}
-A = np.array([[1,3],[2,4]]) 
-B = np.array([[-1,0],[3,2]])
-print(A @ B)
+A_2 = np.array([[1,3],[2,4]]) 
+B_2 = np.array([[-1,0],[3,2]])
+print(A_2 @ B_2)
 ```
 :::::::
 :::::
@@ -1121,9 +1114,9 @@ $$
 = \begin{pmatrix} 9 & 3 \\ 22 & 17 \end{pmatrix}
 $$
 ```{pyodide-python}
-A = np.array([[-1,2,4,1],[1,3,2,4]])
-B = np.array([[2,1],[2,0],[1,0],[3,4]])
-print(A @ B)
+A_3 = np.array([[-1,2,4,1],[1,3,2,4]])
+B_3 = np.array([[2,1],[2,0],[1,0],[3,4]])
+print(A_3 @ B_3)
 ```
 :::::::
 :::::

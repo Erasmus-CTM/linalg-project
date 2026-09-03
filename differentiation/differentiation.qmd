@@ -84,8 +84,8 @@ The Newton quotient thus coincides with the point method based on $a$ and $a+h$ 
 # pyodide: autorun
 x=np.linspace(0,2,100)
 f = np.sqrt
-a=0.3
-h=1.2
+a = 0.3
+h = 1.2
 ksec = (f(a+h)-f(a))/h
 ktan = 1/(2*np.sqrt(a))
 
@@ -203,8 +203,8 @@ This is illustrated in @fig-newtsymdef,
 # pyodide: autorun
 x = np.linspace(0,2,100)
 f = np.sqrt
-a=0.9
-h=0.6
+a = 0.9
+h = 0.6
 ksec = (f(a+h)-f(a-h))/(2*h)
 ktan = 1/(2*np.sqrt(a))
 
@@ -451,7 +451,7 @@ The truncation error bounds are plotted against each other as follows.
 #| label: fig-loglogtestcomp
 #| fig-cap: "loglog plot of the estimates of the truncation errors for the four methods we have considered, for $f(x)=\\sin x$ in $x=0.5$, and  for $h\\in [10^{-6},10^0]$."
 # pyodide: autorun
-a=0.5
+a = 0.5
 h = 10**(-np.arange(0,6,0.1))
 plt.loglog(h, np.abs(np.sin(a)*h/2),
                h, np.abs(np.cos(a)*h**2/6),

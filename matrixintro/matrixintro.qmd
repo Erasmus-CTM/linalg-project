@@ -138,34 +138,34 @@ The *Zero-vector*, written $\mathbf{0}$, is the vector where all components are
 It is clear that the zero-vector satisfies $\mathbf{a}+\mathbf{0}=\mathbf{a}$, and that $0\mathbf{a}=\mathbf{0}$, for all $\mathbf{a}$.
 
 ::: {#exm-}
-Let $\mathbf{a}=(1,2,3)$, $\mathbf{b}=(4,5,6)$, and $t=2$. Then 
+Let $\mathbf{b}=(1,2,3)$, $\mathbf{c}=(4,5,6)$, and $t=2$. Then 
 \begin{align*}
-\mathbf{a}+\mathbf{b}&=(1,2,3)+(4,5,6) = (1+4,2+5,3+6)=(5,7,9) \\
-\mathbf{a}-\mathbf{b} &=(1,2,3)-(4,5,6) = (1-4,2-5,3-6) = (-3,-3,-3) \\
-t\mathbf{a}           &= 2(1,2,3) = (2\cdot 1,2\cdot 2,2\cdot 3) = (2,4,6).
+\mathbf{b}+\mathbf{c}&=(1,2,3)+(4,5,6) = (1+4,2+5,3+6)=(5,7,9) \\
+\mathbf{b}-\mathbf{c} &=(1,2,3)-(4,5,6) = (1-4,2-5,3-6) = (-3,-3,-3) \\
+t\mathbf{b}           &= 2(1,2,3) = (2\cdot 1,2\cdot 2,2\cdot 3) = (2,4,6).
 \end{align*} 
 This can be verified as follows:
 
 ```{pyodide-python}
 #| autorun: true
-a = np.array([1,2,3])
-b = np.array([4,5,6])
+b = np.array([1,2,3])
+c = np.array([4,5,6])
 t = 2
 ```
 
 ```{pyodide-python}
-print(a + b)
+print(b + c)
 ```
 
 ```{pyodide-python}
-print(a-b)
+print(b - c)
 ```
 
 ```{pyodide-python}
-print(t*a)
+print(t*b)
 ```
 
-Note the difference between writing `a+b`, and `sum(a)`. 
+Note the difference between writing `b+c`, and `sum(b)`. 
 The first computes many sums of two components. The last computes one sum of many components. $\clubsuit$
 :::
 
@@ -189,11 +189,11 @@ Here both $\mathbf{a}$ and $\mathbf{b}$ are vectors with $n$ components.
 :::
 
 Addition of a vector and a scalar is also allowed. This is computed as
-$$\mathbf{a}+t=(a_1+t,a_2+t,...,a_n+t).$$
+$$\mathbf{b}+t=(b_1+t,b_2+t,...,b_n+t).$$
 Note that this is not defined mathematically. 
 
 ```{pyodide-python}
-print(a+t)
+print(b+t)
 ```
 
 ::: {#exm- name='Vectorised functions'}
@@ -231,25 +231,25 @@ $\clubsuit$
 ::: {#exm- name='Vectorised binary functions'}
 max and min can be used in the same way as + and -, if one instead passes two arguments: \index{python!np.maximum} \index{python!np.minimum}
 ```{pyodide-python}
-print(np.maximum(a,b))
+print(np.maximum(b,c))
 ```
 
 ```{pyodide-python}
-print(np.minimum(a,b))
+print(np.minimum(b,c))
 ```
 In particular we have that 
 \begin{align*}
-&\max\left( \left(a_1,a_2,...,a_n \right),\left(b_1,b_2,...,b_n \right)\right) \\
-&= \left( \max(a_1,b_1),\max(a_2,b_2),...,\max(a_n,b_n) \right).
+&\max\left( \left(b_1,b_2,...,b_n \right),\left(c_1,c_2,...,c_n \right)\right) \\
+&= \left( \max(b_1,c_1),\max(b_2,c_2),...,\max(b_n,c_n) \right).
 \end{align*}
 Multiplication and taking powers are also vectorised:
 
 ```{pyodide-python}
-print(a*b)
+print(b*c)
 ```
 
 ```{pyodide-python}
-print(a**b)
+print(b**c)
 ```
 
 $\clubsuit$
@@ -257,7 +257,7 @@ $\clubsuit$
 
 There are many other operations which can be applied to vectors. As an example, they can be placed after one-another:\index{python!np.block}
 ```{pyodide-python}
-print(np.block([a,b]))
+print(np.block([b,c]))
 ```
 
 Since vector addition is vectorised, vectors inherit properties from the real numbers: 
@@ -380,24 +380,24 @@ The length of a vector can be computed as follows.\index{python!np.linalg,norm}
 
 ```{pyodide-python}
 #| autorun: true
-a=np.array([3,4])
+d = np.array([3,4])
 ```
 ```{pyodide-python}
-print(np.linalg.norm(a))
+print(np.linalg.norm(d))
 ```
 
 This can also be computed as follows
 
 ```{pyodide-python}
-print(np.sqrt(np.sum(np.abs(a)**2)))
+print(np.sqrt(np.sum(np.abs(d)**2)))
 ```
 
-Here four operations are combined. With $\mathbf{a}=(a_1,a_2,...,a_n)$, these are, in the following order:
+Here four operations are combined. With $\mathbf{d}=(d_1,d_2,...,d_n)$, these are, in the following order:
 
-1. $(|a_1|,|a_2|,...,|a_n|)$ (vectorised absolute value),
-2. $(|a_1|^2,|a_2|^2,...,|a_n|^2)$ (vectorised power),
-3. $|a_1|^2+|a_2|^2+\cdots+|a_n|^2$,
-4. $\sqrt{|a_1|^2+|a_2|^2+\cdots+|a_n|^2}$.
+1. $(|d_1|,|d_2|,...,|d_n|)$ (vectorised absolute value),
+2. $(|d_1|^2,|d_2|^2,...,|d_n|^2)$ (vectorised power),
+3. $|d_1|^2+|d_2|^2+\cdots+|d_n|^2$,
+4. $\sqrt{|d_1|^2+|d_2|^2+\cdots+|d_n|^2}$.
 
 The two last operations are not vectorised, as they return a scalar. 
 
@@ -451,12 +451,12 @@ You get the complex scalar product by writing `np.vdot(a,b)`\index{python!np.vdo
 
 ```{pyodide-python}
 #| autorun: true
-a = np.array([2j,1+1j,3])
-b = np.array([1+2j,-1,2-1j])
+ac = np.array([2j,1+1j,3])
+bc = np.array([1+2j,-1,2-1j])
 ```
 
 ```{pyodide-python}
-print(np.vdot(a,b))
+print(np.vdot(ac,bc))
 ```
 
 So here a slightly different definition is used than @eq-skalarproduktdef2. 
@@ -464,7 +464,7 @@ So here a slightly different definition is used than @eq-skalarproduktdef2.
 $\overline{a_1}b_1+\cdots+\overline{a_n}b_n$, as is easily checked:\index{python!np.conj}
 
 ```{pyodide-python}
-print(np.sum(np.conj(a)*b))
+print(np.sum(np.conj(ac)*bc))
 ```
 These two competing definitions of the complex scalar product stem from different science traditions: 
 In the mathematics literature it is usual to conjugate the second vector, while in the physics literature it is common to conjugate the first vector. `np.vdot` thus follows the literature in physics.
@@ -535,7 +535,7 @@ This result is also called the *best approximation theorem*.
 $\text{proj}_\mathbf{b}(\mathbf{a})$ can be computed as follows
 
 ```{pyodide-python}
-print(np.vdot(b,a)*b/np.linalg.norm(b**2))
+print(np.vdot(bc,ac)*bc/np.linalg.norm(bc**2))
 ```
 
 Note that the order of $\mathbf{a}$ and $\mathbf{b}$ has been changed inside the scalar product here. 
@@ -1156,10 +1156,10 @@ Consider the following code. What does the code do? Justify your answer. Consult
 ```{python}
 #| output: false
 # pyodide: 
-a = np.arange(0,100); a[0] = -1; a[1]=-1
+ap = np.arange(0,100); ap[0] = -1; ap[1]=-1
 for k in range(2,10):
-    a[(2*k)::k] = -1
-print(a[np.where(a!=-1)])
+    ap[(2*k)::k] = -1
+print(ap[np.where(ap!=-1)])
 ```
 
 ::::: {.content-visible when-profile="instructor"}
