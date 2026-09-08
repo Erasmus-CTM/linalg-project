@@ -47,7 +47,7 @@ c_0\phi_0(x_m)+c_1\phi_1(x_m)+\cdots+c_n\phi_n(x_m) &= f(x_m).
 \end{aligned}
 $$ {#eq-basicquestionintpol1}
 Setting $\mathbf{c}=(c_0,c_1,...,c_n)$ and $\mathbf{f}=(f(x_0),f(x_1),...,f(x_m))$,
-This gives the matrix equation
+this gives the matrix equation
 $$
 \begin{pmatrix} 
 \phi_0(x_0) & \phi_1(x_0) & \cdots & \phi_n(x_0) \\

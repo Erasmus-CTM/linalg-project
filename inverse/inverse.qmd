@@ -5,11 +5,13 @@
 #| autorun: true
 #| include: false
 {{< include ../_imports.py >}}
+{{< include ../gaussian_elimination.py >}}
 ```
 
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
+{{< include ../gaussian_elimination.py >}}
 ```
 
 We have seen that a system $A\mathbf{x}=\mathbf{b}$ can be solved by Gaussian elimination. 
@@ -66,7 +68,7 @@ Let us now extend @thm-corekv with an equivalence concerning invertibility, and 
 
 {{< include invmatteo.qmd >}}
 
-From the discussion above it is also clear that if $E_1,E_2,...,E_k$ are elementary matrices which row reduce $A$ to the identity matrix   
+From the discussion above it is also clear that if $E_1,E_2,...,E_k$ are elementary matrices which row reduce $A$ to the identity matrix 
 (so that $E_k\cdots E_1A=I_n$), then
 \begin{align*}
 A &= F_1\cdots F_k & A^{-1} &= E_k\cdots E_1
@@ -115,17 +117,24 @@ Let us find the inverse matrix of $A=\begin{pmatrix} 2 & 3 & 1 \\ 1 & 4 & 1 \\ 2
 \stackrel{I-4II}{\sim} \begin{pmatrix} 1 & 0 & 0 & 1 & -1/2 & -1/4 \\ 0 & 1 & 0 & 0 & 1/2 & -1/4 \\ 0 & 0 & 1 & -1 & -1/2 & 5/4 \end{pmatrix}.
 \end{align*}
 We read out the last 3 columns as $A^{-1}=\begin{pmatrix} 1 & -1/2 & -1/4 \\ 0 & 1/2 & -1/4 \\ -1 & -1/2 & 5/4 \end{pmatrix}$. 
-We can verify the result with the built-in function for computing the inverse: \index{python!np.linalg.inv}
+Let us verify the result in three different ways.
+First we verify with the built-in function for computing the inverse: \index{python!np.linalg.inv}
 ```{pyodide-python}
 #| autorun: true
 print(np.linalg.inv([[2,3,1],[1,4,1],[2,4,2]]))
 ```
-We can also verify the answer symbolically:
+Then we verify symbolically:
 ```{pyodide-python}
 #| autorun: true
 print(sym.Matrix([[2,3,1],[1,4,1],[2,4,2]]).inv())
 ```
-
+Finally we verify with the method `gaussian_elimination, which we implemented:
+```{pyodide-python}
+#| autorun: true
+matr = np.block([[np.array([[2,3,1],[1,4,1],[2,4,2]], dtype='float64'), np.eye(3)]])
+gaussian_elimination(matr, verbose=False)
+print(matr[:,3:])
+```
 We can also read out the elementary matrices
 \begin{align*}
 E_1 &= \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1\end{pmatrix} &

@@ -487,6 +487,8 @@ The mapping which mirrors all points in the plane about the $y$-axis has
 Let $A$ be the elementary $n\times n$-matrix obtained by adding row $i$ to row $j$ ($i\neq j$). 
 The eigenvalues of $A$ are
 
+> Use that $A$ is triangular with ones on the diagonal.
+
 1. [x] all 1
 2. [ ] all 0 or 1
 3. [ ] all positive
@@ -494,6 +496,9 @@ The eigenvalues of $A$ are
 ## Eigenvectors of an elementary matrix.
 
 Let $A$ be the same matrix as in the previous question. Then
+
+> Column $i$ has two entries which are $1$. It follows that $A\mathbf{e}_i$ has two entries which are $1$. 
+Column $j$ on the other has only an entry in row $j$. 
 
 1. [x] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_i$.
 2. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_j$.
@@ -539,7 +544,7 @@ $$
 $$
 where we expanded the determinant along the second row. The eigenvalues are thus $-1$, $2$, and $3$. 
 
-1. [ ] $2$ , $3$}
+1. [ ] $2$ , $3$
 2. [ ] $1$, $2$, and $-3$
 3. [x] $-1$, $2$, and $3$
 4. [ ] $1$, $2$
