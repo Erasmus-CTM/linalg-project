@@ -23,7 +23,9 @@ a_{21}x_1 &+ a_{22}x_2 &+ \cdots &+ a_{2n}x_n &= b_2 \\
 a_{m1}x_1 &+ a_{m2}x_2 &+ \cdots &+ a_{mn}x_n &= b_m
 \end{array}
 \end{align*}
-*Gaussian elimination*\index{Gaussian elimination} solves such a system by systematically eliminating variables from left to right. 
+In the previous chapter we wrote this more compactly on the form $A\mathbf{x}=\mathbf{b}$, where the coefficients $a_{ij}$ were assembled in the matrix $A$, 
+and the right hand sides values $b_i$ in the vector $\mathbf{b}$. 
+*Gaussian elimination*\index{Gaussian elimination} solves the system $A\mathbf{x}=\mathbf{b}$ by systematically eliminating variables from left to right. 
 To explain this further, suppose that the variables $x_1,...,x_n$ already have been eliminated. There are now two  possibilities:
 
 1. $x_{n+1}$ does not appear in the remaining equations. Then $x_{n+1}$ has been eliminated as well, and we proceed with the elimination of $x_{n+2}$.
@@ -113,21 +115,20 @@ $$
 We thus have the unique solution $\mathbf{x}=(x_1,x_2,x_3)=(1,0,2)$. 
 The system is now on what we call *reduced echelon form*\index{Echelon form!reduced}: 
 It is on echelon form, and in addition each variable with a leading one appears in just one equation. 
-These are also called *pivot variables*\index{Pivot!variable}. 
+These are also called *pivot variables*\index{Pivot!variable}. 3
 We also call the position of a leading one a *pivot element*\index{Pivot!element}. $\clubsuit$
 :::
 
-To simplify what we did above it can be useful to gather the coefficients and the right hand side in a matrix - 
-without writing down equality signs and variable names. 
-The matrix $\begin{pmatrix}A & \mathbf{b}\end{pmatrix}$ is called the *augmented matrix*\index{Augmented matrix} 
-of the system $A\mathbf{x}=\mathbf{b}$. 
-From the example above we have that 
-\begin{align*}
+We will also assemble both $A$ and $\mathbf{b}$ in the bigger matrix $\begin{pmatrix}A & \mathbf{b}\end{pmatrix}$, 
+called the *augmented matrix*\index{Augmented matrix} of the system. For the concrete example above we have that 
+$$
+\begin{aligned}
 A &= \begin{pmatrix} 0 & -8 & 3 \\ 4 & -3 & 2 \\ 1 & -2 & 1 \end{pmatrix} & 
 \mathbf{b} &= \begin{pmatrix} 6 \\ 8 \\ 3 \end{pmatrix} &
 \begin{pmatrix}A & \mathbf{b}\end{pmatrix} &= \begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix}
-\end{align*}
-An equation can be thought of as a row, a column as the coefficients associated with a variable. 
+\end{aligned}
+$$
+An equation can be thought of as a row in the augmented matrix, and a variable as a column in the coefficient matrix $A$. 
 The columns in $A$ which have a pivot element are called *pivot columns*\index{Pivot!column}. 
 In the same way, the rows in $A$ which have a pivot element are called *pivot rows*\index{Pivot!row}. 
 If we let $\sim$ denote the operations we did above, everything can be written more compactly as: 
@@ -193,13 +194,14 @@ With the help of this notation @eq-rowrednew can be rewritten as follows:
 &\stackrel{I+2II}{\sim}
 \begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}
 \end{align*}
-The system was thus brought to reduced row echelon form with help of three types of operations:
+The system was thus brought to reduced echelon form with help of three types of operations:
 
 1. Add a multiple of one row to another,
 2. multiply a row with a constant $\neq 0$,
 3. Swap two rows.
 
-These are called *elementary row operations*\index{Elementary!row operation}, and are easily implemented:
+These are called *elementary row operations*\index{Elementary!row operation}, 
+and they are easily implemented as follows:
 
 ```{pyodide-python}
 #| eval: false
@@ -208,7 +210,7 @@ A[i,:] = c*A[i,:]
 A[[i,j],:] = A[[j,i], :]
 ```
 
-The 3 first operations from @exm-gauss1 can in particular be programmed as follows:
+The three first operations from @exm-gauss1 can in particular be programmed as follows:
 ```{pyodide-python}
 #| eval: false
 A=np.array([[0,-8,3,6],[4,-3,2,8],[1,-2,1,3]])
@@ -216,41 +218,36 @@ A[[0,2],:] = A[[2,0],:]
 A[1,:] = A[1,:] - 4*A[0,:]
 A[1,:] = A[1,:]/5
 ```
-In practice Gaussian elimination is not implemented this way: 
-The program itself find the row operations to be applied (see @sec-kodegaussel). 
+In practice, the computer finds the steps for us when Gaussian elimination is applied, see @sec-kodegaussel. 
 
-We also say that $A$ and $B$ are *row equivalent* if we can transform $A$ to $B$ through a series of elementary 
+We say that $A$ and $B$ are *row equivalent* if we can transform $A$ to $B$ through a series of elementary 
 row operations. From the discussion above we get
 $$
 \begin{pmatrix} 0 & -8 & 3 & 6 \\ 4 & -3 & 2 & 8 \\ 1 & -2 & 1 & 3 \end{pmatrix} \sim \begin{pmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{pmatrix}.
 $$
 Every matrix is row equivalent to a matrix on reduced echelon form.
-Elementary row operations can also be expressed in terms of matrices:
+
+
+Elementary row operations can be expressed in terms of matrices. To see this, consider the matrix 
+$$E=I_m + c\mathbf{e}_i\mathbf{e}_j^T,$$ 
+where $i\neq j$. $E$ equals the identity matrix, with the exception that $E_{ij}=c$.
+Clearly $E$ is obtained by altering the identity matrix by adding row $j$ multiplied with $c$ to row $i$. 
+
+Let $\mathbf{x}\in\mathbb{R}^m$. It is clear that $\mathbf{x}$ and $E\mathbf{x}$ differ only in component $i$, where $(E\mathbf{x})_i = x_i+cx_j$. 
+If $A$ is a matrix, it is thus also clear that $A$ and $EA$ differ only in row $i$, where $(EA)_{i:}=A_{i:}+cA_{j:}$.
+
+To summarise, we have shown that the elementary row operation which adds a multiple of one row to another, corresponds to multiplication to the left with the matrix $E$ 
+obtained by applying the same elementary row operation to the identity matrix. It is straightforward to prove that a similar result holds for the other two types of elementary row operations as well. 
+We thus have the following result.
 
 ::: {#prp-smh:elemradop}
 Suppose $B$ is obtained by applying an elementary row operation to the $m\times n$-matrix $A$. 
 Then $B=EA$ where $E$ is the matrix obtained by applying the same row operation to the identity matrix $I_m$.
 :::
 
-::: {.proof}
-Let $F(A)$ be the matrix obtained by applying the row operation to the matrix $A$. 
-If we apply the row operation column-wise we get 
-$$
-F(A) = \begin{pmatrix} F(\mathbf{a}_1) & F(\mathbf{a}_2) & \cdots & F(\mathbf{a}_n) \end{pmatrix}.
-$$
-Furthermore $\mathbf{a}\to F(\mathbf{a})$ is a linear transformation from $\mathbb{R}^m$ to $\mathbb{R}^m$ with matrix 
-$$\begin{pmatrix} F(\mathbf{e}_1) & F(\mathbf{e}_2) & \cdots & F(\mathbf{e}_m) \end{pmatrix}=F(I_m).$$
-It follows that
-\begin{align*}
-F(A)&= \begin{pmatrix} F(I_m)\mathbf{a}_1 & F(I_m)\mathbf{a}_2 & \cdots & F(I_m)\mathbf{a}_n \end{pmatrix} \\
-&= F(I_m) \begin{pmatrix} \mathbf{a}_1 & \mathbf{a}_2 & \cdots & \mathbf{a}_n \end{pmatrix} = F(I_m)A,
-\end{align*}
-which is what we wanted to show. 
-:::
-
 A matrix is called *elementary*\index{Elementary!matrix} if it is obtained by applying an elementary row operation to the identity matrix. 
 The following matrices are elementary, and correspond to the row operations where we
-add $2$ times row $2$ to row $1$, multiply row $3$ with $3$, and swap rows $1$ and $2$, respectively:
+add $2$ times row $2$ to row $1$, multiply row $3$ with $3$, and swap rows $2$ and $3$, respectively:
 $$
 \begin{aligned}
 E_1 &=\begin{pmatrix} 1 & 2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & 
@@ -260,7 +257,7 @@ E_3 &=\begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}
 $$ {#eq-reverseradops}
 Row operations can be reversed in the sense that one can find a row operation reversing what the first one did. 
 The reverse row operations of @eq-reverseradops are
-adding $-2$ times row $2$ to row $1$, multiplying row $3$ with $1/3$, and swapping rows $1$ and $2$, respectively. 
+adding $-2$ times row $2$ to row $1$, multiplying row $3$ with $1/3$, and swapping rows $2$ and $3$, respectively. 
 The elementary matrices for these are 
 \begin{align*}
 F_1 &=\begin{pmatrix} 1 & -2 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} & 
@@ -277,28 +274,26 @@ $$C=E_k\cdots E_2E_1A$$
 where $C$ is a matrix on reduced echelon form, and where $E_1,E_2,...,E_k$ are elementary matrices.
 :::
 
-We also have the following result.
+If $A\mathbf{x}=\mathbf{b}$ is a system, we can easily obtain other systems by multiplying with the same matrix on each side. 
+We have the following result on solutions of systems obtained in this way.
 
 ::: {#prp-}
-Assume a system is obtained from another by applying an elementary row operation. 
-Then the two systems have the same solutions. 
+Let $E$ be an elementary matrix. The system $A\mathbf{x}=\mathbf{b}$ has the same solutions as the system
+$EA\mathbf{x}=E\mathbf{b}$.
 :::
 
 ::: {.proof}
-Let $E$ be the elementary matrix associated with the row operation, 
-and $F$ the elementary matrix associated with the reverse row operation. 
-When we apply an elementary row operation to the original system $A\mathbf{x}=\mathbf{b}$ 
-we get the new system $EA\mathbf{x}=E\mathbf{b}$.
+Let $F$ be the elementary matrix associated with the reverse row operation. 
 
 * If $A\mathbf{x}=\mathbf{b}$ it is clear that also $EA\mathbf{x}=E\mathbf{b}$, so that $\mathbf{x}$ also solves the new system. 
 * If $EA\mathbf{x}=E\mathbf{b}$ we get by applying $F$ on both sides that $A\mathbf{x}=\mathbf{b}$, so that $\mathbf{x}$ 
 also solves the original system.
 
-It follows that the original- and the new system have the same solutions. 
+Thus, the original- and the new system have the same solutions. 
 :::
 
-Above we row reduced a system, and obtained a unique solution. 
-Let us do the same for systems with no solution, and with infiniteky many solutions.
+In @exm-gauss1 we obtained a unique solution to the system under consideration. 
+Let us also consider systems with no solution, and systems with infinitely many solutions.
 
 ::: {#exm-gauss2 name='A system with infinitely many solutions'}
 Consider the system 

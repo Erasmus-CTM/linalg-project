@@ -383,7 +383,7 @@ a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n\end{pmatrix}
 x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots + x_n\mathbf{a}_n.$$
 :::
 
-With this definition @eq-likningsform can be written more compactly as $A\mathbf{x}=\mathbf{b}$. 
+With this definition @eq-likningsform can be written more compactly (i.e., without plusses, equality signs, and variable names) as $A\mathbf{x}=\mathbf{b}$. 
 The rewriting to $x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots + x_n\mathbf{a}_n$ above follows from the properties of vectors. 
 Note that $A\mathbf{x}$ is defined if and only if  the number of columns in $A$ equals the number of components in $\mathbf{x}$, 
 and that $A\mathbf{x}$ then can be interpreted as $m$ scalar products (between the rows in $A$, and $\mathbf{x}$). 
@@ -781,6 +781,8 @@ $$
 $$ {#eq-blockmatrixdef}
 for the matrix where the components in these four matrices are placed over, under, to the left, or to the right of each other as indicated. 
 Lines are used to separate the blocks. We call this a *block matrix*\index{Block matrix!definition}. 
+The simplest block matrices we will run into are 
+$\left(\begin{array}{c|c} A & \mathbf{b} \end{array}\right)$ and $\left(\begin{array}{c} A \\ \hline \mathbf{c}^T \end{array}\right)$, where $\mathbf{b}$ and $\mathbf{c}$ are column vectors. 
 Block matrices can be created as follows: 
 ```{pyodide-python}
 #| eval: false
