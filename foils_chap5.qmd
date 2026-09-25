@@ -2,9 +2,10 @@
 title: "Foils for Chapter 5 in linear algebra and numerical methods"
 author: "Øyvind Ryan"
 date: last-modified
-format: beamer
+format: 
+    beamer:
+        classoption: ["t", "notheorems"]
 echo: true
-classoption: "notheorems"
 ---
 
 ```{python}
@@ -43,12 +44,105 @@ The following are equivalent:
 A relation as in 2. is also called a *linear dependence relation*\index{Linear!dependence relation}. 
 In other words, if $\mathbf{c}=(c_1,...,c_n)$, then $A\mathbf{c}=\mathbf{0}$ is a linear dependence relation between the columns of $A$.
 
+Proof:
+
 ---
 
+## Orthogonal sets of vectors are linearly independent.
+
+---
+
+::: {#prp-avhrel}
+Row equivalent matrices share the same linear dependence relations between columns. 
+In particular, linear dependence relations between columns in a matrix are preserved by elementary row operations. 
+:::
+
+Proof: 
+
+---
+
+## Interpretation of linear independence and span by means of pivot elements:
+
+* $\mathbf{b}$ is a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$: 
+we can find $x_1,x_2,...,x_n$ so that 
+$$x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots x_n \mathbf{a}_n = \mathbf{b},$$
+i.e., $A\mathbf{x}=\mathbf{b}$ has a solution, 
+i.e., the last column in the augmented matrix $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ is not a pivot column. 
+* $\mathbf{b}$ can be written as a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ in a unique way: 
+requires in addition that all columns in $A$ are pivot columns.
+* $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$: $A\mathbf{x}=\mathbf{b}$ has always 
+a solution, i.e., all rows in $A$ are pivot rows. 
+(this implies that that the last column in $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ never becomes a pivot column). 
+* In a reduced echelon form: pivot columns are linearly independent. The other columns can be expressed in terms of these. 
+This therefore also applies for the matrix itself - the pivot columns are linearly independent, and the other columns are 
+linear combinations of these. 
+
+---
+
+## Corollary
+
+::: {#prp-}
+The following hold
+
+* If $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ then we have that $n\geq m$. 
+* If $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent we have that $n\leq m$.
+
+:::
+
+Proof: 
+
+---
+
+## Bases
+A *basis* for $\mathbb{R}^m$ is a linearly independent set of vectors which span $\mathbb{R}^m$. 
+Bases are denoted by $\mathcal{A}$, $\mathcal{B}$, $\mathcal{C}$, and so on. 
+From the result above: a basis for $\mathbb{R}^m$ has exactly $m$ elements. 
+$\mathbb{R}^m$ has in particular the simple basis consisting of
+$$
+\mathbf{e}_1=\begin{pmatrix} 1 \\ 0 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix} \text{, }
+\mathbf{e}_2=\begin{pmatrix} 0 \\ 1 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix} \text{,..., }
+\mathbf{e}_m=\begin{pmatrix}0 \\ 0 \\ 0 \\ \vdots \\ 0 \\ 1 \end{pmatrix}.
+$$
+We will denote this by $\mathcal{E}$, and call it the *standard basis*.
+
+---
 
 {{< include bases/invmatteo.qmd >}}
 
+Proof: 
+
 --- 
+
+## Example: Find a linearly independent subset
+We have the vectors 
+\begin{align*}
+\mathbf{a}_1&= \begin{pmatrix} 0 \\ 2 \\ 1 \end{pmatrix} &
+\mathbf{a}_2&= \begin{pmatrix} 1\\ 1 \\ 2 \end{pmatrix} &
+\mathbf{a}_3&= \begin{pmatrix} 1 \\ 2 \\ 0 \end{pmatrix} &
+\mathbf{a}_4&= \begin{pmatrix} -2 \\ 3 \\ 4 \end{pmatrix}.
+\end{align*}
+We show that these span $\mathbb{R}^3$ by row-reducing to echelon form:
+
+ 
+
+
+
+We observe that:
+
+* In the echelon form we see that all rows are pivot rows, so that the four vectors span $\mathbb{R}^3$. 
+* The first three columns are pivot columns, so that these are linearly independent.
+* The fourth vector can be expressed with the other three columns since it is not a pivot column.
+* $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$ are both linearly independent and span $\mathbb{R}^3$ (i.e., a basis)
+
+---
+
+## Example: Expand to a basis
+Let us expand 
+\begin{align*} 
+\mathbf{a}_1&=\begin{pmatrix} 3 \\ 2 \\ 1\end{pmatrix} & \mathbf{a}_2&=\begin{pmatrix} 6 \\ -1 \\ 3\end{pmatrix} \end{align*}
+to a basis for $\mathbb{R}^3$. 
+
+---
 
 ## Subspaces
 
@@ -60,11 +154,51 @@ A set $U\subseteq\mathbb{R}^m$ so that
 Examples of subspaces:
 
 - $\text{Span}(\mathbf{a}_1,...,\mathbf{a}_n$: Span of the vectors $\{\mathbf{a}_i\}_{i=1}^n$.
-- $\text{Col} A$: The column space of $A$.
-- $\text{Row} A$: The row space of $A$.
-- $\text{Nul} A$: The null space of $A$
+- $\text{Col} A$: The column space of $A$: the span of all the columns in the matrix
+the pivot columns of $A$ are a basis for $\text{Col}(A)$.
+- $\text{Row} A$: The row space of $A$: the span of all the rows in the matrix
+the pivot rows of $A$ (the rows with a leading one) are a basis for $\text{Row}(A)$,
+- $\text{Nul} A$: The null space of $A$: the collection of all vectors $\mathbf{x}$ so that  $A\mathbf{x}=\mathbf{0}$
 - $A^{\perp}$: The orthogonal complement of the set $A$.
 
 ---
 
-## Coordinate mappings and change of coordinates {#sec-coordmappings}
+## Example
+
+Let us find bases for the row space, column space, and null space of  
+$A=\begin{pmatrix} 2 & 1 & 3 & 8\\ 1 & 3 & -1 & 4 \\ 4 & -3 & 11 & 16 \end{pmatrix}$. 
+
+---
+
+## All bases for a subspace have the same number of vectors.
+
+* The number of vectors in a basis is called the *dimension* of the subspace. 
+* When a matrix is on reduced echelon form we see that the dimension of both the row space and the column space 
+equals the number of pivot elements. 
+* This common dimension of $\text{Col}(A)$ and $\text{Row}(A)$ is called the *rank* of the matrix, written $\text{rank}(A)$. 
+
+Proof: 
+
+---
+
+## Example: Rank one matrices
+
+---
+
+::: {#prp-}
+Let $A$ be an $m\times n$-matrix. Then we have that
+$$
+\text{rank}(A) + \text{dim}(\text{Nul}(A))=n.
+$$
+:::
+
+In the previous example: the rank was $1$, and the dimension of the null space was $n-1$. 
+This agrees with the proposition, since $1+(n-1)=n$.
+
+Proof: 
+
+---
+
+## The reduced echelon form is unique.
+
+Proof: 

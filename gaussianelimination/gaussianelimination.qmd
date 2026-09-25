@@ -383,7 +383,7 @@ Any system can be brought to reduced echelon form, and we have the following pos
 
 :::
 
-From the discussion above we also have the following.
+If we restrict to square coefficient matrices, the discussion above gives the following result. 
 
 {{< include invmatteo.qmd >}}
 
@@ -766,7 +766,7 @@ have solution(s)?
 Let
 $$
 \begin{aligned}
-A &= \begin{pmatrix} 3 & -1 & 2 \\ 2 & 4 & 1 \\ -2 & 3 & 2 \\ 1 & 2 & 4 \end{pmatrix} & {\bf b} &= \begin{pmatrix}1 \\ 4 \\ -1 \\ a \end{pmatrix}.
+A &= \begin{pmatrix} 3 & -1 & 2 \\ 2 & 4 & 1 \\ -2 & 3 & 2 \\ 1 & 2 & 4 \end{pmatrix} & {\bf b} &= \begin{pmatrix} 1 \\ 4 \\ -1 \\ a \end{pmatrix}.
 \end{aligned}
 $$
 For which values of $a$ does the system $A{\bf x}={\bf b}$ have a solution?

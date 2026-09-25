@@ -390,7 +390,7 @@ and that $A\mathbf{x}$ then can be interpreted as $m$ scalar products (between t
 
 ::: {#exm-}
 Let us compute $A\mathbf{x}$ when $A=\begin{pmatrix} 2 & 1 & -2 \\ 3 & 0 & -1 \\ 7 & -4 &2\end{pmatrix}$ 
-and $\mathbf{x}=\begin{pmatrix}3 \\ -1 \\ -2\end{pmatrix}$. This is well-defined since the number of columns in $A$  
+and $\mathbf{x}=\begin{pmatrix}3 \\ -1 \\ -2\end{pmatrix}$. This is well-defined since the number of columns in $A$ 
 equals the number of components in $\mathbf{x}$ (both are 3). We get
 \begin{align*}
 \begin{pmatrix} 2 & 1 & -2 \\ 3 & 0 & -1 \\ 7 & -4 &2\end{pmatrix}
@@ -429,7 +429,7 @@ If we now set
 X & = \begin{pmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \cdots & \mathbf{x}_k\end{pmatrix} &
 B &= \begin{pmatrix} \mathbf{b}_1 & \mathbf{b}_2 & \cdots & \mathbf{b}_k \end{pmatrix},
 \end{align*}
-Column $j$ in the equation $AX=B$ is $A\mathbf{x}_j=\mathbf{b}_j$. 
+column $j$ in the equation $AX=B$ simply says that $A\mathbf{x}_j=\mathbf{b}_j$. 
 $AX=B$ can also be interpreted as the assembly of $k$ systems. 
 $AX$ is only defined when the number of columns in $A$  equals the number of rows in $X$. 
 
@@ -478,13 +478,13 @@ Matrix multiplication can also be interpreted in terms of the scalar product: Ab
 If the left hand side matrix has rows $\mathbf{a}_1$ and $\mathbf{a}_2$, 
 and the right hand side matrix have columns $\mathbf{b}_1$ and $\mathbf{b}_2$, we computed 
 \begin{align*}
-\mathbf{a}_1\cdot\mathbf{b}_1&=26 & \mathbf{a}_1\cdot\mathbf{b}_2&=-1 & \mathbf{a}_2\cdot\mathbf{b}_1&=4 & \mathbf{a}_2\cdot\mathbf{b}_2&=-5.
+\mathbf{a}_1\cdot\mathbf{b}_1&=26, & \mathbf{a}_1\cdot\mathbf{b}_2&=-1, & \mathbf{a}_2\cdot\mathbf{b}_1&=4, & \mathbf{a}_2\cdot\mathbf{b}_2&=-5.
 \end{align*}
 $\clubsuit$
 :::
 
 ::: {#exm-outerproduct name='The outer product'}
-Let $\mathbf{a}\in\mathbb{R}^m$ and $\mathbf{x}\in\mathbb{R}^n$ be column vectors. We have that
+Let $\mathbf{a}\in\mathbb{R}^m$ and $\mathbf{x}\in\mathbb{R}^n$ be column vectors. The definition of matrix multiplication gives that
 \begin{align*}
 \mathbf{a}\mathbf{x}^T&=\begin{pmatrix} a_1 \\ a_2 \\ \vdots \\ a_m \end{pmatrix}\begin{pmatrix}x_1 & x_2 & \cdots & x_n\end{pmatrix} = 
 \begin{pmatrix}
@@ -638,7 +638,8 @@ Such matrices are therefore called *projection matrices*\index{Projection matric
 :::
 
 ::: {#exm- name='Rotations'}
-Consider the mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with angle $\theta$ \index{Rotation matrix}. If we use polar form we get
+Consider the mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with angle $\theta$ \index{Rotation matrix}. 
+Write $\mathbf{x}\in\mathbb{R}^2$ on polar form as $(r\cos\alpha,r\sin\alpha)$. We get
 \begin{align*}
 \mathbf{F}\begin{pmatrix}r\cos\alpha \\ r\sin\alpha\end{pmatrix}
 &=\begin{pmatrix} r\cos(\alpha+\theta) \\ r\sin(\alpha+\theta)\end{pmatrix}
@@ -652,8 +653,8 @@ Consider the mapping $\mathbf{F}$ which rotates a vector in $\mathbb{R}^2$ with 
 \end{pmatrix}
 \begin{pmatrix} r\cos\alpha\\r\sin\alpha\end{pmatrix}
 \end{align*}
-It follows that $\mathbf{F}$ is linear, with matrix $\begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}$. 
-Assuming that $\mathbf{F}$ is linear, it is easy to find the matrix of $\mathbf{F}$:
+where we used the formula for the sines and cosines of the sum of two angles. 
+It follows that $\mathbf{F}$ is linear, with matrix $\begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}$. We can also find the columns in this matrix more directly as follows: 
 \begin{align*}
 \mathbf{F}(\mathbf{e}_1) &= \begin{pmatrix}\cos\theta \\ \sin\theta \end{pmatrix} & 
 \mathbf{F}(\mathbf{e}_2) &= \begin{pmatrix}\cos(\theta+\pi/2) \\ \sin(\theta+\pi/2) \end{pmatrix}

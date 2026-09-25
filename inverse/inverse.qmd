@@ -14,59 +14,76 @@
 {{< include ../gaussian_elimination.py >}}
 ```
 
+
+
+
+
+
+
+
+
+
+
 We have seen that a system $A\mathbf{x}=\mathbf{b}$ can be solved by Gaussian elimination. 
 If $A$ is square and satisfies 1.-4. in @thm-corekv, we can consider the mapping $\mathbf{b}\to\mathbf{x}$, 
-i.e., the mapping which sends a given right hand side to the unique solution $\mathbf{x}$. 
-This is easily seen to be a linear transformation, and its matrix will be denoted by $A^{-1}$. 
-If we have found $A^{-1}$, we can solve any system $A\mathbf{x}=\mathbf{b}$ simply by computing $\mathbf{x}=A^{-1}\mathbf{b}$. 
+i.e., the mapping which sends a given right hand side to the unique $\mathbf{x}$ which satisfies $A\mathbf{x}=\mathbf{b}$. 
+This is easily seen to be a linear transformation, and its matrix will be denoted by $A^{-1}$, and called the *inverse* of $A$\index{Inverse}. 
 
-In this chapter we shall define the inverse matrix more precisely. We will start by proving the following:
-
-::: {#lem-}
-Le $A$ be a square matrix. $A$ satisfies 1.-4. in @thm-corekv if and only if there exists a matrix $B$ so that $AB=I_n$.
-:::
-
-::: {.proof}
-Suppose that $A=E_k\cdots E_1$ satisfies 1.-4. in @thm-corekv. 
-If $F_i$ are elementary matrices which represent the reverse operations we have that 
-$$E_k\cdots E_1F_1\cdots F_k=I_n.$$
-The matrix $B=F_1\cdots F_k$ thus satisfies $AB=I_n$. 
-The other way, suppose $A$ and $B$ are square matrices so that $AB=I_n$. 
-Suppose that $B\mathbf{x}=\mathbf{0}$ for an $\mathbf{x}\neq 0$. Then $AB\mathbf{x}=\mathbf{0}$ also, which violates that $AB=I_n$.
-$B\mathbf{x}=\mathbf{0}$ therefore has the unique solution $\mathbf{x}=\mathbf{0}$, so that $B$ satisfies 1.-4. in @thm-corekv. 
-But then $B$ can be written as a product of elementary matrices, $B=F_1\cdots F_k$. 
-From $AB=I_n$ it follows that $A=E_k\cdots E_1$, where $E_i$ represents the reverse row operations. 
-$A$ thus satisfies 1.-4. in @thm-corekv også. 
-:::
-
-When $AB=I_n$ we say that $B$ is a *right inverse*\index{Inverse!right} of $A$. 
-Due to the lemma above we can add that $A$ has a right inverse as an equivalence in @thm-corekv. 
-We will do this, but with a small modification:
-We say that $B$ is a *left inverse*\index{Inverse!left} of $A$ if $BA=I_n$. 
-Suppose $A$ has a right inverse $B$. From the reasoning above it follows that we can write $A=E_k\cdots E_1$ and $B=F_1\cdots F_k$, where the $E_i$ are elementary, and where the
-$F_i$ are the reverse counterparts. But then 
-$$BA = F_1\cdots F_kE_k\cdots E_1=I_n,$$
-so that $B$ also is a left inverse of $A$. It also follows that a left/right inverse is unique. We have shown the following.
-
+If we have found $A^{-1}$, we can solve any system $A\mathbf{x}=\mathbf{b}$ simply by computing $\mathbf{x}=A^{-1}\mathbf{b}$. We will use this in the following.
 
 ::: {#prp-}
-Suppose that $B$ is a right inverse of $A$. Then $B$ is also a left inverse to $A$. A left inverse/right inverse of $A$ is unique.
+Assume that $A$ satisfies 1.-4. in @thm-corekv. The following hold.
+
+1. $A^{-1}A=AA^{-1}=I_n$. 
+2. $A^{-1}$ also satisfies 1.-4. in @thm-corekv.
+3. $A$ is the inverse of $A^{-1}$.
+
 :::
 
-Due to this we need not differ between right- and left inverses, and it is natural to define that $A$ is *invertible*\index{Invertible}
-when there exists a matrix $B$ so that $AB=BA=I_n$. $B$ is called  the *inverse matrix*\index{Inverse} of $A$, 
-and we write $A^{-1}$ for this. 
+We also say that $A^{-1}$ is a left inverse of $A$ when $A^{-1}A=In$\index{Inverse!left}, and a right inverse of $A$ when $AA^{-1}=I_n$\index{Inverse!right}.
 
-Some properties of the inverse matrix follow immediately from the definition.
-Since $A^{-1}A=I_n$, in particular $\left(A^{-1}\right)^{-1}=A$. 
-Furthermore, if $s\neq 0$ then 
-$$\left(sA\right)\left(s^{-1}A^{-1}\right)=AA^{-1}=I_n,$$
-so that $(sA)^{-1}=s^{-1}A^{-1}$.
-In the exercises of this chapter you will be asked to prove other properties of the inverse matrix.
+::: {.proof}
+1: Since clearly $A^{-1}A\mathbf{x}=\mathbf{x}$ for all $\mathbf{x}$, and $AA^{-1}\mathbf{b}=\mathbf{b}$ for all $\mathbf{b}$, 
+we have that $A^{-1}A=AA^{-1}=I_n$.
 
-Let us now extend @thm-corekv with an equivalence concerning invertibility, and at the same time give it a name.
+2: Consider the system $A^{-1}\mathbf{x}=\mathbf{0}$. Multiplying with $A$ on both sides and using 1. implies that $\mathbf{x}=\mathbf{0}$, 
+so that $A^{-1}$ satisfies 2. in @thm-corekv. But then $A$ satisfies all of 1.-4. as well.
+
+3: Consider the linear transformation $T$ which sends $\mathbf{x}$ to the unique solution $\mathbf{b}$ of the system $A^{-1}\mathbf{b}=\mathbf{x}$. Since then $A\mathbf{x}=\mathbf{b}$, 
+we have that $T(\mathbf{x})=\mathbf{b}=A\mathbf{x}$, so that the matrix of $T$ is $A$. It follows that the inverse of $A^{-1}$ is $A$. This concludes the proof.
+:::
+
+
+We say that $A$ is *invertible*\index{Invertible} when there exists a square matrix $B$ so that $BA=AB=I_n$. 
+When $A$ satisfies 1.-4. in @thm-corekv, we have shown that $A$ is invertible (simply choose $B=A^{-1}$). 
+The other way, we will show that, if $A$ is invertible, it must satisfy 1.-4. in @thm-corekv. 
+We will actually prove the following stronger statement: 
+
+::: {#prp-}
+If $AB=I_n$, then both $A$ and $B$ satisfy 1.-4. in @thm-corekv (so that they are invertible). 
+Also, $A$ and $B$ are inverses of one-another:
+:::
+
+From this it follows that a left inverse is automatically a right inverse as well, and that inverses are unique. 
+
+::: {.proof}
+If $AB=I_n$, Multiplying with $A$ to the left on both sides in $B\mathbf{x}=\mathbf{0}$ implies that $\mathbf{x}=\mathbf{0}$ is the unique solution to this system, so that $B$ satisfies 2. in @thm-corekv, and hence all of 1.-4. as well. $B$ thus has an inverse. 
+
+If we multiply the expression $AB=I_n$ with $B^{-1}$ to the right on both sides we obtain that $A=B^{-1}$. It follows that $A$ also satisfies 1.-4.. 
+
+If we multiply the expression $A=B^{-1}$ with $B$ to the right and $A^{-1}$ to the left we obtain that $B=A^{-1}$, so that $A$ and $B$ are inverses of one-another. 
+:::
+
+
+We now extend @thm-corekv with an equivalence concerning invertibility, and at the same time give it a name.
 
 {{< include invmatteo.qmd >}}
+
+Some properties of the inverse matrix follow immediately from the definition. For instance, if $s\neq 0$ then 
+$$\left(sA\right)\left(s^{-1}A^{-1}\right)=AA^{-1}=I_n,$$
+so that $(sA)^{-1}=s^{-1}A^{-1}$.
+In the exercises of this chapter you will be asked to prove other properties of the inverse.
+
 
 From the discussion above it is also clear that if $E_1,E_2,...,E_k$ are elementary matrices which row reduce $A$ to the identity matrix 
 (so that $E_k\cdots E_1A=I_n$), then
@@ -128,7 +145,7 @@ Then we verify symbolically:
 #| autorun: true
 print(sym.Matrix([[2,3,1],[1,4,1],[2,4,2]]).inv())
 ```
-Finally we verify with the method `gaussian_elimination, which we implemented:
+Finally we verify with the method `gaussian_elimination`, which we implemented:
 ```{pyodide-python}
 #| autorun: true
 matr = np.block([[np.array([[2,3,1],[1,4,1],[2,4,2]], dtype='float64'), np.eye(3)]])

@@ -173,8 +173,8 @@ From the echelon form it is clear that all rows are pivot rows - we don't need t
 reduced echelon form to see this. It follows that the four vectors span $\mathbb{R}^3$. 
 Further we see that the first three columns are pivot columns, so that these are linearly independent. The fourth vector can be 
 expressed with the other three columns since it is not a pivot column.
-That the four vector can't be linearly independent can also be inferred from 
-that linear independence would require $m\geq n$, which is clearly not the case. 
+That the four vectors can't be linearly independent can also be inferred from 
+that this would require $m\geq n$, which is clearly not the case. 
 The three columns $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$ are therefore both linearly independent and span $\mathbb{R}^3$, since all rows and columns have pivot elements in this $3\times 3$-matrix. $\clubsuit$
 :::
 
