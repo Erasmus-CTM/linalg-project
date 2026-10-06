@@ -844,7 +844,7 @@ $$
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-$(2,4,3)$
+$\mathbf{x}=(2,4,3)$
 :::::::
 :::::
 
@@ -873,7 +873,17 @@ $$
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-$\mathbf{x}=(3/2,x_3-1/4,x_3)=(3/2,-1/4,0)+x_3(0,1,1).$
+Vi radreduserer:
+$$
+\begin{aligned}
+\begin{pmatrix} 1 & -2 & 2 & 2 \\ 2 & 3 & -4 & 2 \end{pmatrix}
+&\sim \begin{pmatrix} 1 & -2 & 2 & 2 \\ 0 & 7 & -8 & -2 \end{pmatrix}
+\sim \begin{pmatrix} 1 & -2 & 2 & 2 \\ 0 & 1 & -8/7 & -2/7 \end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 0 & -2/7 & 10/7 \\ 0 & 1 & -8/7 & -2/7 \end{pmatrix}
+\end{aligned}
+$$
+Det er uendelig mange løsninger siden $x_3$ er en fri variabel, og vi får en generell løsning der $x_1 = \frac{2}{7}x_3 + \frac{10}{7}$ og $x_2 = \frac{8}{7}x_3 - \frac{2}{7}$, slik at 
+$$\mathbf{x}=\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix} = \begin{pmatrix} \frac{2}{7}x_3 + \frac{10}{7} \\ \frac{8}{7}x_3 - \frac{2}{7} \\ x_3 \end{pmatrix} = x_3\begin{pmatrix} \frac{2}{7}\\ \frac{8}{7}\\1\end{pmatrix}+\begin{pmatrix} \frac{10}{7} \\ -\frac{2}{7} \\ 0\end{pmatrix}.$$
 :::::::
 :::::
 :::

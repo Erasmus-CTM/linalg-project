@@ -89,9 +89,9 @@ In particular, linear dependence relations between columns in a matrix are prese
 ::: {.proof}
 For the first part, assume that $B=EA$ where $E$ is elementary. 
 If $A\mathbf{c}=\mathbf{0}$ we have that $B\mathbf{c}=EA\mathbf{c}=\mathbf{0}$, so that 
-any linear dependence relation between columns isn $A$ also is a linear dependence relation between columns in $B$. 
+any linear dependence relation between columns in $A$ also is a linear dependence relation between columns in $B$. 
 The other way, any elementary matrix is invertible, so that $A=E^{-1}B$. 
-From this it follows in the same way that any linear dependence relation between columns isn $B$ also is a linear dependence relation between columns in $A$. The two thus share the same linear dependence relations. 
+From this it follows in the same way that any linear dependence relation between columns in $B$ also is a linear dependence relation between columns in $A$. The two thus share the same linear dependence relations. 
 
 For the last part, if $A$ and $B$ are row equivalent, we have that 
 $B=E_1\cdots E_kA$, where the $E_i$ er elementary. 
@@ -126,7 +126,7 @@ The following hold
 ::: {.proof}
 If $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ we know that all the rows in $A$ are pivot rows. This gives that
 $$m = \text{  \#rows = \#pivot rows = \#pivot columns } \leq\text{ \#columns =} n,$$
-where \#rows denotes the number of rows in $A$
+where \#rows denotes the number of rows in $A$. 
 If $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent we know that all columns in $A$ are pivot columns. This gives that
 $$n = \text{ \#columns = \#pivot columns = \#pivot rows } \leq \text{\#rows  =} m.$$
 :::
