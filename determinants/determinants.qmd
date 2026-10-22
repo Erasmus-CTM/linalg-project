@@ -172,14 +172,15 @@ We have that $\det(A)=0$ if $A$ has a row with zeros only, or a column with zero
 :::
 
 ::: {.proof}
-This is simplest to see for rows with zeros only: 
-If we use @eq-detdef so many times that all sub-matrices start with a row of zeros, it is clear that the next application of @eq-detdef 
-will give $0$. 
-Suppose instead that we have a column of zeros. For $1\times 1$-matrices with a column of zeros it is clear that the determinant is $0$. 
+This is simplest to see for rows with zeros only. If the first row only has zeros, this follows directly from the definition. 
+If one of the other rows is zero, apply @eq-detdef so many times that all sub-matrices start with a row of zeros. 
+The next application of @eq-detdef then gives that all submatrices have determinant $0$, and that $\det(A)=0$. 
+
+Suppose instead we have a column of zeros. For $1\times 1$-matrices with a column of zeros it is clear that the determinant is $0$. 
 Suppose we have shown that all $(n-1)\times(n-1)$-matrices with a column of zeros have determinant $0$. 
-When we use @eq-detdef on an $n\times n$-matrix with a column of zeros, we get a contribution from $n-1$ $(n-1)\times(n-1)$-sub-matrices with columns of zeros. 
-And the contribution from the remaining column is $0$, since we have a zero on the corresponding place in the first row that is multiplied in. 
-It follows that  $n\times n$-matrices with a zero column also have determinant $0$.
+When we use @eq-detdef on an $n\times n$-matrix with a column of zeros, we get a contribution from $n-1$ $(n-1)\times(n-1)$-sub-matrices, all with columns of zeros. 
+The contribution from the remaining column is $0$, since we multiply with the zero from the corresponding place in the first row. 
+It follows that  all $n\times n$-matrices with a zero column also have determinant $0$.
 :::
 
 
@@ -193,14 +194,14 @@ The determinant of an upper- or lower triangular matrix equals the product of th
 
 ::: {.proof}
 The result is obvious for $n=1$. 
-If $A$ is lower triangular @eq-detdef says that $\det(A)=a_{11}\det(A^{(11)})$. Since $A^{(11)}$ also is lower triangular, and with 
-$a_{22}$, $a_{33}$,...$,a_{nn}$ on the diagonal, it follows by induction that
-$$\det(A)=a_{11}(a_{22}a_{33}\cdots a_{nn})=a_{11}a_{22}a_{33}\cdots a_{nn}.$$
+If $A$ is lower triangular @eq-detdef says that $\det(A)=a_{11}\det(A^{(11)})$, since there is only one non-zero in the first row. 
+Since $A^{(11)}$ also is lower triangular with $a_{22}$, $a_{33}$,...$,a_{nn}$ on the diagonal, by the induction hypothesis $\det(A^{(11)})=a_{22}a_{33}\cdots a_{nn}$. It follows that 
+$$\det(A)=a_{11}\det(A^{(11)})=a_{11}(a_{22}a_{33}\cdots a_{nn})=a_{11}a_{22}a_{33}\cdots a_{nn}.$$
 Suppose instead that $A$ is upper triangular. The first column in the minors $A^{(12)},A^{(13)},...,A^{(1n)}$ are then all zero, 
 and then @prp-nullradsoyle says that 
 $$\det(A^{(12)})=\det(A^{(13)}=\cdots=\det(A^{(1n)})=0.$$
 Only the first minor contributes in @eq-detdef, so that $\det(A)=a_{11}\det(A^{(11)})$, which again by induction gives that 
-$\det(A)=a_{11}a_{22}a_{33}\cdots a_{nn}$
+$\det(A)=a_{11}a_{22}a_{33}\cdots a_{nn}.$
 :::
 
 We have the following result on how elementary row operations change the determinant. 
@@ -217,7 +218,7 @@ Let $A$ and $B$ be square matrices of equal dimension. The following hold:
 ::: {.proof}
 We prove 1.. 
 Let $D_{ij}$ be the determinant of the matrix obtained by removing row $1$ and $2$ in $A$, as well as column $i$ and $j$ in $A$. 
-We have that
+If we apply @eq-detdef twice (i.e., expand along the first two rows) we get 
 \begin{align*}
 \det(A)&=\sum_{i<j} ( (-1)^{i+1}(-1)^j a_{1i}a_{2j} + (-1)^{j+1}(-1)^{i+1}a_{1j}a_{2i})D_{ij}\\
 &=\sum_{i<j} (-1)^{i+j}(a_{1j}a_{2i}-a_{1i}a_{2j})D_{ij}
@@ -228,8 +229,8 @@ If $B$ is the matrix where row 1 and 2 in $A$ er swapped, we have that $b_{1i}=a
 = \sum_{i<j} (-1)^{i+j}(a_{2j}a_{1i}-a_{2i}a_{1j})D_{ij} \\
 &= -\sum_{i<j} (-1)^{i+j} (a_{2i}a_{1j}-a_{2j}a_{1i})D_{ij} = -\det(A)
 \end{align*}
-If two other neighbouring rows are swapped it follows by induction, and from the definition
-$\det(A)=\sum_{j=1}^n(-1)^{j+1}a_{1j}A_{1j}$ that the determinant also changes sign. 
+If two other neighbouring rows are swapped it follows by induction on $n$, and from the definition 
+$\det(A)=\sum_{j=1}^n(-1)^{j+1}a_{1j}A^{(1j)}$ that the determinant also changes sign. 
 Further, if  row $i$ and $j$ not are neighbouring rows, a row interchange of these can be expressed as $j-i+(j-i-1)=2(j-i)-1$ 
 neighbouring row interchanges. 
 Since this is an odd number the determinant also then will change sign. This proves 1..
@@ -264,32 +265,6 @@ s \text{ if $E$ multiplies a row with $s$.} \\
 $$ {#eq-elementar00}
 
 
-We can now prove the following. 
-
-::: {#prp-detprodmatr}
-If $A$ and $B$ both are square we have that $\det(AB)=\det(A)\det(B)$.
-:::
-
-::: {.proof}
-we can write 
-\begin{align*} A&=E_1E_2\cdots E_k C & B&=F_1F_2\cdots F_l D \end{align*}
-where $E_1,F_1,E_2,F_2,...$ are elementary matrices, and $C$ and $D$ are reduced echelon forms. 
-If $C=D=I_n$ then
-\begin{align*}
-\det(AB) &= \det(E_1E_2\cdots E_kF_1F_2\cdots F_l) = \det(E_1)\det(E_2)\cdots \det(E_k)\det(F_1F_2\cdots F_l) \\
-&= \det(E_1E_2\cdots E_k)\det(F_1F_2\cdots F_l) = \det(A)\det(B).
-\end{align*}
-Suppose then that one of $C,D$ is$\neq I_n$. 
-It follows that one of $\det(A)$ or $\det(B)$ equals 0, so that also $\det(A)\det(B)=0$. It is therefore enough to show that also 
-$\det(AB)=0$. It is clear that $\det(AB)=0$ if and only if $\det(CF_1F_2\cdots F_l D)=0$. We consider two possibilities:
-
-1. If $C=I_n$, $D\neq I_n$: Then $\det(D)=0$ (since $D$ has a row of zeros). But then 
-$$\det(CF_1F_2\cdots F_l D)=\det(F_1F_2\cdots F_l D)=0.$$
-2. If $C\neq I_n$ then $C$ has a row of zeros. But then also $CF_1F_2\cdots F_l D$ has a row of zeros, and then 
-$\det(CF_1F_2\cdots F_l D)=0$
-
-:::
-
 In particular we can find the determinant with the help of Gaussian elimination. Let us show this with an example. 
 
 ::: {#exm- name='A $3\times 3$-determinant using Gaussian elimination'}
@@ -311,7 +286,7 @@ $$
 1\times(-1/7)\times(1) \times(-1)
 \left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|
 $$
-som gir at 
+which gives that
 $$
 (-38/7)=(1/7) \left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|,
 $$
@@ -333,7 +308,31 @@ $$\det(A)=\det(E_k\cdots E_1)=\det(E_k)\cdots\det(E_1)\neq 0,$$
 where we used @prp-detprodmatr, and that elementary matrices have a determinant different from $0$. 
 
 $7.\Rightarrow 1.$ Suppose that $A$ is not row equivalent with $I_n$. Then we can write $C=E_k\cdots E_1A$, and $A=F_1\cdots F_kC$, 
-where $C\neq I_n$ is the reduced echelon form of $A$. But then $\det(C)=0$, and it follows from @prp-detprodmatr that $\det(A)=0$. 
+where $C\neq I_n$ is the reduced echelon form of $A$. We have that $\det(C)=0$ since $C$ is triangular, and it follows from @prp-radbytte that $\det(A)=\det(F_1)\cdots\det(F_k)\det(C)=0$. 
+:::
+
+
+
+We can also prove the following. 
+
+::: {#prp-detprodmatr}
+If $A$ and $B$ both are square we have that $\det(AB)=\det(A)\det(B)$.
+:::
+
+::: {.proof}
+we can write 
+\begin{align*} A&=E_1E_2\cdots E_k C & B&=F_1F_2\cdots F_l D \end{align*}
+where $E_1,F_1,E_2,F_2,...$ are elementary matrices, and $C$ and $D$ are reduced echelon forms. 
+If $C=D=I_n$ then
+\begin{align*}
+\det(AB) &= \det(E_1E_2\cdots E_kF_1F_2\cdots F_l) = \det(E_1)\det(E_2)\cdots \det(E_k)\det(F_1F_2\cdots F_l) \\
+&= \det(E_1E_2\cdots E_k)\det(F_1F_2\cdots F_l) = \det(A)\det(B).
+\end{align*}
+Suppose then that one of $C,D$ is$\neq I_n$. It follows as above that one of $\det(A)$ or $\det(B)$ equals 0, so that one of them is not invertible. We have that $\det(A)\det(B)=0$. 
+It is therefore enough to show that also $\det(AB)=0$, which is the same as that $AB$ is not invertible. 
+Assume for contradiction that $AB$ is invertible. Then we can write $AB=E_1\cdots E_k$. 
+Multiplying with the inverse elementary matrices $F_i$ on both sides it follows from @prp-satisfies14 that both $A$ and $B$ are invertible, which is a contradiction. 
+Thus $\det(AB)=\det(A)\det(B)=0$ in this case. 
 :::
 
 
@@ -425,7 +424,7 @@ Let $X=\cup_i B_{\mathbf{r}_i,\delta}$ be a disjoint union of boxes. Then $V(AX)
 :::
 
 This means that $V(AB)$ works as a *magnification factor*\index{Magnification factor} for $A$ for sets $X$ on the form $\cup_i B_{\mathbf{r}_i,\delta}$. 
-The ide is that, since $V(AX)=V(AB)V(X)$ for such $X$, and since moste sets can be approximated arbitrarily well with 
+The ide is that, since $V(AX)=V(AB)V(X)$ for such $X$, and since most sets can be approximated arbitrarily well with 
 such sets, the also 
 $V(AX)=V(AB)V(X)$ for more general sets $X$. Thus, $V(AB)$ works as a magnification factor more generally sets as well!
 
@@ -652,7 +651,7 @@ Since a matrix with two equal rows has determinant 0 (@cor-tolikerader), we have
 $$0=\det(A_0)=\mathbf{a}_i\cdot\mathbf{b} \text{ for } i=2,...,n,$$
 so that $\mathbf{b}$ is orthogonal to all $\{\mathbf{a}_i\}_{i=2}^n$. 
 
-To see that $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$ (punkt 2.), observe first that the projection of $\mathbf{a}_1$ onto $\mathbf{b}$ is 
+To see that $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$ (point 2.), observe first that the projection of $\mathbf{a}_1$ onto $\mathbf{b}$ is 
 $\frac{\mathbf{a}_1\cdot\mathbf{b}}{|\mathbf{b}|^2}\mathbf{b}$, 
 which has length $\frac{|\mathbf{a}_1\cdot\mathbf{b}|}{|\mathbf{b}|}$. This equals the distance from $\mathbf{a}_1$ to the plane spanned by $\mathbf{a}_2,...,\mathbf{a}_n$. 
 Since volume equals base times height we get that

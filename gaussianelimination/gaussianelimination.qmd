@@ -277,7 +277,7 @@ where $C$ is a matrix on reduced echelon form, and where $E_1,E_2,...,E_k$ are e
 If $A\mathbf{x}=\mathbf{b}$ is a system, we can easily obtain other systems by multiplying with the same matrix on each side. 
 We have the following result on solutions of systems obtained in this way.
 
-::: {#prp-}
+::: {#prp-samesolsrwoeq}
 Let $E$ be an elementary matrix. The system $A\mathbf{x}=\mathbf{b}$ has the same solutions as the system
 $EA\mathbf{x}=E\mathbf{b}$.
 :::
@@ -359,8 +359,17 @@ x_1 & + x_2=& 0 \\
        &          0=& 1 
        \end{array}
 $$
-$0=1$ is impossible, so that there are no solutions. $\clubsuit$
+$0=1$ is impossible, so that there are no solutions. 
+
+Above we started with a right hand side $\mathbf{b}=(2,5)$, for which it turned out that the system had no solutions. 
+In practice we would like to go the opposite way: How do we find a right hand side $\mathbf{b}$ so that the system has no solution? 
+This can be achieved by starting with the reduced echelon form $\begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$ 
+(which represents a system with no solution, i.e., $0=1$), and perform the reverse row operations in reverse order. 
+This will give back the coefficient matrix for the original system, and a right hand side so that the system has a no solution. 
+$\clubsuit$
 :::
+
+
 
 The three examples above illustrate three possibilities: A system can have
 
@@ -383,11 +392,25 @@ Any system can be brought to reduced echelon form, and we have the following pos
 
 :::
 
-If we restrict to square coefficient matrices, the discussion above gives the following result. 
+Note that, had we instead considered the system 
+$$
+\begin{array}{rrr}
+x_1 & +x_2=& 2 \\
+3x_1 & +3x_2=& 6 
+\end{array}
+$$
+in @exm-gauss3 (i.e., with another right hand side), we would have found solutions to the system: 
+The existence of solutions thus depends on the particular right hand side. 
+This situation can only occur when the reduced echelon form of $A$ has a row of zeros 
+(i.e., has row(s) which are not pivot rows), as was the case in @exm-gauss3. 
+If all rows are pivot rows, as in @exm-gauss1 and @exm-gauss2, there exists a solution, regardless of the right hand side.
+
+If we restrict to square coefficient matrices, for which all rows are pivot rows if and only if all columns are pivot columns, 
+the discussion above gives the following result. 
 
 {{< include invmatteo.qmd >}}
 
-Later we will extend this result with more equivalences.
+This result will be extended later with more equivalences.
 
 ::: {.proof}
 $1.\Rightarrow 3.$: Suppose that $A$ can be row reduced to the identity matrix. We can solve $A\mathbf{x}=\mathbf{b}$ by row reducing 

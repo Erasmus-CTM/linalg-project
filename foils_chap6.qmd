@@ -2,9 +2,10 @@
 title: "Foils for Chapter 6 in linear algebra and numerical methods"
 author: "Øyvind Ryan"
 date: last-modified
-format: beamer
+format: 
+    beamer:
+        classoption: ["t", "notheorems"]
 echo: true
-classoption: "notheorems"
 ---
 
 ```{python}
@@ -59,15 +60,64 @@ a_{n1} & a_{n2} & \cdots & a_{n(n-1)}
 \end{aligned}
 $$
 
----
-
-Note
-
 - Row $1$ of $A$ has been left out in all submatrices.
 - In the first submatrix column $1$ of $A$ has also been left out, in the second column $2$ of $A$ has been left out, and so on. 
 
 ---
 
+## Some simple determinants
+
+* The determinant of a $1\times 1$-matrix is the one component in the matrix.
+* The determinant of a $2\times 2$-matrix:
+$$\det(A)=\left| \begin{array}{cc}  a_{11} & a_{12} \\ a_{21} & a_{22} \end{array} \right| = a_{11}a_{22}-a_{12}a_{21}.$$
+* The determinant of a $3\times 3$-matrix:
+$$
+\begin{aligned}
+\left| \begin{array}{ccc}  a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{array} \right| 
+&= a_{11}\left| \begin{array}{cc}  a_{22} & a_{23} \\ a_{32} & a_{33} \end{array} \right| 
+-a_{12}\left| \begin{array}{cc}  a_{21} & a_{23} \\ a_{31} & a_{33} \end{array} \right| \\
+&+ a_{13}\left| \begin{array}{cc}  a_{21} & a_{22} \\ a_{31} & a_{32} \end{array} \right| 
+\end{aligned}
+$$
+
+---
+
+## A $3\times 3$-determinant
+
+The determinant of the matrix $\begin{pmatrix} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{pmatrix}$ is
+
+---
+
+Verification: 
+
+```{python}
+#| autorun: true
+A=np.array([[2,1,3],[1,4,2],[3,1,-1]])
+print(np.linalg.det(A))
+```
+Why not -38 exactly?
+
+---
+
+```{python}
+def detdef(A):
+    n = np.shape(A)[0]
+    if n>1:
+        d=0
+        for k in range(n):
+            colinds = np.arange(0,n)
+            colinds=np.delete(colinds, k)
+            d += (-1)**k*A[0,k]*detdef( A[1:,colinds] )
+        return d
+    else:
+        return A.item()
+```
+
+```{python}
+detdef( np.array([[2,1,3],[1,4,2],[3,1,-1]]) )
+```
+
+---
 
 ## Properties of the determinant
 
@@ -75,6 +125,13 @@ Let $A$ be a square matrix
 
 - $\det(A)=0$ if $A$ has a row with zeros only, or a column with zeros only
 - If $A$ is triangular then $\det(A)$ equals the product of the diagonal elements. 
+
+Proof: 
+
+---
+
+## The determinant and elementary row operations
+
 - If $B$ is obtained from a simple row interchange in $A$, then $\det(B)=-\det(A)$. 
 - If $B$ is obtained by multiplying a row in $A$ with $s$, then $\det(B)=s\det(A)$. 
 - If $B$ is obtained by adding $s$ times row $i$ to row $j$ in $A$, then $\det(B)=\det(A)$. 
@@ -91,7 +148,41 @@ $$
 
 ---
 
-## Main properties
+## Proof
+
+---
+
+## Computing a $3\times 3$-determinant using Gaussian elimination
+$$
+\begin{aligned}
+\begin{pmatrix} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{pmatrix} \sim 
+\end{aligned}
+$$
+
+---
+
+* First row operation is a row interchange. 
+* Next two operations add a multiple of row $1$ to the other rows. 
+* Then we scale row 2 with (-1/7).
+* Finally we add a multiple of row 2 to row 3. 
+
+The result is an upper triangular matrix, for which the determinant is the product of the diagonal elements. We then get
+$$
+\left|\begin{array}{ccc} 1 & 4 & 2 \\ 0 & 1 & 1/7 \\ 0 & 0 & -38/7 \end{array}\right|
+=
+1\times(-1/7)\times(1) \times(-1)
+\left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|
+$$
+which gives that 
+$$
+(-38/7)=(1/7) \left|\begin{array}{ccc} 2 & 1 & 3 \\ 1 & 4 & 2 \\ 3 & 1 & -1\end{array}\right|,
+$$
+so that the determinant is $-38$.
+
+
+---
+
+## Main properties of the determinant
 
 - $\det(A)=\det(A^T)$.
 - $\det(AB)=\det(A)\det(B)$.
@@ -99,6 +190,10 @@ $$
 $$ \det(A)=\sum_{j=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
 - Determinants can be expanded along any column: For all $1\leq j\leq n$ we have that 
 $$\det(A)=\sum_{i=1}^{n} (-1)^{i+j}a_{ij}\det(A^{(ij)}).$$
+
+---
+
+## Proof: 
 
 ---
 
@@ -116,40 +211,135 @@ $$
 
 ---
 
+## Expand the determinant along the row/column with the most zeros!
+
+Consider the $4\times 4$-matrix
+$A=\begin{pmatrix} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 & 2 & 3 \end{pmatrix}$. 
+We get
+\begin{align*}
+\left|\begin{array}{cccc} 2 & 0 & 2 & 3 \\  1 & 0 & 0 & 2 \\ 3 & 1 & -1 & 3 \\ -1 & 0 & 2 & 3 \end{array}\right| = 
+\end{align*}
+
+---
 {{< include determinants/invmatteo.qmd >}}
 
 ---
 
-## Magnification factors for matrices
+## Proof
+
+---
+
+## Magnification factors for matrices(*)
+
+* What do we mean by a volume in $\mathbb{R}^n$?
+* The volume of a set $X$ in $\mathbb{R}^n$ is denoted $V(X)$. 
+
+Let $A$ be an $n\times n$-matrix.
+
+*  We define $AX = \{ A\mathbf{x} : \mathbf{x}\in X\}$ (the image of $X$ under multiplication with $A$). 
+* The *magnification factor* of a matrix $A$ is a constant $k$ so that $V(AX)=kV(X)$
+
+---
+
+Let $A$ be an elementary matrix. Then the magnification factor is 
+
+* $1$ if $A$ is a row interchange
+* $|s|$ if $A$ multiplies a row with $s$.
+* $1$ if $A$ adds a multiple of one row to another.
+
+Thus, the magnification factor of any invertible matrix $A$ is $|\det(A)|$! 
 
 ---
 
 ## The vector product
 
-$$\left( x_2y_3-x_3y_2, - (x_1y_3-x_3y_1),x_1y_2-x_2y_1\right)$$
-is called the *vector product* of $\mathbf{x}$ and $\mathbf{y}$. 
-Also written as $\mathbf{x}\times\mathbf{y}$. 
+Let $\mathbf{x}=(x_1,x_2,x_3)$ and $\mathbf{y}=(y_1,y_2,y_3)$. 
+We define the *vector product* $\mathbf{x}\times\mathbf{y}$ as
+$$\mathbf{x}\times\mathbf{y}=\left( x_2y_3-x_3y_2, - (x_1y_3-x_3y_1),x_1y_2-x_2y_1\right)$$
+We also write this as
+$$
+\left| 
+\begin{array}{ccc}
+\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e_3} \\
+x_1 & x_2 & x_3 \\
+y_1 & y_2 & y_3
+\end{array}
+\right|
+$$
 
 - $\mathbf{x}\times\mathbf{y}$ is orthogonal to both $\mathbf{x}$ and $\mathbf{y}$. 
 - $|\mathbf{x}\times\mathbf{y}|$ equals the area of the parallellogram spanned by $\mathbf{x}$ and $\mathbf{y}$. 
 - The direction of $\mathbf{x}\times\mathbf{y}$ satisfies the *right hand rule*.
+- The volume of the parallellepiped spanned by $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ is the determinant of the matrix
+$\begin{pmatrix} \mathbf{a} & \mathbf{b} & \mathbf{c} \end{pmatrix}$. 
+
+Let $\mathbf{a}_1=(1,3,2)$, and $\mathbf{a}_2=(2,-1,3)$. Then $\mathbf{a}_1\times\mathbf{a}_2$ is
+
 
 ---
 
-## Geometrical interpretation of the determinant.
+## Verification
 
-If we define
+Can also be computed with help of the command `cross`:
+
+```{python}
+a1 = np.array([1,3,2])
+a2 = np.array([2,-1,3])
+np.cross(a1,a2)
+```
+
+
+---
+
+## Finding the expression for a plane going through three points
+
+We use the vector product to find a normal vector for the plane passing through the
+three points 
 $$
-\mathbf{b}=\left( \det(A^{(11)}),-\det(A^{(12)}),\det(A^{(13)}),...,(-1)^{n+1}\det(A^{(1n)}) \right),
+\begin{aligned}
+\mathbf{a}&=(4,-2,-1) & \mathbf{b}&=(1,0,0) & \mathbf{c}&=(2,-1,0)
+\end{aligned}
+$$ 
+
+$\mathbf{b}-\mathbf{a}$ and $\mathbf{c}-\mathbf{a}$ are vectors parallel to this plane:
 $$
-then the definition of the determinant can be written as the scalar product 
-$\mathbf{a}_1\cdot \mathbf{b}$ ($\mathbf{a}_i$ is here row $i$ in $A$). 
-We can show that
+\begin{aligned}
+\mathbf{b}-\mathbf{a}&=(-3,2,1) & \mathbf{c}-\mathbf{a}&=(-2,1,1)
+\end{aligned}
+$$
+The vector product of these:
+$$
+\begin{aligned}
+\left| \begin{array}{ccc} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ -3 & 2 & 1 \\ -2 & 1 & 1 \end{array} \right| 
+&= (2-1)\mathbf{e}_1 -(-3+2)\mathbf{e}_2 + (-3+4)\mathbf{e}_3 \\
+&= \mathbf{e}_1+\mathbf{e}_2+\mathbf{e}_3 = (1,1,1). 
+\end{aligned}
+$$
+The plane can thus be written on the form $x+y+z=1$.  
 
-- $\mathbf{b}$ is orthogonal to all $\mathbf{a}_2,...,\mathbf{a}_n$, 
-- $|\mathbf{b}|=V(F(\mathbf{a}_2,...,\mathbf{a}_n))$,
-- $|\mathbf{a}_1\cdot\mathbf{b}|=V(AB)=|\det(A)|$.
+--- 
 
-$\mathbf{b}$ is thus a generalisation of the vector product. 
+We also have
+
+* The area of the parallellogram spanned by $\mathbf{a}$ and $\mathbf{b}$ is the length of the vector
+$$
+\left| \begin{array}{ccc} 
+\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\
+4 & -2 & -1 \\ 
+1 & 0 & 0  
+\end{array} \right|
+=(0,-1,2),
+$$
+which is $\sqrt{5}$.
+* The volume of the parallellepiped spanned by $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$, is
+$$
+\left| \begin{array}{ccc} 
+4 & -2 & -1 \\ 
+1 & 0 & 0 \\
+2 & -1 & 0 
+\end{array} \right|
+=
+-\left| \begin{array}{cc} -2 & -1 \\ -1 & 0 \end{array} \right| = 1.
+$$
 
 ---

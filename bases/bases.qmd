@@ -18,6 +18,15 @@ Let $\{\mathbf{a}_i\}_{i=1}^n$ be $n$ vectors in $\mathbb{R}^m$.
 If $c_1,c_2,...,c_n$ are scalars, we call 
 $$c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n$$
 a *linear combination*\index{Linear!combination} of $\{\mathbf{a}_i\}_{i=1}^n$. 
+That $\mathbf{b}$ is a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ is the same as that we can find $x_1,x_2,...,x_n$ so that 
+$$x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots x_n \mathbf{a}_n = \mathbf{b},$$
+which is the same as that  $A\mathbf{x}=\mathbf{b}$ has a solution. 
+@prp-gaussel can thus be restated as follows:
+
+* $\mathbf{b}$ can be written as a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ 
+if and only if the last column in the augmented matrix $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ is not a pivot column, 
+* $\mathbf{b}$ can be written as a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ in a unique way if also all columns in $A$ are pivot columns.
+
 The *Span* of $\{\mathbf{a}_i\}_{i=1}^n$, \index{Span} written 
 $$\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n),$$
 is the collection of av all linear combinations of $\{\mathbf{a}_i\}_{i=1}^n$. We say that 
@@ -25,9 +34,13 @@ is the collection of av all linear combinations of $\{\mathbf{a}_i\}_{i=1}^n$. W
 * the $\mathbf{a}_i$ *span* $\mathbb{R}^m$ if $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)=\mathbb{R}^m$,
 * the $\mathbf{a}_i$ are *linearly independent*\index{Linear!independence} 
 if every $\mathbf{b}\in \text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ can be written as a linear combination of 
-the $\mathbf{a}_i$ in a unique way.
+the $\mathbf{a}_i$ in a unique way. Otherwise the $\mathbf{a}_i$ are said to be *linearly dependent*. 
 
-The following result is often useful when it comes to proving linear independence for a set of vectors. 
+That $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ is the same as that $A\mathbf{x}=\mathbf{b}$ always has a solution, 
+which is the same as that all rows in $A$ are pivot rows 
+(since this implies that the last column in $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ never becomes a pivot column). 
+
+The following result is often useful when it comes to proving linear independence of a set of vectors. 
 
 ::: {#prp-linindequivalence}
 The following are equivalent:
@@ -66,52 +79,63 @@ where not all $t_k$ are zero. Thus, there exists some nonzero $(c_1,...,c_n)$ so
 This is the negated statement of 2., and this completes the proof.
 :::
 
-Orthogonal sets of vectors are linearly independent. To see this, consider a linear dependence relation
+
+
+Let us take a look at some particular cases where linear independence follows easily:
+
+* Standard basis vectors are linearly independent: The column vectors $\mathbf{e}_i$ with a $1$ in component $i$, and $0$ elsewhere, are called *standard basis vectors*. Assume that 
+$$c_1\mathbf{e}_1 + c_2\mathbf{e}_2 + \cdots + c_n\mathbf{e}_n=\mathbf{0}.$$
+The $i$'th component in this is $c_i$, since $\mathbf{e}_i$ is the only vector contributing at index $i$. It follows that $c_i=0$, 
+so that standard basis vectors are linearly independent. 
+* The pivot columns in a reduced echelon form are linearly independent, since they are standard basis vectors. 
+* The pivot rows in a reduced echelon form are linearly independent. To see this, consider a relation
+$$c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n=\mathbf{0},$$
+where $\mathbf{a}_i$ is the $i$'th pivot row. Since $\mathbf{a}_1$ is the only pivot row with a nonzero entry at the first pivot column, 
+we must have that $c_1=0$. 
+Since $\mathbf{a}_2$ is the only pivot row with a nonzero entry at the second pivot column, it follows in the same way that 
+$c_2=0$, and so on. Linear independence follows. 
+* Let $A$ be a triangular matrix with nonzero diagonal entries. It follows in the same way as above that 
+the column vectors of $A$ are linearly independent. 
+* Orthogonal sets of vectors are linearly independent: Consider a linear dependence relation
 $$
 c_1\mathbf{a}_1+c_2\mathbf{a}_2+\cdots + c_n\mathbf{a}_n=\mathbf{0}.
 $$
 Taking the scalar product with $\mathbf{a}_i$ on each side we get 
 $$
-c_1(\mathbf{a}_1\cdot\mathbf{a}_i)+c_2(\mathbf{a}_2\cdot\mathbf{a}_i)+\cdots + c_n(\mathbf{a}_n\cdot\mathbf{a}_i)=0,
+c_1(\mathbf{a}_1\cdot\mathbf{a}_i)+c_2(\mathbf{a}_2\cdot\mathbf{a}_i)+\cdots + c_n(\mathbf{a}_n\cdot\mathbf{a}_i)=0.
 $$
-which simplifies to $c_i(\mathbf{a}_i\cdot\mathbf{a}_i)=0$, so that $c_i=0$ 
-(since $\mathbf{a}_i\cdot\mathbf{a}_i\neq 0$ when $\mathbf{a}_i\neq \mathbf{0}$).
-It follows from @prp-linindequivalence that $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent.
+Since $\mathbf{a}_j\cdot\mathbf{a}_i=0$ when $i\neq j$, this simplifies to $c_i(\mathbf{a}_i\cdot\mathbf{a}_i)=0$. 
+Since $\mathbf{a}_i\cdot\mathbf{a}_i\neq 0$ when $\mathbf{a}_i\neq \mathbf{0}$, it follows that $c_i=0$.
+@prp-linindequivalence thus says that $\{\mathbf{a}_i\}_{i=1}^n$ are linearly independent.
 
-Below we shall write $\mathbf{a}_i$ for the columns of the matrix $A$. We will have use for the following result about 
+Below we shall write $\mathbf{a}_i$ for the columns in the matrix $A$. We will have use for the following result about 
 linear dependence relations.
 
-::: {#prp-avhrel}
-Row equivalent matrices share the same linear dependence relations between columns. 
+::: {#prp-avhrel name='Row equivalent matrices share linear dependence relations between columns'}
+Let $A$ have columns $\mathbf{a}_i$, and $B$ have columns $\mathbf{b}_i$. 
+If $A$ and $B$ are row equivalent (i.e., $A\sim B$), then
+$$c_1\mathbf{a}_1 + c_2\mathbf{a}_2 + \cdots + c_n\mathbf{a}_n = \mathbf{0}$$
+if and only if
+$$c_1\mathbf{b}_1 + c_2\mathbf{b}_2 + \cdots + c_n\mathbf{b}_n = \mathbf{0}.$$
 In particular, linear dependence relations between columns in a matrix are preserved by elementary row operations. 
 :::
 
-::: {.proof}
-For the first part, assume that $B=EA$ where $E$ is elementary. 
-If $A\mathbf{c}=\mathbf{0}$ we have that $B\mathbf{c}=EA\mathbf{c}=\mathbf{0}$, so that 
-any linear dependence relation between columns in $A$ also is a linear dependence relation between columns in $B$. 
-The other way, any elementary matrix is invertible, so that $A=E^{-1}B$. 
-From this it follows in the same way that any linear dependence relation between columns in $B$ also is a linear dependence relation between columns in $A$. The two thus share the same linear dependence relations. 
+In a reduced echelon form the pivot columns are standard basis vectors, 
+and the other columns are linear combinations of the preceding pivot columns 
+(since they have entries in the components corresponding to the pivot rows only). 
+Due to @prp-avhrel this also applies for the matrix itself - the pivot columns are linearly independent, and the other columns are linear combinations of these. 
 
-For the last part, if $A$ and $B$ are row equivalent, we have that 
-$B=E_1\cdots E_kA$, where the $E_i$ er elementary. 
-By iterating on the first part it follows that $A$ and $B$ have the same linear dependence relations. 
+::: {.proof}
+Assume first that $B=EA$ where $E$ is elementary. 
+@prp-samesolsrwoeq for the particular case where $\mathbf{b}=\mathbf{0}$ gives that the systems $A\mathbf{c}=\mathbf{0}$ and $EA\mathbf{c}=\mathbf{0}$ have the same solutions, 
+i.e., that $A$ and $EA$ share the same linear dependence relations between columns. Thus, linear dependence relations between columns in a matrix are preserved by elementary row operations. 
+
+Since we can write $B=E_k\cdots E_2E_1A$ with the $E_i$ elementary, by iterating on the first part we also get that $A$ and $B$ share the same linear dependence relations between 
+their columns. 
 :::
 
-The concepts linear independence and span can be interpreted by means of pivot elements:
 
-* That $\mathbf{b}$ is a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ is the same as that we can find $x_1,x_2,...,x_n$ so that 
-$$x_1\mathbf{a}_1 + x_2\mathbf{a}_2 + \cdots x_n \mathbf{a}_n = \mathbf{b},$$
-which is the same as that  $A\mathbf{x}=\mathbf{b}$ has a solution, which again is the same as that the last column 
-in the augmented matrix $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ is not a pivot column. 
-* That $\mathbf{b}$ can be written as a linear combination of $\{\mathbf{a}_i\}_{i=1}^n$ in a unique way
-requires in addition that all columns in $A$ are pivot columns.
-* That $\{\mathbf{a}_i\}_{i=1}^n$ span $\mathbb{R}^m$ is the same as that $A\mathbf{x}=\mathbf{b}$ always 
-has a solution, which is the same as that all rows in $A$ are pivot rows. 
-(since this implies that that the last column in $\begin{pmatrix} A & \mathbf{b} \end{pmatrix}$ never becomes a pivot column). 
-* In a reduced echelon form the pivot columns are linearly independent, and the other columns can be expressed in terms of these. 
-This therefore also applies for the matrix itself - the pivot columns are linearly independent, and the other columns are 
-linear combinations of these. 
+
 
 From this we will prove the following:
 
@@ -164,18 +188,32 @@ We have the vectors
 \mathbf{a}_3&= \begin{pmatrix} 1 \\ 2 \\ 0 \end{pmatrix} &
 \mathbf{a}_4&= \begin{pmatrix} -2 \\ 3 \\ 4 \end{pmatrix}.
 \end{align*}
-Let us first show that these span $\mathbb{R}^3$. We row-reduce to echelon form:
+Let us first show that these span $\mathbb{R}^3$. We stack the vectors in a matrix and row-reduce:
 \begin{align*}
 \begin{pmatrix} 0 & 1 & 1 & -2 \\ 2 & 1 & 2 & 3 \\ 1 & 2 & 0 & 4 \end{pmatrix} &\sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 2 & 1 & 2 & 3 \\ 0 & 1 & 1 & -2 \end{pmatrix} \sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & -3 & 2 & -5 \\ 0 & 1 & 1 & -2 \end{pmatrix}
 \sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & 1 & 1 & -2 \\ 0 & 0 & 5 & -11 \end{pmatrix}
 \end{align*}
-From the echelon form it is clear that all rows are pivot rows - we don't need to bring the matrix to
-reduced echelon form to see this. It follows that the four vectors span $\mathbb{R}^3$. 
-Further we see that the first three columns are pivot columns, so that these are linearly independent. The fourth vector can be 
-expressed with the other three columns since it is not a pivot column.
-That the four vectors can't be linearly independent can also be inferred from 
-that this would require $m\geq n$, which is clearly not the case. 
-The three columns $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$ are therefore both linearly independent and span $\mathbb{R}^3$, since all rows and columns have pivot elements in this $3\times 3$-matrix. $\clubsuit$
+From this it is clear that all rows are pivot rows - we don't need to bring the matrix to
+(reduced) echelon form to see this. It follows that the four vectors span $\mathbb{R}^3$. 
+Further we see that the first three columns are pivot columns, so that these are linearly independent. 
+The fourth vector can be expressed with the other three columns since it is not a pivot column. To find this expression, bring the matrix all the way to reduced echelon form:
+$$
+\begin{aligned}
+\begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & 1 & 1 & -2 \\ 0 & 0 & 5 & -11 \end{pmatrix}
+&\sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & 1 & 1 & -2 \\ 0 & 0 & 1 & -11/5 \end{pmatrix}
+\sim \begin{pmatrix} 1 & 2 & 0 & 4 \\ 0 & 1 & 0 & 1/5 \\ 0 & 0 & 1 & -11/5 \end{pmatrix} \\
+&\sim \begin{pmatrix} 1 & 0 & 0 & 18/5 \\ 0 & 1 & 0 & 1/5 \\ 0 & 0 & 1 & -11/5 \end{pmatrix}
+\end{aligned}
+$$
+Denoting the four columns in this reduced echelon form by $\mathbf{c}_1$, $\mathbf{c}_2$, $\mathbf{c}_3$, and $\mathbf{c}_4$, we see the linear dependence relation
+$\mathbf{c}_4 = \frac{18}{5}\mathbf{c}_1 + \frac{1}{5}\mathbf{c}_2 - \frac{11}{5}\mathbf{c}_3$. This is a linear dependence relation for the matrix itself also, so that 
+$$\mathbf{a}_4 = \frac{18}{5}\mathbf{a}_1 + \frac{1}{5}\mathbf{a}_2 - \frac{11}{5}\mathbf{a}_3.$$
+This relation is easily verified by computing the left and right hand sides.
+ 
+That the four vectors can't be linearly independent can also be inferred from that this would require $m\geq n$, which is clearly not the case. 
+The three columns $\mathbf{a}_1$, $\mathbf{a}_2$, $\mathbf{a}_3$, however, are both linearly independent and span $\mathbb{R}^3$, since all rows and columns have pivot elements in the corresponding $3\times 3$-matrix. 
+$\{\mathbf{a}_1,\mathbf{a}_2,\mathbf{a}_3\}$ is therefore a basis for $\mathbb{R}^3$.
+$\clubsuit$
 :::
 
 If the columns in a matrix do not span $\mathbb{R}^m$ we now get a simple procedure for expanding a set of pivot columns 
@@ -371,30 +409,35 @@ that the rank equals the number of pivot columns,
 and that the sum of the number of pivot columns and the number of free variables equals the number of columns in the matrix. 
 :::
 
-We round off this section with the following result.
+We round off this section with the uniqueness of the reduced echelon form:
 
 ::: {#prp-}
-The reduced echelon form is unique.
+For any $m\times n$-matrix, the reduced echelon form is unique.
 :::
 
 ::: {.proof}
-Suppose that a matrix $A$ can be row-reduced to two reduced echelon forms $C_1$ and $C_2$. We need to show that $C_1=C_2$. 
-We first show that $C_1$ and $C_2$ have the same pivot columns (at the same column indices). 
-Assume by contradiction that this is not the case. Then there exists a column index $k$ so that \index{Proof by contradiction!Reduced echelon form is unique}
+Assume that $A$ has both $C$ and $D$ as reduced echelon forms. $C$ and $D$ are then row equivalent ($C\sim D$). 
+We will prove by induction that they in fact are equal. 
 
-* the columns $1,...,k-1$ in both $C_1$ and $C_2$ have the same columns with leading ones,
-* column $k$ in $C_1$ have a leading one, while column $k$ in $C_2$ does not.
+We start by proving that the first column in both $C$ and $D$ are equal. This is either 
+a column of zeros, or $\mathbf{e}_1$. It is impossible that one has a first column of zeros, 
+and the other has $\mathbf{e}_1$ as a first column - since row operations on the zero vector can only give the zero vector back. 
+The first columns in $C$ and $D$ thus coincide. 
 
-Then column $k$ in $C_1$ can not be expressed by columns $1,...,k-1$ in $C_1$, 
-while column $k$ in $C_2$, can be expressed by columns $1,...,k-1$ in $C_2$. 
-We thus have a linear dependence relation between the stated columns in $C_2$, which is not such a relation for $C_1$. 
-This is a contradiction, since $A$, $C_1$, and $C_2$ have the same linear dependence relations. 
-Thus, $C_1$ and $C_2$ have the same columns with leading ones (at the same indices). 
-This also means that these columns must be equal, since the leading ones must come in row 1,2,3, and so on. 
+Assume now that the first $k$ columns of $C$ and $D$ have been proved to be equal, where $k\geq 1$. 
+Consider column $k+1$ in $C$ and $D$ ($\mathbf{c}_{k+1}$ and $\mathbf{d}_{k+1}$). There are two possibilities. 
+One is that both of them are pivot columns. Then they are trivially equal.
 
-The remaining columns (those without a leading one) can be written as linear combinations of the columns with leading ones.
-Since these are equal, and the linear dependence relations are the same, 
-it follows that the remaining columns in $C_1$ and $C_2$ also are equal. 
+The other possibility is that one of them (say $\mathbf{c}_{k+1}$) is not a pivot column. We can then write 
+$$\mathbf{c}_{k+1}=\sum_r a_r\mathbf{c}_r$$ 
+for some scalars $a_r$, where only the pivot columns among $\{\mathbf{c}_r\}_{r=1}^k$ contribute. 
+Since these columns are the same in $C$ and $D$, and since $C$ and $D$ share the same linear dependence relations between 
+their columns, we get that
+$$
+\mathbf{c}_{k+1}=\sum_k a_r\mathbf{c}_r=\sum_k a_r\mathbf{d}_r=\mathbf{d}_{k+1},
+$$
+so that column $k+1$ are also equal in the two matrices. 
+This completes the proof. 
 :::
 
 Note that the concept "pivot column" was not used for the reduced echelon forms above. 
@@ -854,7 +897,7 @@ Suppose that $A$ and $B$ are row equivalent. Show that $\text{Row}(A)=\text{Row}
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 Since the order of the vectors $\mathbf{a}_i$ in $\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$ does not matter, 
-it is clear that $\text{Row}(A)=\text{Row}(B)$ if $B$ is obtained from $A$ by a row exchange. Since 
+it is clear that $\text{Row}(A)=\text{Row}(B)$ if $B$ is obtained from $A$ by a row interchange. Since 
 $$\text{Sp}(s\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)=\text{Sp}(\mathbf{a}_1,\mathbf{a}_2,...,\mathbf{a}_n)$$
 it is also clear that $\text{Row}(A)=\text{Row}(B)$ if $B$ is obtained from $A$ by multiplying a row with a scalar$\neq 0$.
 

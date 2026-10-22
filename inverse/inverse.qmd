@@ -59,7 +59,7 @@ When $A$ satisfies 1.-4. in @thm-corekv, we have shown that $A$ is invertible (s
 The other way, we will show that, if $A$ is invertible, it must satisfy 1.-4. in @thm-corekv. 
 We will actually prove the following stronger statement: 
 
-::: {#prp-}
+::: {#prp-satisfies14}
 If $AB=I_n$, then both $A$ and $B$ satisfy 1.-4. in @thm-corekv (so that they are invertible). 
 Also, $A$ and $B$ are inverses of one-another:
 :::
@@ -300,7 +300,7 @@ as $B$ has rows (6).
 
 1. [ ] The product $AB$ is defined.
 1. [ ] The equation $BA=C$ has the solution $A=B^{-1}C$.
-1. [ ] The matrix $B$ has double as many components as $A$.
+1. [ ] The matrix $B$ has twice as many components as $A$.
 1. [x] The product $A^TB$ is not defined.
 1. [ ] None of the other statements are true.
 

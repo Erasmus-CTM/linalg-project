@@ -472,7 +472,7 @@ shuffle_answers: false
 ---
 
 
-## Eigenvectors of a mirroring operations
+## Eigenvectors of a mirroring operation
 
 The mapping which mirrors all points in the plane about the $y$-axis has
 
@@ -484,10 +484,10 @@ The mapping which mirrors all points in the plane about the $y$-axis has
 
 ## Eigenvalues of an elementary matrix.
 
-Let $A$ be the elementary $n\times n$-matrix obtained by adding row $i$ to row $j$ ($i\neq j$). 
-The eigenvalues of $A$ are
+Let $E$ be the elementary $n\times n$-matrix obtained by adding row $i$ to row $j$ ($i\neq j$). 
+The eigenvalues of $E$ are
 
-> Use that $A$ is triangular with ones on the diagonal.
+> Use that $E$ is triangular with ones on the diagonal.
 
 1. [x] all 1
 2. [ ] all 0 or 1
@@ -495,14 +495,66 @@ The eigenvalues of $A$ are
 
 ## Eigenvectors of an elementary matrix.
 
-Let $A$ be the same matrix as in the previous question. Then
+Let $E$ be the same matrix as in the previous question. Then
 
-> Column $i$ has two entries which are $1$. It follows that $A\mathbf{e}_i$ has two entries which are $1$. 
+> Column $i$ has two entries which are $1$. It follows that $E\mathbf{e}_i$ has two entries which are $1$. 
 Column $j$ on the other has only an entry in row $j$. 
 
-1. [x] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_i$.
-2. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$, except $\mathbf{e}_j$.
-3. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $A$.
+1. [x] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $E$, except $\mathbf{e}_i$.
+2. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $E$, except $\mathbf{e}_j$.
+3. [ ] All $\mathbf{e}_1,...,\mathbf{e}_n$ are eigenvectors of $E$.
+
+
+
+## Eigenvalues of a row interchange matrix
+
+The matrix 
+$$
+E=\begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+$$
+has eigenvalues
+
+> Start by expanding the determinant of $E-\lambda I_3$ along the third row
+
+1. [ ] $-1,-1,1$
+2. [x] $-1,1,1$
+3. [ ] $1,1,1$
+4. [ ] $-1,-1,-1$
+
+## Eigenvalues of a general row interchange matrix
+
+Let $E$ be the elementary $n\times n$ matrix obtained by interchanging row $i$ and $j$ in the identity matrix. The eigenvalues of $E$ are
+
+> Start by expanding the determinant of $E-\lambda I_n$ along the rows different from $i$ and $j$. 
+Having done this you need to consider the matrix
+$$
+\begin{pmatrix} -\lambda & 1 \\ 1 & -\lambda \end{pmatrix}.
+$$
+
+1. [ ] $-1$ with multiplicity $n$.
+2. [ ] $1$ with multiplicity $n$.
+3. [ ] $-1$ (with multiplicity $n-1$) and $1$ with multiplicity $1$.
+4. [x] $1$ (with multiplicity $n-1$) and $-1$ with multiplicity $1$.
+
+
+## Eigenvectors of a general row interchange matrix
+
+Let $E$ be as in the previous exercise. The eigenvectors of $E$ are
+
+> Here it is perhaps simplest to verify which of the alternatives give eigenvectors by computing $E\mathbf{x}$ 
+for each such vector directly. A bit more complicated is to find the eigenvectors from the reduced echelon form of $E-\lambda I$:  
+The reduced echelon form of $E-I_n$ has only one pivot row, 
+and which has only two nonzero entries at index $i$ and $j$ (with a 1 and a -1). 
+An eigenvector must thus satisfy $x_i=x_j$, where the other variables are free. 
+It follows that $\{\mathbf{e}_k\}_{k\neq i,j}$, in addition to $\mathbf{e}_i+\mathbf{e}_j$, are eigenvectors.  
+The reduced echelon form of $E+I_n$ has ones on the diagonal, except at index $j$, where it is 0. 
+Row $i$ states that $x_1+x_2=0$, so that $x_1=-x_2$, so that $\mathbf{e}_i-\mathbf{e}_j$ is an eigenvector. 
+
+1. [ ] $\{\mathbf{e}_k\}_{k=1}^n$
+2. [ ] $\mathbf{e}_i+\mathbf{e}_j$, $\mathbf{e}_i-\mathbf{e}_j$
+3. [ ] $\{\mathbf{e}_k\}_{k\neq i,j}$.
+4. [x] $\mathbf{e}_i+\mathbf{e}_j$, $\mathbf{e}_i-\mathbf{e}_j$, as well as $\{\mathbf{e}_k\}_{k\neq i,j}$.
+
 
 
 ## A matrix with distinct eigenvalues
@@ -551,6 +603,15 @@ where we expanded the determinant along the second row. The eigenvalues are thus
 5. [ ] $2$
 
 
+## A matrix with complex eigenvalues and eigenvectors
+
+The matrix 
+$$\begin{pmatrix}1 & 1 \\ -1 & 1\end{pmatrix}$$ has
+
+1. [ ] $1+i$ and $1-i$ as eigenvalues, with $(i,1)$ and $(-i,1)$ as corresponding eigenvectors, respectively.
+2. [ ] $i$ and $-i$ as eigenvalues, with $(-i,2)$ and $(i,2)$ as corresponding eigenvectors, respectively.
+3. [ ] $3+i$ and $3-i$ as eigenvalues, with $(-2i,3)$ and $(2i,3)$ as corresponding eigenvectors, respectively.
+4. [x] $1+i$ and $1-i$ as eigenvalues, with $(-i,1)$ and $(i,1)$ as corresponding eigenvectors, respectively.
 
 ## Eigenvectors of a $2\times 2$-matrix.
 
@@ -560,11 +621,59 @@ A=\begin{pmatrix}0.8 & 0.7 \\ 0.2 & 0.3 \end{pmatrix}
 $$
 has 
 
-1. [ ] eigenvectors $(1,3)$ and $(4,1)$
+1. [ ] eigenvectors $\mathbf{v}_1=(1,3)$ and $\mathbf{v}_2=(4,1)$
 2. [ ] not two linearly independent eigenvectors
-3. [ ] eigenvectors $(1,2)$ and $(2,1)$
-4. [ ] eigenvectors $(1,1)$ and $(7,-2)$
-5. [x] eigenvectors $(-1,1)$ and $(7,2)$
+3. [ ] eigenvectors $\mathbf{v}_1=(1,2)$ and $\mathbf{v}_2=(2,1)$
+4. [ ] eigenvectors $\mathbf{v}_1=(1,1)$ and $(\mathbf{v}_2=7,-2)$
+5. [x] eigenvectors $\mathbf{v}_1=(-1,1)$ and $\mathbf{v}_2=(7,2)$
+
+## Decomposition with eigenvectors and limits for a system
+
+Let $A$ be the matrix from the preceding exercise, and let $\mathbf{v}_1$ and $\mathbf{v}_2$ 
+be the eigenvectors you found there. The vector 
+$$
+\mathbf{x}_0=\begin{pmatrix} 26 \\ 10 \end{pmatrix}
+$$
+can be written as 
+
+> The eigenvalues from the preceding exercise are 0.1 and 1
+
+1. [ ] $\mathbf{x}_0=2\mathbf{v}_1+4\mathbf{v}_2$, and we have that $\lim_{n\to\infty}A^n\mathbf{x}_0=(-2,2)$
+2. [x] $\mathbf{x}_0=2\mathbf{v}_1+4\mathbf{v}_2$, and we have that $\lim_{n\to\infty}A^n\mathbf{x}_0=(28,8)$
+3. [ ] $\mathbf{x}_0=3\mathbf{v}_1+3\mathbf{v}_2$, and we have that $\lim_{n\to\infty}A^n\mathbf{x}_0=(4,7)$
+4. [ ] $\mathbf{x}_0=4\mathbf{v}_1-\mathbf{v}_2$, and we have that $\lim_{n\to\infty}A^n\mathbf{x}_0=(7,12)$
+
+
+## Diagonalisation
+
+Let again $A$ be the matrix from the preceding exercise. A diagonalisation of $A$ is
+
+> The $P$ in the diagonalisation has the eigenvectors as columns, so that 
+$$P=\begin{pmatrix} -1 & 7 \\ 1 & 2 \end{pmatrix}$$
+The formula for the inverse of a $2\times 2$-matrix gives
+$$P^{-1}=-\frac{1}{9}\begin{pmatrix} 2 & -7 \\ -1 & -1\end{pmatrix}.$$
+
+
+1. [x] $$A=-\frac{1}{9}\begin{pmatrix} -1 & 7 \\ 1 & 2 \end{pmatrix}\begin{pmatrix} 0.1 & 0 \\ 0 & 1 \end{pmatrix}\begin{pmatrix} 2 & -7 \\ -1 & -1\end{pmatrix}$$
+2. [ ] $$A=-\frac{1}{9}\begin{pmatrix} 2 & -7 \\ -1 & -1\end{pmatrix}\begin{pmatrix} 0.1 & 0 \\ 0 & 1 \end{pmatrix}\begin{pmatrix} -1 & 7 \\ 1 & 2 \end{pmatrix}$$
+3. [ ] $$A=-\frac{1}{9}\begin{pmatrix} -1 & 7 \\ 1 & 2 \end{pmatrix}\begin{pmatrix} 1 & 0 \\ 0 & 0.1 \end{pmatrix}\begin{pmatrix} 2 & -7 \\ -1 & -1\end{pmatrix}$$
+4. [ ] $$A=-\frac{1}{9}\begin{pmatrix} 2 & -7 \\ -1 & -1\end{pmatrix}\begin{pmatrix} 1 & 0 \\ 0 & 0.1 \end{pmatrix}\begin{pmatrix} -1 & 7 \\ 1 & 2 \end{pmatrix}$$
+
+
+## Eigenvalues and eigenvectors of a rank one matrix. 
+
+Let $\mathbf{p}\in\mathbb{R}^n$ have length 1, and define the $n\times n$-matrix $P=\mathbf{p}\mathbf{p}^T$. 
+Which of the following statements are true?
+
+> $\mathbf{p}$ is a basis for the column space of $P$ (it has rank one). From this it follows that $\mathbf{p}$ is an eigenvector for $P$. All other eigenvalues must be zero, i.e., they satisfy $P\mathbf{x}=\mathbf{0}$, 
+which is the same as that $\mathbf{x}$ is in the ortogonal complement of $\mathbf{p}$ (i.e., is in the null space of the row vector $\mathbf{p}$).  This null space has dimension $n-1$ (all but one variable are free), 
+so that the set of eigenvectors corresponding to eigenvalue $0$ also has dimension $n-1$. 
+
+- [x] $P$ has $1$ as an eigenvalue, and the corresponding space of eigenvectors has dimension $1$.
+- [ ] $P$ has $1$ as an eigenvalue, and the corresponding space of eigenvectors has dimension $n-1$.
+- [x] $P$ has $0$ as an eigenvalue, and the corresponding space of eigenvectors has dimension $n-1$.
+- [ ] $P$ has $0$ as an eigenvalue, and the corresponding space of eigenvectors has dimension $1$. 
+- [x] $\mathbf{p}$ is an eigenvector for $P$.
 
 ```
 :::
@@ -834,8 +943,8 @@ Show that the rank of a diagonalisable matrix equals the number of nonzero eigen
 Let $A=PDP^{-1}$ be diagonalisable. 
 Multiplication with $P^{-1}$ to the right does not change the column space, so that $\text{rank}(DP^{-1})=\text{rank}(D)$. 
 Similarly, multiplication with $P$ to the left does not change the dimension of the column space, so that 
-$$\text{rank}(A)=\text{rank}(PDP^{-1})=\text{rank}(Dp^{-1})=\text{rank(D},$$
-and $\text{rank(D}$ clearly equals the number of nonzero eigenvalues counted with multiplicity.
+$$\text{rank}(A)=\text{rank}(PDP^{-1})=\text{rank}(DP^{-1})=\text{rank}(D),$$
+and $\text{rank}(D)$ is clearly the number of nonzero eigenvalues counted with multiplicity.
 
 The second statement follows from that $A^k=PD^kP^{-1}$, and from that $D$ and $D^k$ have the same positions of zeros on the diagonal.
 
