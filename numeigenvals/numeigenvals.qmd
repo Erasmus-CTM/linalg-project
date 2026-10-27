@@ -1,5 +1,12 @@
 # Numerical methods for finding eigenvalues and eigenvectors
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -11,10 +18,14 @@ Others may only find the eigenvalues, or perhaps only one particular eigenvalue,
 In this chapter we will encounter some of these methods.  
 
 One obvious way to find eigenvalues of a matrix would be to plot the characteristic polynomial, and zoom in to find its zeros. 
-Let us test this approach on the $4\times 4$-matrix
-$A=\left(\begin{array}{cccc} 1 & 2 & 3 & 4 \\ 2 & 1 & 2 & 3 \\ 3 & 2 & 1 & 2 \\ 4 & 3 & 2 & 1 \end{array} \right)$,  
-where we start by plotting the characteristic polynomial of $A$ over $[-4,10]$ (the second line). 
-```{python}
+Let us test this approach on the matrix
+```{pyodide-python}
+#| autorun: true
+A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
+```
+where we start by plotting the characteristic polynomial of $A$ over $[-4,10]$. 
+```{pyodide-python}
+#| autorun: true
 {{< include code5b.py >}}
 ```
 We see that there is a zero in $[8,10]$, so that we can restrict the plot to this interval.
@@ -108,12 +119,14 @@ it is clear that $c_{kl}=I_{kl}$
 when $k\neq r,s$, $l\neq r,s$ ($I$ is the identity matrix). 
 If $k\neq r,s$ we also see that $c_{kr}=c_{rk}=c_{ks}=c_{sk}=0$, since columns $r,s$ are the only ones which have elements in row $r$ and $s$. 
 Further we see that 
-\begin{eqnarray*}
+$$
+\begin{aligned}
   c_{rs} &=& -\cos\theta\sin\theta + \sin\theta\cos\theta = 0\\
   c_{sr} &=& -\sin\theta\cos\theta + \cos\theta\sin\theta = 0\\
   c_{rr} &=& \cos\theta\cos\theta + \sin\theta\sin\theta = 1\\
   c_{ss} &=& (-\sin\theta)(-\sin\theta) + \cos\theta\cos\theta = 1.
-\end{eqnarray*}
+\end{aligned}
+$$
 It is therefore clear that $C=I$, so that the two matrices are inverses of one-another. 
 
 
@@ -127,16 +140,19 @@ to the plane spanned by two variables $x_r$ and $x_s$, while all other variables
 
 Let us go through the steps needed to implement Jacobi's method. 
 The function below takes the position $(r,s)$, the angle $\theta$, and the dimension $n$ as arguments, and returns the matrix $P_k$ in @eq-s_matrisen.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include P_k.py >}}
 ```
 The next functions take a real $n\times n$-matrix $A$ as input. 
 The first returns $\text{off}(A)$:
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include off.py >}}
 ```
 The next returns the position $(r,s)$ of the element outside the diagonal with biggest absolute value. The `np.max`-function is used:
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include offabsmaks.py >}}
 ```
 
@@ -153,7 +169,7 @@ The same can be shown when $A$ is multiplied with an orthogonal matrix to the le
 By restricting $B=P^TAP$ to row/columns $r$ and $s$, and using that $A$ and $B$ have the same Frobenius norm, we get that 
 $$a_{rr}^2 + a_{rs}^2 + a_{sr}^2 + a_{ss}^2 = b_{rr}^2 + b_{rs}^2 + b_{sr}^2 + b_{ss}^2,$$
 which can also be written as 
-$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^1-2a_{rs}^2.$$ {#eq-newrel}
+$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^2-2a_{rs}^2.$$ {#eq-newrel}
 
 
 We need to compute the components in the matrix $P$. Applying the definition of matrix multiplication,
@@ -161,12 +177,14 @@ and using that $P$ has nonzero elements only in position $r$ and $s$ in row/colu
 
 * If $i,j$ are both different from $r$ and $s$, we have that $b_{ij}=a_{ij}$. 
 * For component $(r,s)$ we get
-\begin{eqnarray*}
+$$
+\begin{aligned}
   b_{rs} &=& (P^T)_{rr}a_{rr}P_{rs} + (P^T)_{rr}a_{rs}P_{ss} + (P^T)_{rs}a_{sr}P_{rs} + (P^T)_{rs}a_{ss}P_{ss} \\
          &=& \cos\theta a_{rr}\sin\theta + \cos\theta a_{rs}\cos\theta -\sin\theta a_{sr}\sin\theta - \sin\theta a_{ss}\cos\theta \\
          &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + \cos^2\theta a_{rs} - \sin^2\theta a_{sr} \\
          &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta - \sin^2\theta)a_{sr},
-\end{eqnarray*}
+\end{aligned}
+$$
 where we have used that $A$ is symmetric. Since $B$ is symmetric it follows that
 $$b_{rs} = b_{sr} = \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta-\sin^2\theta)a_{rs}.$$
 
@@ -205,32 +223,36 @@ From this it follows that the off-diagonal contribution converges to zero, and w
 
 The following function returns an approximation to the eigenvalues and the eigenvectors of a given matrix 
 with help of Jacobi's method. 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include eig_jacobi.py >}}
 ```
 Inside the loop $r,s$ are first found as the off-diagonal entry with largest absolute value, $\theta$ is found from @eq-losdenne, and the matrix $P_k$ is computed. 
 The variable `A` is updated to $A_2$, $A_3$, and so on, while the variable `P` is updated to $P_1$, $P_1P_2$, $P_1P_2P_3$, and so on. 
 The code stops when $\text{off}(A_k)$ gets smaller than the given tolerance.
-To test this we create a random $6\times 6$ matrix $A$. $A+A^T$ is then a symmetric matrix:
-```{python}
-A = np.random.rand(6,6)
-A = A+A.T
+To test this consider the symmetric matrix:
+```{pyodide-python}
+#| autorun: true
+A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
 ```
 Our method gives the following approximation to the eigenvalues:
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = eig_jacobi(A)
-np.diag(D)
+print(np.diag(D))
 ```
 We first verify that the columns in $P$ are eigenvectors. This is the same as testing that 
 $PDP^T$ is an orthogonal diagonalisation of $A$:
-```{python}
-A - P @ D @ P.T
+```{pyodide-python}
+#| autorun: true
+print(A - P @ D @ P.T)
 ```
 It is seen that $A-PDP^T$ is not exactly zero, but very close to zero. This is due to roundoff errors on the computer. 
 We then test that we get the same eigenvalues as returned by `np.linalg.eig`:
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = np.linalg.eig(A)
-D
+print(D)
 ```
 We see that `eig_jacobi` and `np.linalg.eig` give approximately the same values, 
 but they are listed in a different order. On a computer we have no control over 
@@ -239,7 +261,8 @@ the order eigenvalues are listed - the algorithm decides this along the way.
 The matrix $A$ may be very large, and the function $P_k$ allocates a matrix of the same size. 
 The following function implements multiplication with $P_k$ to the right, and avoids this problem simply by 
 re-computing columns $r$ and $s$ (these are the only two columns in $A$ and $AP_k$ which differ). 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include mult_Pk_right.py >}}
 ```
 <!--
@@ -259,31 +282,29 @@ The QR-method is a method for finding eigenvalues which is very similar to Jacob
 In Jacobi's method the similarity transformations were plane rotations, but in the QR-method they are given by the QR-factorisation: If $A_k=Q_kR_k$ is a QR-factorisation of $A_k$, we set $A_{k+1}=Q_k^TA_kQ_k$. 
 We now get $A_{k+1}=Q_k^TQ_kR_kQ^k=R_kQ_k$. We can test this code on the same matrix $A$ as before, with small modifications to `eig_jacobi` above:
 
-```{python}
-def eig_qr(A):
-    tol=10**(-4)
-    n = np.shape(A)[0]
-    P = np.eye(n)
-    while off(A) > tol:
-        Q, R = np.linalg.qr(A)
-        A = R @ Q
-        P = P @ Q
-    return A, P
+```{pyodide-python}
+#| autorun: true
+{{< include eig_qr.py >}}
 ```    
 The function `np.linalg.qr()` to used to find the $QR$ factorisation here. 
+The following code verifies that the QR method actually finds the eigenvalues and eigenvectors for the same symmetric matrix as above. 
+Again the method `off` is used to find the off-diagonal contribution in the matrix. 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = eig_qr(A)
-np.diag(D)
+print(np.diag(D))
 ```
 
-```{python}
-A - P @ D @ P.T
+```{pyodide-python}
+#| autorun: true
+print(A - P @ D @ P.T)
 ```
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = np.linalg.eig(A)
-D
+print(D)
 ```
 
 We will not prove that the QR-method converges towards the eigenvalues/eigenvectors. 
@@ -419,7 +440,8 @@ so that $C(p)$ is diagonalisable, with $V$ diagonalising it.
 We can also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
 
 The following function takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include C.py >}}
 ```
 The function `np.poly(A)` is used to find the characteristic polynomial of $A$. 
@@ -435,17 +457,21 @@ This makes it computationally easier to use the power method (and other methods!
 The function `power_impl` below takes a matrix $A$ and an integer $n$ as input, computes $C(A)$, 
 performs $n$ iterations of the power method, and returns the corresponding estimate for the biggest eigenvalue.
 The function sets the vector having $1$ in all components as initial vector for the power method:
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include power_impl.py >}}
 ```
 
-```{python}
+The following code verifies that the power method actually finds the largest eigenvalue.
+
+```{pyodide-python}
+#| autorun: true
 mu, x = power_impl(C(A),10)
-mu
+print(mu)
 ```
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = np.linalg.eig(A)
-D
-```
+print(D)
 ```

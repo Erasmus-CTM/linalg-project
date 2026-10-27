@@ -1,5 +1,12 @@
 # Project: The companion matrix
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -32,7 +39,9 @@ $$
 (a) Show that the characteristic polynomial of $C(p)$ is given by $\det(C(p)-\lambda I)=(-1)^n p(\lambda)$, 
 so that the eigenvalues of $C(p)$ correspond to the roots of $p$. 
 
-\textbf{Hint:} Expand the determinant along the last row.  
+::::: {.callout-tip title='Hint' collapse="true"}
+Expand the determinant along the last row.
+:::::
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -51,12 +60,14 @@ $$
 When expanding the determinant along the last row we get the minors 
 $$1,-\lambda,\lambda^2,...,(-1)^{n-1}\lambda^{n-1},$$
 so that the determinant is
-\begin{align*}
-\lefteqn{ \sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} } \\
+$$
+\begin{aligned}
+&\sum_{k=1}^{n-1} (-1)^{n+k+1}a_{k-1} (-1)^{k-1}\lambda^{k-1}      +      (-1)^{2n+1}(a_{n-1}+\lambda) (-1)^{n-1}\lambda^{n-1} \\
 &= (-1)^n \sum_{k=1}^{n-1} a_{k-1} \lambda^{k-1}    +   (-1)^n\lambda^n (a_{n-1}\lambda^{n-1} +\lambda^n)  \\
 &= (-1)^n \sum_{k=1}^n a_{k-1} \lambda^{k-1} + (-1)^n\lambda^n \\
 &= (-1)^n p(\lambda).
-\end{align*}
+\end{aligned}
+$$
 :::::::
 :::::
 
@@ -104,21 +115,22 @@ Show that $(1,\lambda,\lambda^2,...,\lambda^{n-1})$ is a corresponding eigenvect
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 We have that
-\begin{align*}
-\lefteqn{
-\left(\begin{array}{rrrrr} 
+$$
+\begin{aligned}
+&\left(\begin{array}{rrrrr} 
   0 & 1 & 0 & \cdots & 0 \\ 
   0 & 0 & 1 & \cdots & 0 \\ 
   \vdots & \vdots & \vdots & \vdots & \vdots \\ 
   0 & 0 & 0 & \cdots & 1 \\ 
   -a_0 & -a_1 & -a_2 & \cdots & -a_{n-1} 
 \end{array}\right)
-\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} } \\
+\begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} \\
 &= \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ -a_0-a_1\lambda-a_2\lambda^2 - \cdots - a_{n-1}\lambda^{n-1} \end{pmatrix}
 = \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n-p(\lambda) \end{pmatrix}
 = \begin{pmatrix} \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \\ \lambda^n \end{pmatrix} \\
 &= \lambda \begin{pmatrix} 1 \\ \lambda \\ \lambda^2 \\ \vdots \\ \lambda^{n-1} \end{pmatrix} 
-\end{align*}
+\end{aligned}
+$$
 :::::::
 :::::
 :::
@@ -142,7 +154,8 @@ You can use the command \texttt{poly(A)} in \texttt{numpy} to find the character
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The code can look as follows.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include C.py >}}
 ```
 :::::::
@@ -162,35 +175,97 @@ As initial vector for the power method you can choose the vector having $1$ in a
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The code can look as follows.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include power_impl.py >}}
 ```
 :::::::
 :::::
 :::
 
+The following code verifies that the power method actually finds the largest eigenvalue for the symmetric matrix
+```{pyodide-python}
+#| autorun: true
+A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
+```
+
+```{pyodide-python}
+#| autorun: true
+mu, x = power_impl(C(A),10)
+print(mu)
+```
+
+```{pyodide-python}
+#| autorun: true
+D, P = np.linalg.eig(A)
+print(D)
+```
+
 With the power method we only found approximations to the biggest eigenvalue above. 
-The  $QR$ factorization is a method which can be used to find all the eigenvalues, not only the biggest. 
-If $A=QR$ is the $QR$-factorisation of $A$, then the matrices $QR$ and $RQ$ are similar (this is Exercise 5.2.31 in @lay), 
-so that they have the same eigenvalues. 
-If we then define $A_1=RQ=Q_1R_1$ (where $Q_1R_1$ is the $QR$-factorisation of $A_1$), 
+The *QR-method* is a method for finding eigenvalues which is very similar to Jacobi's method. In particular it can be used to find approximations to 
+all eigenvalues. 
+Again we start with a symmetric matrix $A$, and apply similarity transformations (so that all matrices have the same eigenvalues), 
+In Jacobi's method the similarity transformations were plane rotations. In the QR-method they are given by the QR-factorisation: 
+
+::: {#exr-45}
+Let $A=QR$ be a $QR$-factorisation of $A$. Show that the matrices $QR$ and $RQ$ are similar.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $Q(RQ)Q^{-1} = QR$. Since $Q$ is orthogonal it follows that $QR$ and $RQ$ are similar. 
+:::::::
+:::::
+:::
+
+It follows that $QR$ and RQ$ have the same eigenvalues. 
+If $A_k=Q_kR_k$ is a QR-factorisation of $A_k$, we set $A_{k+1}=Q_k^TA_kQ_k$. 
+We now get $A_{k+1}=Q_k^TQ_kR_kQ^k=R_kQ_k$. 
+We will test this on the same matrix $A$ as before.
+
+
+
+
+We define $A_1=RQ=Q_1R_1$ (where $Q_1R_1$ is the $QR$-factorisation of $A_1$), 
 and then $A_2=R_1Q_1=Q_2R_2$ (where $Q_2R_2$ is the $QR$-factorisation of $A_2$), and so on, 
 we get a sequence of matrices $A,A_1,A_2,\ldots$, which all have the same eigenvalues.
 
 ::: {#exr-5}
 
-(a) Write a function `qr_impl` which prints the matrices $A_1$, $A_2$, $A_n$, following the recipe above ($A$ and $n$ as input again). 
+::: {#exr-55}
+Write a function `off(A)` which takes a real $n\times n$-matrix $A$ as input, and returns 
+$$\text{off}(A) = \sqrt{\sum_{i\neq j}^n a_{ij}^2}.$$
+if `off(A)` is less than a given tolerance, $A$ will be considered 'diagonal enough', with the eigenvalues on the diagonal, and the algorithm terminates. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used
+```{pyodide-python}
+#| autorun: true
+{{< include off.py >}}
+```
+:::::::
+:::::
+:::
+
+(a) Write a function `eig_qr` which follows the recipe above to find the matrices $A_1$, $A_2$, and so on. $A$ should be input to the function. 
+The method should stop when `off(A)` (the off-diagonal part of the matrix) gets smaller than the tolerance $10^{-4}$. 
 Use the built-in function `np.linalg.qr()` to find the $QR$ factorisation of a matrix. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-```{python}
-{{< include qr_impl.py >}}
-```
+```{pyodide-python}
+#| autorun: true
+{{< include eig_qr.py >}}
+``` 
 :::::::
 :::::
 
-(b) We now define the matrix $A=\left(\begin{array}{cccc} 1 & 2 & 3 & 4 \\ 2 & 1 & 2 & 3 \\ 3 & 2 & 1 & 2 \\ 4 & 3 & 2 & 1 \end{array} \right)$. 
+
+(b) We now define the matrix 
+```{pyodide-python}
+#| autorun: true
+A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
+```
 Plot the characteristic polynomial of $A$ over $[-4,10]$. Do you find any zeros? 
 Restrict the plot interval gradually so that you can read out more precise approximations to the zeros, 
 and write down these.
@@ -198,10 +273,11 @@ and write down these.
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code5b.py >}}
 ```
-On the second line the plot interval $[-4,10]$ i set. 
+First the plot interval $[-4,10]$ is set. 
 This can be restricted further to for instance $[8,10]$, since the plot shows that there clearly is a zero in this interval. 
 The next plot reveals that a zero can be found in the interval $[8.75,9.25]$. Continuing in this way you will find a zero close to $9.09$. 
 This procedure has to be repeated for te other zeros as well.
@@ -209,8 +285,9 @@ This procedure has to be repeated for te other zeros as well.
 :::::
 
 (c) Consider the matrices printed out when running 
-```{python}
-{{< include code5c1.py >}}
+```{pyodide-python}
+#| autorun: true
+print(eig_qr(A))
 ```
 What do you observe? Explain how you now can see approximations to the eigenvalues of $A$.
 Are they close to the actual eigenvalues?
@@ -219,8 +296,10 @@ Are they close to the actual eigenvalues?
 ::::::: {.callout-important title='Solution' collapse="true"} 
 It looks like the matrices $A_n$ get more and more diagonal,
 The actual eigenvalues can be found as follows.
-```{python}
-{{< include code5c2.py >}}
+```{pyodide-python}
+#| autorun: true
+D,P = np.linalg.eig(A)
+print(D)
 ```
 The entries on the diagonal in the $A_n$ seem to be close to this, so that we have obtained good approximations to the eigenvalues.
 :::::::

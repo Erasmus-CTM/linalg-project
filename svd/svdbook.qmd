@@ -1,5 +1,12 @@
 # The singular value decomposition {#sec-svd}  
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -36,24 +43,24 @@ We start by showing that
 $$U \Sigma =  \begin{pmatrix} \sigma_{1} \mathbf{u}_{1} & \sigma_{2}\mathbf{u}_{2}  & \cdots & \sigma_{r} \mathbf{u}_{r} & \mathbf{0} & \cdots & \mathbf{0}\end{pmatrix}$$
 where the number of zero-vectors is $n-r$.
 
-Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\mbox{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
+Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\text{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
 In the same way we get that $(U\Sigma)_{ij} = 0$ for $j > r$ (since only the $\sigma_1,...,\sigma_r$ are different from $0$). 
-Therefore we get that $\mbox{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
+Therefore we get that $\text{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
 
 Recall that if $B$ is an $m \times p$ matrix, and $C$ is an $p \times n$ matrix, then the matrix product $BC$ can be written as  
-$$BC = \sum_{j=1}^{p}\, \texttt{col}_{j}(B) \, \texttt{row}_{j}(C).$$
+$$BC = \sum_{j=1}^{p}\, \text{col}_{j}(B) \, \text{row}_{j}(C).$$
 We use this and the above to show that 
 $$A = \sum_{j=1}^r \, \sigma_j \, \mathbf{u}_{j}\mathbf{v}_{j}^T.$$ {#eq-A}
 
 Since $A=U \Sigma V^T$ we have that
 \begin{align*}
-  A &= \sum_{j=1}^{p}\, \texttt{col}_{j}(U \Sigma) \, \texttt{row}_{j}(V^T) \\
-    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\texttt{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
+  A &= \sum_{j=1}^{p}\, \text{col}_{j}(U \Sigma) \, \text{row}_{j}(V^T) \\
+    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\text{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
 \end{align*}
 
 **Comment:**  The above shows that only the $r$ first columns of $U$ and $V$ matter in the SVD $A = U \Sigma V^T$.
 Note also that all terms in the sum @eq-A are rank 1 matrices, 
-since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\texttt{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
+since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\text{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
 $\mathbf{u}$ and $\mathbf{v}$ are both nonzero. 
 Thus, a matrix of rank $r$ can be written as a sum of $r$ rank one matrices.
 
@@ -71,30 +78,43 @@ The following function takes an $m \times n$ matrix $A$, and $k$, as input,
 computes the SVD of the matrix, and returns the matrix $A^{(k)}$ in @eq-Ak. 
 If $k > r =\text{rank}(A)$ the function provides a suitable error message:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include svdApprox.py >}}
 ```
 
-The following code loads the Marilyn Monroe image `mm.gif` provided in this project into a matrix $A$, 
-checks that $A$ is a $256 \times 256$ matrix, and computes its rank with help of the `linalg.matrix\_rank`-function,
+```{pyodide-python}
+#| autorun: true
+#| echo: false
+{{< include mmasarray.py >}}
+```
+You can assume that the Marilyn Monroe image has been stored in the array $A$. We display the image:
+```{pyodide-python}
+#| autorun: true
+plt.imshow(A, cmap='gray')
+plt.show()
+```
+The following code then checks that $A$ has dimensions $256 \times 256$, 
+and computes its rank with help of the `linalg.matrix_rank`-function,
 and also with tolerances 0.001, 0.01, 0.1, and 1.
 
-```{python}
+
+
+```{pyodide-python}
+#| autorun: true
 {{< include code2b.py >}}
 ```
 The size of the matrix is printed first, followed by the different ranks.
 
 
-The following code uses the function `svdApprox` to display the images corresponding to $A^{(k)}$ for $k = 8$ and $k=32$. 
-These are shown in @fig-2b8 and @fig-2b32
-
-```{python}
-#| label: fig-2b8
+The following code uses the function `svdApprox` to display the image corresponding to $A^{(8)}$:
+```{pyodide-python}
+#| autorun: true
 {{< include code2c8.py >}}
 ```
-
-```{python}
-#| label: fig-2b32
+and the image corresponding to $A^{(32)}$:
+```{pyodide-python}
+#| autorun: true
 {{< include code2c32.py >}}
 ```
 
@@ -104,7 +124,8 @@ Since the rank of the image matrix equals the number of nonzero singular values,
 a low rank means that we can represent the matrix with just a few values. 
 Consider the matrix below, which also is displayed as an image. 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code2d.py >}}
 ```
 
@@ -120,10 +141,9 @@ Thus, the most ''important'' information is found in the first terms in the sum 
 The following code plots the singular values of the matrix corresponding to the Marilyn Monroe image 
 ($\sigma_j$ as a function of $j$). It also
 constructs a random image of the same size, and with pixel values in the same interval as the Marilyn Monroe image. 
-The resulting plot is shown in @fig-oppg4-svar.
 
-```{python}
-#| label: fig-oppg4-svar
+```{pyodide-python}
+#| autorun: true
 {{< include code3a.py >}}
 ```
 
@@ -151,7 +171,8 @@ where the norm of an $m \times n$ matrix $B = [b_{i,j}]$ is defined by
 $$\| B \| = \sqrt{ \sum_{i=1}^m \sum_{j=1}^n  {b_{i,j}}^2 }.$$
 The following function computes the relative error between the two matrices `A` and `AK`. 
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include relError.py >}}
 ```
 
@@ -163,17 +184,20 @@ $\sum_{j=9}^r \sigma_j \mathbf{u}_{j}\mathbf{v}_{j}^T$, where $r = \text{rank}(A
 
 The relative error when only the 8 first singular values are included is
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d1.py >}}
 ```
 
 The relative error when the remaining singular values are included is
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d2.py >}}
 ```
 The image looks as follows 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d3.py >}}
 ```
 
@@ -189,10 +213,10 @@ This shows in particular that $A^{(k)}$ has rank $k$. This basis is orthonormal.
 Note first that for $1\leq s\leq k$ we have that
 $$A^{(k)}\mathbf{v}_s = \sum_{j=1}^k \sigma_j \mathbf{u_j}\mathbf{v_j}^T \mathbf{v}_s = \sigma_s \mathbf{u_s},$$
 since the $\mathbf{v}_s$ provide an orthonormal basis. 
-It follows that all $\mathbf{u_s}$ are in the column space of $A^{(k)}$, so that $\texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k) \subseteq \mbox{Col}(A^{(k)})$. 
+It follows that all $\mathbf{u_s}$ are in the column space of $A^{(k)}$, so that $\text{Span}( \mathbf{u}_1,...,\mathbf{u}_k) \subseteq \text{Col}(A^{(k)})$. 
 Since column $s$ in $A^{(k)}$ is
 $$\sum_{j=1}^k \sigma_j \mathbf{u_j}(\mathbf{v_j}^T)_s,$$
-it follows that also $\mbox{Col}(A^{(k)}) \subseteq \texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k )$. 
+it follows that also $\text{Col}(A^{(k)}) \subseteq \text{Span}( \mathbf{u}_1,...,\mathbf{u}_k )$. 
 Therefore $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for $\text{Col}(A^{(k)})$. 
 
 

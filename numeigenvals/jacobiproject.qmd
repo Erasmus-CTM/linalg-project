@@ -1,5 +1,12 @@
 # Project: Jacobi's method for finding eigenvalues
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
@@ -8,13 +15,15 @@
 
 We will study the *Jacobi method*, which can be used to find all eigenvectors and eigenvalues of a symmetric matrix numerically. 
 It does so by constructing orthogonal matrices $P_1,P_2,...$, and successively applying similarity transformations
-\begin{eqnarray*}
+$$
+\begin{aligned}
   A_1 &=& A \\
   A_2 &=& P_1^TA_1P_1 \\
   A_3 &=& P_2^TA_2P_2 \\
   \vdots & & \vdots \\
   A_{k+1} &=& P_k^TA_kP_k
-\end{eqnarray*}
+\end{aligned}
+$$
 
 ::: {#exr-1}
 Set $B=P^TAP$ with $A$ symmetric and $P$ orthogonal. Show that $B$ is symmetric.
@@ -127,12 +136,14 @@ it is clear that $c_{kl}=I_{kl}$
 when $k\neq r,s$, $l\neq r,s$ ($I$ is the identity matrix). 
 If $k\neq r,s$ we also see that $c_{kr}=c_{rk}=c_{ks}=c_{sk}=0$, since columns $r,s$ are the only ones which have elements in row $r$ and $s$. 
 Further we see that 
-\begin{eqnarray*}
+$$
+\begin{aligned}
   c_{rs} &=& -\cos\theta\sin\theta + \sin\theta\cos\theta = 0\\
   c_{sr} &=& -\sin\theta\cos\theta + \cos\theta\sin\theta = 0\\
   c_{rr} &=& \cos\theta\cos\theta + \sin\theta\sin\theta = 1\\
   c_{ss} &=& (-\sin\theta)(-\sin\theta) + \cos\theta\cos\theta = 1.
-\end{eqnarray*}
+\end{aligned}
+$$
 It is therefore clear that $C=I$, so that the two matrices are inverses of one-another. 
 :::::::
 :::::
@@ -157,7 +168,8 @@ Write a function \texttt{P\_k} which takes the position $(r,s)$, the angle $\the
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include P_k.py >}}
 ```
 :::::::
@@ -171,7 +183,8 @@ Write a function which takes a real $n\times n$-matrix $A$ as input, and returns
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include off.py >}}
 ```
 :::::::
@@ -185,7 +198,8 @@ and returns the position $(r,s)$ of the element outside the diagonal with bigges
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 There are several ways to do this. One way is to use the \texttt{max}-function as follows:
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include offabsmaks.py >}}
 ```
 :::::::
@@ -211,7 +225,7 @@ $$
 
 ::: {#exr-10}
 Show that 
-$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^1-2a_{rs}^2.$$ {#eq-newrel}
+$$a_{rr}^2 + a_{ss}^2 - b_{rr}^2 - b_{ss}^2=2b_{rs}^2-2a_{rs}^2.$$ {#eq-newrel}
 by restricting $B=P^TAP$ to row/columns $r$ and $s$, 
 
 ::::: {.content-visible when-profile="instructor"}
@@ -234,12 +248,14 @@ Show that
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 Since $P$ has nonzero elements only in position $r$ and $s$ in row/column $r$ and $s$, it is clear that
-\begin{eqnarray*}
+$$
+\begin{aligned}
   b_{rs} &=& (P^T)_{rr}a_{rr}P_{rs} + (P^T)_{rr}a_{rs}P_{ss} + (P^T)_{rs}a_{sr}P_{rs} + (P^T)_{rs}a_{ss}P_{ss} \\
          &=& \cos\theta a_{rr}\sin\theta + \cos\theta a_{rs}\cos\theta -\sin\theta a_{sr}\sin\theta - \sin\theta a_{ss}\cos\theta \\
          &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + \cos^2\theta a_{rs} - \sin^2\theta a_{sr} \\
          &=& \sin\theta\cos\theta (a_{rr}-a_{ss}) + (\cos^2\theta - \sin^2\theta)a_{sr},
-\end{eqnarray*}
+\end{aligned}
+$$
 where we have used that $A$ is symmetric in the last equality.
 :::::::
 :::::
@@ -273,7 +289,7 @@ For the latter @eq-losdenne0 must hold.
 :::::
 :::
 
-Note that @los-denne0 also can be written as
+Note that @eq-losdenne0 also can be written as
 $$\tan(2\theta)=\frac{2a_{rs}}{a_{ss}-a_{rr}}.$$ {#eq-losdenne}
 
 
@@ -299,7 +315,8 @@ Since $\left| 1- \frac{2}{n(n-1)}\right|\leq 1$ it follows that $\text{off}(B)$ 
 
 ::: {#exr-14}
 Study the following code.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include eig_jacobi.py >}}
 ```
 Explain all parts of this code, and which exercise over that are used. What will the code print?
@@ -319,26 +336,29 @@ The code stops when $\text{off}(A_k)$ gets smaller than the given tolerance.
 
 
 
-To test this we create a random $6\times 6$ matrix $A$. $A+A^T$ is then a symmetric matrix:
-```{python}
-A = np.random.rand(6,6)
-A = A+A.T
+To test this consider the symmetric matrix:
+```{pyodide-python}
+#| autorun: true
+A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
 ```
 Our method gives the following approximation to the eigenvalues:
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = eig_jacobi(A)
-np.diag(D)
+print(np.diag(D))
 ```
 We first verify that the columns in $P$ are eigenvectors. This is the same as testing that 
 $PDP^T$ is an orthogonal diagonalisation of $A$:
-```{python}
-A - P @ D @ P.T
+```{pyodide-python}
+#| autorun: true
+print(A - P @ D @ P.T)
 ```
 It is seen that $A-PDP^T$ is not exactly zero, but very close to zero. This is due to roundoff errors on the computer. 
 We then test that we get the same eigenvalues as returned by `np.linalg.eig`:
-```{python}
+```{pyodide-python}
+#| autorun: true
 D, P = np.linalg.eig(A)
-D
+print(D)
 ```
 We see that `eig_jacobi` and `np.linalg.eig` give approximately the same values, 
 but they are listed in a different order. On a computer we have no control over 
@@ -346,14 +366,15 @@ the order eigenvalues are listed - the algorithm decides this along the way.
 
 The matrix $A$ may be very large, and the function $P_k$ allocates a matrix of the same size. 
 
-::: {#-exr-15}
+::: {#exr-15}
 Write a function which implements the transformation $A\to AP_k$ and avoids this problem
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following function implements multiplication with $P_k$ to the right, and avoids this problem simply by 
 re-computing only the two columns $r$ and $s$ (these are the only two columns in $A$ and $AP_k$ which differ):
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include mult_Pk_right.py >}}
 ```
 :::::::

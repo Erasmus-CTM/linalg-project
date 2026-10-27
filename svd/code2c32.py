@@ -1,2 +1,3 @@
 AK=svdApprox(A,32)
-plt.imshow(AK,cmap='gray')
+plt.imshow(AK, cmap='gray')
+plt.show()

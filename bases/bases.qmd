@@ -216,12 +216,14 @@ $\{\mathbf{a}_1,\mathbf{a}_2,\mathbf{a}_3\}$ is therefore a basis for $\mathbb{R
 $\clubsuit$
 :::
 
-If the columns in a matrix do not span $\mathbb{R}^m$ we now get a simple procedure for expanding a set of pivot columns 
-to a basis for the whole of $\mathbb{R}^m$: 
-We modify the row-reduced echelon form of $A$ by adding columns which are standard basis vectors, 
-so that we obtain a new matrix with a leading one in each row. 
-The columns in this new matrix provide a basis for $\mathbb{R}^m$. If we row reduce backwards we get 
-$m$ vectors which also are a basis for $\mathbb{R}^m$, and which contain the original vectors. 
+Let us summarise this example:
+
+::: {.callout-note title='How to find a linearly independent subset of a set of vectors' collapse="false"}
+To find a linearly independent subset of the vectors $\{\mathbf{a}_i\}_{i=1}^k$, stack the vectors as columns in a matrix, and bring the matrix to echelon form. 
+The pivot columns in the original matrix are then linearly independent and have the same span as $\{\mathbf{a}_i\}_{i=1}^k$. 
+:::
+
+If the columns in a matrix do not span $\mathbb{R}^m$, there is a simple procedure for extending them to a basis for the whole of $\mathbb{R}^m$: 
 This is easiest to illustrate with an example. 
 
 ::: {#exm- name='Expand to a basis'}
@@ -237,8 +239,9 @@ to a basis for $\mathbb{R}^3$. We row-reduce
 \stackrel{III+3II}{\sim} \begin{pmatrix} 1 & 3 \\ 0 & 1 \\ 0 & 0 \end{pmatrix} 
 \end{align*}
 Since both columns are pivot columns it follows that the two vectors are linearly independent. 
-To expand to a basis for $\mathbb{R}^3$ we add a third vector to the echelon form so that we get a third pivot column, and 
-row-reduce backwards:
+To expand to a basis for $\mathbb{R}^3$ we add a third vector to the echelon form so that we get a third pivot column. 
+The three columns in the echelon form are also linearly independent.
+If we apply the reverse row operations in reverse order we get
 \begin{align*}
 \begin{pmatrix} 1 & 3 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix}
 &\stackrel{III-3II}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 0 & 1 & 0 \\ 0 & -3 & 1\end{pmatrix}
@@ -247,8 +250,29 @@ row-reduce backwards:
 &\stackrel{II+2I}{\sim} \begin{pmatrix} 1 & 3 & 0 \\ 2 & -1 & 0 \\ 3 & 6 & 1\end{pmatrix}
 \stackrel{I\leftrightarrow III}{\sim} \begin{pmatrix} 3 & 6 & 1\\ 2 & -1 & 0 \\ 1 & 3 & 0  \end{pmatrix}
 \end{align*}
+The resulting vectors are also linearly independent, with the original vectors listed first. 
 It follows that we obtain a basis for $\mathbb{R}^3$ by adding $\mathbf{a}_3=(1,0,0)$. $\clubsuit$
 :::
+
+
+
+Let us summarise the method.
+
+::: {.callout-note title='How to expand a linearly independent set to a basis' collapse="false"}
+To expand a linearly independent set of vectors $\{\mathbf{a}_i\}_{i=1}^k$ to a basis, 
+
+* stack the vectors as columns in a matrix, and bring the matrix to echelon form. 
+* Add columns so that the resulting matrix has a leading one in all rows.
+* Perform the reverse row operations in reverse order
+
+The columns in the resulting matrix is then a basis for $\mathbb{R}^m$, where the first $k$ vectors are $\{\mathbf{a}_i\}_{i=1}^k$.
+:::
+
+
+
+
+
+
 
 ## Subspaces
 By a *subspace*\index{Subspace} (of $\mathbb{R}^m$) we mean a set $U\subseteq\mathbb{R}^m$ so that

@@ -1,17 +1,27 @@
 # Project: Image compression based on the singular value decomposition
 
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
 ```
+
+In this section we will analyse what kind of information the SVD captures, 
+and illustrate how it provides a method for compressing images by 
+reducing storage requirements.
 
 The Singular Value Decomposition Theorem states as follows:
 
 {{< include svdmaintheorem.qmd >}}
 
 You are not required to read the proof for this in order to solve this project. 
-Rather the purpose here is to analyse what kind of information the SVD captures, 
-and illustrate how it provides a method for compressing images by reducing storage requirements.
+
 
 
 
@@ -33,15 +43,15 @@ where the number of zero-vectors is $n-r$.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\mbox{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
+Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\text{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
 In the same way we get that $(U\Sigma)_{ij} = 0$ for $j > r$ (since only the $\sigma_1,...,\sigma_r$ are different from $0$). 
-Therefore we get that $\mbox{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
+Therefore we get that $\text{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
 :::::::
 :::::
 
 (b)
 Recall that if $B$ is an $m \times p$ matrix, and $C$ is an $p \times n$ matrix, then the matrix product $BC$ can be written as  
-$$BC = \sum_{j=1}^{p}\, \texttt{col}_{j}(B) \, \texttt{row}_{j}(C).$$
+$$BC = \sum_{j=1}^{p}\, \text{col}_{j}(B) \, \text{row}_{j}(C).$$
 Use this and (a) to show that 
 $$ A = \sum_{j=1}^r \, \sigma_j \, \mathbf{u}_{j}\mathbf{v}_{j}^T.$$ {#eq-A}
 
@@ -49,15 +59,15 @@ $$ A = \sum_{j=1}^r \, \sigma_j \, \mathbf{u}_{j}\mathbf{v}_{j}^T.$$ {#eq-A}
 ::::::: {.callout-important title='Solution' collapse="true"}
 Since $A=U \Sigma V^T$ we have that
 \begin{align*}
-  A &= \sum_{j=1}^{p}\, \texttt{col}_{j}(U \Sigma) \, \texttt{row}_{j}(V^T) \\
-    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\texttt{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
+  A &= \sum_{j=1}^{p}\, \text{col}_{j}(U \Sigma) \, \text{row}_{j}(V^T) \\
+    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\text{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
 \end{align*}
 :::::::
 :::::
 
 **Comment:**  (b) shows that only the $r$ first columns of $U$ and $V$ matter in the SVD $A = U \Sigma V^T$.
-Note also that all terms in the sum @eq-A are rank 1 matrices, 
-since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\texttt{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
+Note also that all terms in the sum in @eq-A are rank 1 matrices, 
+since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\text{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
 $\mathbf{u}$ and $\mathbf{v}$ are both nonzero. 
 (b) thus also shows that a rank $r$ matrix $A$ can be written as a sum of $r$ rank one matrices.
 :::
@@ -79,22 +89,35 @@ If $k > r =\text{rank}(A)$ the function should provide a suitable error message.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include svdApprox.py >}}
 ```
 :::::::
 :::::
 
+```{pyodide-python}
+#| autorun: true
+#| echo: false
+{{< include mmasarray.py >}}
+```
+You can assume that the Marilyn Monroe image has been stored in the array $A$. We display the image:
+```{pyodide-python}
+#| autorun: true
+plt.imshow(A, cmap='gray')
+plt.show()
+```
+
 (b)
-Load the Marilyn Monroe image \textsf{mm.gif} provided in this project into a matrix $A$. 
 Check that $A$ is a $256 \times 256$ matrix, and compute its rank with help of the 
-function `linalg.matrix\_rank}`.
+function `linalg.matrix_rank`.
 Also compute the rank with tolerances 0.001, 0.01, 0.1, and 1.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used.
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code2b.py >}}
 ```
 The size of the matrix is printed first, followed by the different ranks.
@@ -102,23 +125,21 @@ The size of the matrix is printed first, followed by the different ranks.
 :::::
 
 (c)
-Use the function you implemented in (a) to display the image corresponding to $A^{(k)}$ for $k = 8$ and $k=32$.
+Use the function you implemented in (a) to display the images corresponding to $A^{(8)}$ and $A^{(32)}$
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used:
 
-```{python}
-#| label: fig-2b8
+```{pyodide-python}
+#| autorun: true
 {{< include code2c8.py >}}
 ```
 
-```{python}
-#| label: fig-2b32
+```{pyodide-python}
+#| autorun: true
 {{< include code2c32.py >}}
 ```
-
-These are shown in @fig-2b8 and @fig-2b32
 :::::::
 :::::
 
@@ -126,7 +147,8 @@ These are shown in @fig-2b8 and @fig-2b32
 Since the rank of the image matrix equals the number of nonzero singular values, a low rank means that we can represent the matrix with just a few values. 
 Can you say anything about the rank of the matrix below, which also is displayed as an image?
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code2d.py >}}
 ```
 
@@ -150,17 +172,17 @@ Plot the singular values of the matrix from the Marilyn Monroe image ($\sigma_j$
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code solves both (a) and (b). 
-```{python}
-#| label: fig-oppg4-svar
+```{pyodide-python}
+#| autorun: true
 {{< include code3a.py >}}
 ```
-The resulting plot is shown in @fig-oppg4-svar.
 :::::::
 :::::
 
 (b)
 Construct a random image of the same size, and with pixel values in the same interval as the Marilyn Monroe image. This you can do by writing
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code3b.py >}}
 ```
 Plot the singular values of the matrix of the random image together with the singular values of the matrix of the Marilyn Monroe image. 
@@ -216,7 +238,8 @@ What is the relative error between the original image and the approximation you 
 ::::::: {.callout-important title='Solution' collapse="true"}
 The following code can be used.
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include relError.py >}}
 ```
 
@@ -234,17 +257,20 @@ Look at both images, and compute the relative error for each of them. Is the ``v
 ::::::: {.callout-important title='Solution' collapse="true"}
 Relative error when only the 8 first singular values are included:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d1.py >}}
 ```
 
 Relative error when the remaining singular values are included:
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d2.py >}}
 ```
 
-```{python}
+```{pyodide-python}
+#| autorun: true
 {{< include code4d3.py >}}
 ```
 
@@ -267,10 +293,10 @@ This shows in particular that $A^{(k)}$ has rank $k$ (as mentioned in @exr-2). N
 Note first that for $1\leq s\leq k$ we have that
 $$A^{(k)}\mathbf{v}_s = \sum_{j=1}^k \sigma_j \mathbf{u_j}\mathbf{v_j}^T \mathbf{v}_s = \sigma_s \mathbf{u_s},$$
 since the $\mathbf{v}_s$ provide an orthonormal basis. 
-It follows that all $\mathbf{u_s}$ are in the column space of $A^{(k)}$, so that $\texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k) \subseteq \mbox{Col}(A^{(k)})$. 
+It follows that all $\mathbf{u_s}$ are in the column space of $A^{(k)}$, so that $\text{Span}( \mathbf{u}_1,...,\mathbf{u}_k) \subseteq \text{Col}(A^{(k)})$. 
 Since column $s$ in $A^{(k)}$ is
 $$\sum_{j=1}^k \sigma_j \mathbf{u_j}(\mathbf{v_j}^T)_s,$$
-it follows that also $\mbox{Col}(A^{(k)}) \subseteq \texttt{Span}( \mathbf{u}_1,...,\mathbf{u}_k )$. 
+it follows that also $\text{Col}(A^{(k)}) \subseteq \text{Span}( \mathbf{u}_1,...,\mathbf{u}_k )$. 
 Therefore $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for $\text{Col}(A^{(k)})$. 
 :::::::
 :::::

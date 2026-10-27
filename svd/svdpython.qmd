@@ -10,12 +10,7 @@ This means that we need 3 different matrices to store an image in the rgb format
 In this project we shall stick to gray tone images, so that one matrix is enough to store the image.
 
 \medskip Below is a description of some Python commands that may be useful. 
-$A$ is here a two-dimensional \texttt{numpy} array. We start by importing the packages we need:
-```{python}
-import matplotlib.pyplot as plt
-import numpy as np
-```
-
+$A$ is here a two-dimensional \texttt{numpy} array.
 The \texttt{linalg.matrix\_rank} function in \texttt{numpy} returns the rank of $A$, and can be invoked in two ways:
 ```{python}
 #| eval: false

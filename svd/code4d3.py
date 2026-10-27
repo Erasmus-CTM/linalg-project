@@ -1,1 +1,2 @@
-plt.imshow(AK2)
+plt.imshow(AK2, cmap='gray')
+plt.show()
