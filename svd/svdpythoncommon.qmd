@@ -1,0 +1,21 @@
+An image can simply be considered as a matrix, a rectangular grid where each point in the grid corresponds to an element in the matrix. 
+In image analysis one rather uses the term *pixel*, instead of grid point. 
+
+In *gray tone* images every pixel has an associated value measuring its intensity. Pixel values in such images are often stored as integers between 0 and 255, where 0 corresponds to black and 255 corresponds to white. 
+*Colour images* on the other hand are often stored in the *rgb-format*, where every pixel has three components, one for red (r), one for green (g), and one for blue (b). 
+All possible colours can be produced by combining these three base colours in different ways.
+This means that we need 3 different matrices to store an image in the rgb format.
+In this project we shall stick to gray tone images, so that one matrix is enough to store the image.
+
+We have the following three functions in the `matplotlib.pyplot` module
+```{python}
+#| eval: false
+A = np.double(plt.imread(filename,format=None))
+plt.imwrite(filename,A,format=str)
+plt.imshow(img,cmap='gray')
+```
+On the first line an image is read from a given file in a given format, and stored in the matrix $A$. 
+Note the conversion to `double` here, which is needed.
+On the second line the image stored in $A$ is written to a given file, in the given format 
+(to print images you have generated, use this command first, then send the resulting file to the printer). 
+On the third line the matrix $A$ is displayed as an image. The named parameter `cmap`, which here is set to `gray`, states that the image should be interpreted as a grayscale image (with values between 0 and 255).

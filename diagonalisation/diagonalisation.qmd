@@ -139,7 +139,7 @@ C_1e^{\lambda t}\mathbf{p} + \overline{C_1}e^{\overline{\lambda} t}\overline{\ma
 so that we can set $C=C_1$.
 :::
 
-The expression $2\Re(C_1e^{\lambda t}\mathbf{p} )$ involves complex numbers, even thought the answer is real. 
+The expression $2\Re(Ce^{\lambda t}\mathbf{p} )$ involves complex numbers, even thought the answer is real. 
 But it is easy to rewrite this to a form not involving complex arithmetic. 
 Let $\mathbf{c}$ and $\mathbf{d}$ be the real and imaginary parts of the complex vector $C\mathbf{p}$, 
 and let $\lambda=a+ib$. Then $C\mathbf{p}=\mathbf{c}+i\mathbf{d}$ and $e^{\lambda t}=e^{at}(\cos(bt)+i\sin(bt))$, and we get
@@ -367,7 +367,7 @@ The initial conditions give the equations
 C         &= 4 \\
 -3C+D &= -13,
 \end{align*}
-which have the soltion $C=4$, $D=-1$. The solution is thus $y(t)=4e^{-3t}-te^{-3t}$. $\clubsuit$
+which have the solution $C=4$, $D=-1$. The solution is thus $y(t)=4e^{-3t}-te^{-3t}$. $\clubsuit$
 :::
 
 

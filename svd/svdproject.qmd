@@ -29,60 +29,62 @@ You are not required to read the proof for this in order to solve this project.
 
 
 
-::: {#exr-1}
+::: {#exr-1svd}
 Let $A = U \Sigma V^T$ be the SVD of the $m \times n$ matrix $A$, and let $\mathbf{u}_{j}$ and $\mathbf{v}_{j}$ be the  $j$-th column of $U$ and $V$, respectively, i.e.,
 \begin{align*}
 U &= \begin{pmatrix} \mathbf{u}_{1} & \mathbf{u}_{2} & \cdots & \mathbf{u}_{m}\end{pmatrix} &
 V &= \begin{pmatrix} \mathbf{v}_{1} & \mathbf{v}_{2} & \cdots & \mathbf{v}_n\end{pmatrix}.
 \end{align*}
 
-(a)
+a.
 Show that 
 $$U \Sigma =  \begin{pmatrix} \sigma_{1} \mathbf{u}_{1} & \sigma_{2}\mathbf{u}_{2}  & \cdots & \sigma_{r} \mathbf{u}_{r} & \mathbf{0} & \cdots & \mathbf{0}\end{pmatrix}$$
 where the number of zero-vectors is $n-r$.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $\text{col}_j(U\Sigma) = \sigma_j \mathbf{u}_j$. 
+Suppose first that $1\leq j\leq r$. We then see that $(U\Sigma)_{ij} = U_{ij} \sigma_j$. Therefore we get that $(U\Sigma)_{:j} = \sigma_j \mathbf{u}_j$. 
 In the same way we get that $(U\Sigma)_{ij} = 0$ for $j > r$ (since only the $\sigma_1,...,\sigma_r$ are different from $0$). 
-Therefore we get that $\text{col}_j(U\Sigma) = \mathbf{0}$ for such $j$, and the result follows. 
+Therefore we get that $(U\Sigma)_{:j} = \mathbf{0}$ for such $j$, and the result follows. 
 :::::::
 :::::
 
-(b)
-Recall that if $B$ is an $m \times p$ matrix, and $C$ is an $p \times n$ matrix, then the matrix product $BC$ can be written as  
-$$BC = \sum_{j=1}^{p}\, \text{col}_{j}(B) \, \text{row}_{j}(C).$$
-Use this and (a) to show that 
+b.
+Recall that if $B$ is an $m \times p$ matrix, and $C$ is an $p \times n$ matrix, the outer form of matrix multiplication is  
+$$BC = \sum_{j=1}^{p}\, \mathbf{b}_{:j}\mathbf{c}_{j:}$$
+Use this and a. to show that 
 $$ A = \sum_{j=1}^r \, \sigma_j \, \mathbf{u}_{j}\mathbf{v}_{j}^T.$$ {#eq-A}
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 Since $A=U \Sigma V^T$ we have that
 \begin{align*}
-  A &= \sum_{j=1}^{p}\, \text{col}_{j}(U \Sigma) \, \text{row}_{j}(V^T) \\
-    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j (\text{col}_{j}(V))^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
+  A &= \sum_{j=1}^{p}\, (U \Sigma)_{:j} (V^T)_{j:} \\
+    &= \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j ((V)_{:j})^T = \sum_{j=1}^{r} \, \sigma_j \mathbf{u}_j \mathbf{v}_{j}^T.
 \end{align*}
 :::::::
 :::::
 
-**Comment:**  (b) shows that only the $r$ first columns of $U$ and $V$ matter in the SVD $A = U \Sigma V^T$.
+**Comment:**  b. shows that only the $r$ first columns of $U$ and $V$ matter in the SVD $A = U \Sigma V^T$.
 Note also that all terms in the sum in @eq-A are rank 1 matrices, 
-since $\mathbf{u}\mathbf{v}^T = [v_{1}\mathbf{u} \quad v_{2}\mathbf{u} \quad \ldots \quad v_{n}\mathbf{u}]$, so that $\text{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
+since 
+$$\mathbf{u}\mathbf{v}^T = \begin{pmatrix} v_{1}\mathbf{u} & v_{2}\mathbf{u} & \cdots & v_{n}\mathbf{u}\end{pmatrix}$$
+so that $\text{rank}( \mathbf{u}\mathbf{v}^T ) = 1$ when
 $\mathbf{u}$ and $\mathbf{v}$ are both nonzero. 
-(b) thus also shows that a rank $r$ matrix $A$ can be written as a sum of $r$ rank one matrices.
+b. thus also shows that a rank $r$ matrix $A$ can be written as a sum of $r$ rank one matrices.
 :::
 
 {{< include svdpython.qmd >}}
 
 
-::: {#exr-2}
-We continue using the notation from @exr-1. For $1 \leq k \leq r$ we define
+::: {#exr-2svd}
+We continue using the notation from @exr-1svd. For $1 \leq k \leq r$ we define
 $$A^{(k)} = \sum_{j=1}^k \sigma_j \mathbf{u_j}\mathbf{v_j}^T.$$ {#eq-Ak}
 $A^{(k)}$ has rank $k$ and can thus be thought of as a rank $k$ approximation to $A$. 
 How many terms we need to include, i.e., how big $k$ must be for an acceptable approximation, 
 will of course depend on the singular values, and how quickly they tend to $0$.
 
-(a)
+a.
 Write a function `svdApprox(A,k)` which takes an $m \times n$ matrix $A$, and $k$, as input, 
 computes the SVD of the matrix, and returns the matrix $A^{(k)}$ in @eq-Ak. 
 If $k > r =\text{rank}(A)$ the function should provide a suitable error message. 
@@ -108,7 +110,7 @@ plt.imshow(A, cmap='gray')
 plt.show()
 ```
 
-(b)
+b.
 Check that $A$ is a $256 \times 256$ matrix, and compute its rank with help of the 
 function `linalg.matrix_rank`.
 Also compute the rank with tolerances 0.001, 0.01, 0.1, and 1.
@@ -124,8 +126,8 @@ The size of the matrix is printed first, followed by the different ranks.
 :::::::
 :::::
 
-(c)
-Use the function you implemented in (a) to display the images corresponding to $A^{(8)}$ and $A^{(32)}$
+c.
+Use the function you implemented in a. to display the images corresponding to $A^{(8)}$ and $A^{(32)}$
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -143,7 +145,7 @@ The following code can be used:
 :::::::
 :::::
 
-(d)
+d.
 Since the rank of the image matrix equals the number of nonzero singular values, a low rank means that we can represent the matrix with just a few values. 
 Can you say anything about the rank of the matrix below, which also is displayed as an image?
 
@@ -163,15 +165,15 @@ a rank one matrix.
 
 :::
 
-::: {#exr-3}
-The singular values are listed in decreasing order with the biggest first. Thus, the most ''important'' information is found in the first terms in the sum in @eq-A. 
+::: {#exr-3svd}
+The singular values are listed in decreasing order with the biggest first. Thus, the most "important" information is found in the first terms in the sum in @eq-A. 
 
-(a)
+a.
 Plot the singular values of the matrix from the Marilyn Monroe image ($\sigma_j$ as a function of $j$). 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-The following code solves both (a) and (b). 
+The following code solves both a. and b. .
 ```{pyodide-python}
 #| autorun: true
 {{< include code3a.py >}}
@@ -179,30 +181,25 @@ The following code solves both (a) and (b).
 :::::::
 :::::
 
-(b)
-Construct a random image of the same size, and with pixel values in the same interval as the Marilyn Monroe image. This you can do by writing
-```{pyodide-python}
-#| autorun: true
-{{< include code3b.py >}}
-```
-Plot the singular values of the matrix of the random image together with the singular values of the matrix of the Marilyn Monroe image. 
-Compare how the singular values decrease for the two matrices, and try to explain what you see.
+b.
+Construct a random image of the same size, and with pixel values in the same interval, as the Marilyn Monroe image. 
+Plot the singular values of both matrices together, and compare how the singular values decrease for the two. Try to explain what you see.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 The point here is to see that the singular values decay much faster for the Marilyn Monroe image than for the random image. 
-An informal explanation of this is that the random image has a greater degree of unorder, more ``details'', so that one needs more singular values to describe it.
+An informal explanation of this is that the random image has a greater degree of unorder, more "details", so that one needs more singular values to describe it.
 :::::::
 :::::
 
 :::
 
-::: {#exr-4}
-Every term in the sum @eq-Ak needs two vectors, in addition to one singular value. 
+::: {#exr-4svd}
+Every term in the sum in @eq-Ak needs two vectors, in addition to one singular value. 
 To store the matrix $A^{(k)}$ we therefore only need to store the $k$ first vectors in both matrices $U$ and $V$, as well as the $k$
 first singular values. 
 
-(a)
+a.
 How many numbers do you need to store a rank $k$ SVD approximation to an image of size $m\times n$?
 
 ::::: {.content-visible when-profile="instructor"}
@@ -214,7 +211,7 @@ Storing the first $20$ singular components would require $20\times 1001\approx 2
 :::::::
 :::::
 
-(b)
+b.
 How big $k$ is needed in order for the rank $k$ SVD approximation to be visually as good as the original? Experiment with Python.
 
 ::::: {.content-visible when-profile="instructor"}
@@ -223,16 +220,16 @@ Here there clearly is no unique answer. $k\approx 50$ may be acceptable, while $
 :::::::
 :::::
 
-(c)
+c.
 The *relative error* between the matrices $A$ and $A^{(k)}$  is defined as
 \begin{equation*}
-  e_{rel} = \frac{\| A - A^{(k)} \|}{ \|A\|},
+  e_{rel} = \frac{\| A - A^{(k)} \|_F}{ \|A\|_F},
 \end{equation*} 
-where the norm of an $m \times n$ matrix $B = [b_{i,j}]$ is defined by
-$$\| B \| = \sqrt{ \sum_{i=1}^m \sum_{j=1}^n  {b_{i,j}}^2 }.$$
+where the *Frobenius norm* of an $m \times n$ matrix $B$ is defined by
+$$\| B \|_F = \sqrt{ \sum_{i=1}^m \sum_{j=1}^n  {b_{i,j}}^2 }.$$
 Implement a function `relError(A,AK)` which computes the relative error between the two 
 matrices `A` and `AK`. 
-What is the relative error between the original image and the approximation you chose in (b)?
+What is the relative error between the original image and the approximation you chose in b.?
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -243,15 +240,15 @@ The following code can be used.
 {{< include relError.py >}}
 ```
 
-The answer depends on which $k$ you chose in (b).
+The answer depends on which $k$ you chose in b..
 :::::::
 :::::
 
-(d)
-in @exr-2(c) you reconstructed the Marylin Monroe image from the 8 first singular components, i.e., from $A^{(8)}$. 
-Try now to reconstruct the same image by using all singular values \emph{except from} the 8 first singular components, i.e., by using the matrix 
+d.
+in @exr-2svd c. you reconstructed the Marylin Monroe image from the 8 first singular components, i.e., from $A^{(8)}$. 
+Try now to reconstruct the same image by using all singular values **except from** the 8 first singular components, i.e., by using the matrix 
 $\sum_{j=9}^r \sigma_j \mathbf{u}_{j}\mathbf{v}_{j}^T$, where $r = \text{rank}(A)$. 
-Look at both images, and compute the relative error for each of them. Is the ``visual'' error in both images acceptable?
+Look at both images, and compute the relative error for each of them. Is the "visual" error in both images acceptable?
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -281,12 +278,12 @@ It is far from perfect, but you can see what it is. In the other image the error
 
 :::
 
-::: {#exr-5}
-We continue using the notation from @exr-1. 
+::: {#exr-5svd}
+We continue using the notation from @exr-1svd. 
 
-(a)
+a.
 Let $1 \leq k \leq r$. Show that $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for Col $A^{(k)}$.
-This shows in particular that $A^{(k)}$ has rank $k$ (as mentioned in @exr-2). Note that this basis is orthonormal. 
+This shows in particular that $A^{(k)}$ has rank $k$ (as mentioned in @exr-2svd). Note that this basis is orthonormal. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -301,7 +298,7 @@ Therefore $\{ \mathbf{u}_{1}, \, \ldots \, , \mathbf{u}_{k} \}$ is a basis for $
 :::::::
 :::::
 
-(b)
+b.
 What is the SVD of $A^T$ ? Display the image corresponding to $A^T$ when $A$ is the Marylin Monroe image.  
 Describe the matrix corresponding to the image where Marylin has been rotated  med 90 degrees counterclockwise.
 
@@ -313,14 +310,13 @@ We get this if we in addition reverse the rows of $A^T$.
 :::::::
 :::::
   
-(c)
+c.
 Explain that  $\{ \mathbf{v}_{1}, \, \ldots \, , \mathbf{v}_{r} \}$ is a basis for Row$(A)$= Col$(A^T)$. 
 Note that this basis is orthonormal. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-From (a) and the singular value decomposition of til $A^{(k)}$ in (b) 
-it follows that $\{ \mathbf{v}_{1}, \, \ldots \, , \mathbf{v}_{r} \}$ is a basis for Col $A^T$, 
+From a. and the singular value decomposition of $A^{(k)}$ in b. it follows that $\{ \mathbf{v}_{1}, \, \ldots \, , \mathbf{v}_{r} \}$ is a basis for Col $A^T$, 
 and therefore also a basis for Row $A$. 
 :::::::
 :::::

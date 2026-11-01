@@ -151,8 +151,7 @@ $$ {#eq-ineqhere}
 for all $\mathbf{x}$. 
 :::
 
-
-
+::: {.proof}
 Since symmetric matrices are orthogonally diagonalisable we can write $A=PDP^T$, where $P$ is orthogonal. We have that
 $$
 |A\mathbf{x}|^2 = | PDP^T\mathbf{x} |^2 =  \mathbf{x}^T PDP^T PDP^T\mathbf{x} = (P^T\mathbf{x})^TD^2P^T\mathbf{x} = \mathbf{u}^TD^2\mathbf{u},
@@ -164,7 +163,7 @@ where we put $\mathbf{u}=P^T\mathbf{x}$. We then get
 \end{align*}
 where we used that $|\mathbf{u}|^2=\mathbf{x}^TPP^T\mathbf{x}=\mathbf{x}^T\mathbf{x}=|\mathbf{x}|^2$. 
 By taking square roots it follows that $|\lambda_n||\mathbf{x}|\leq|A\mathbf{x}|\leq |\lambda_1||\mathbf{x}|$.
-
+:::
 
 
 

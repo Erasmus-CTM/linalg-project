@@ -85,7 +85,7 @@ We will not go into similar arguments for the convergence of $P_1\cdots P_k$ to 
 
 After each transformation $A_{k+1} = P_k^TA_kP_k$ we will therefore compute
 $$\text{off}(A) = \sqrt{\sum_{i\neq j}^n a_{ij}^2},$$
-and if this value is less than a given tolerance, $A$ is considered 'diagonal enough', and the algorithm terminates. 
+and if this value is less than a given tolerance, $A$ is considered "diagonal enough", and the algorithm terminates. 
 
 
 

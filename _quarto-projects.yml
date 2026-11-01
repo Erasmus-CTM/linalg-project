@@ -16,5 +16,7 @@ book:
   chapters:
     - index.qmd
     - svd/svdproject.qmd
+    - svd/wavelets.qmd
     - numeigenvals/jacobiproject.qmd
     - numeigenvals/companionproject.qmd
+    - ml/ml.qmd

@@ -1,0 +1,362 @@
+---
+title: "Foils for Chapter 8 in linear algebra and numerical methods"
+author: "Øyvind Ryan"
+date: last-modified
+format: 
+    beamer:
+        classoption: ["t", "notheorems"]
+echo: true
+---
+
+```{python}
+#| include: false
+{{< include _imports.py >}}
+```
+
+
+
+# Diagonalisation and Systems of differential equations.
+
+## A linear first order system of differential equations with constant coefficients
+
+$$
+\begin{aligned}
+x_1'(t) &= a_{11}x_1(t) + a_{12}x_2(t) + \cdots + a_{1n}x_n(t) \\
+x_2'(t) &= a_{21}x_1(t) + a_{22}x_2(t) + \cdots + a_{2n}x_n(t) \\
+\vdots & \\
+x_n'(t) &= a_{n1}x_1(t) + a_{n2}x_2(t) + \cdots + a_{nn}x_n(t),
+\end{aligned}
+$$ {#eq-orden1system}
+$x_1(t),x_2(t),...,x_n(t)$ are unknown differentiable functions. 
+
+The system can be written more compactly as 
+$$\mathbf{x}'(t)=A\mathbf{x}(t).$$
+where
+
+* $\mathbf{x}(t)=(x_1(t),x_2(t),...,x_n(t))$
+* $\mathbf{x}'(t)=(x_1'(t),x_2'(t),...,x_n'(t))$
+* The matrix $A$ has components $a_{ij}$
+
+---
+
+::: {#prp-}
+Suppose $A$ is diagonalisable, with $A=PDP^{-1}$. 
+Then we have that $\mathbf{x}(t)$ solves the system $\mathbf{x}'(t) = A\mathbf{x}(t)$ 
+if and only if $\mathbf{y}(t)=P^{-1}\mathbf{x}(t)$ solves the system $\mathbf{y}'(t) = D\mathbf{y}(t)$.
+:::
+
+
+---
+
+
+::: {#prp-spes-reelle}
+Suppose that $A$ has real eigenvalues and that $\mathbf{x}(t_0)$ is known, and real. Then there exist unique real constants $C_1$ and $C_2$ so that
+$$\mathbf{x}(t) = C_1e^{\lambda_1 t}\mathbf{p}_1 + C_2e^{\lambda_2 t}\mathbf{p}_2.$$ {#eq-genlosn1} 
+:::
+
+The other way: @eq-genlosn1 is real when $C_1$ and $C_2$ are real. 
+
+
+---
+
+* Set $A=\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}$. 
+* $A$ has eigenvalues $\lambda_1=-1$ and $\lambda_2=1$
+* Corresponding eigenvectors are $\mathbf{p}_1=(-1,1)$ and $\mathbf{p}_2=(1,1)$. 
+
+General solution to @eq-genlosn1:
+$$
+C_1e^{-t}\begin{pmatrix} -1 \\ 1 \end{pmatrix}  + C_2e^t \begin{pmatrix} 1 \\ 1 \end{pmatrix} 
+= \begin{pmatrix} -C_1e^{-t} + C_2e^t \\ C_1e^{-t} + C_2e^t \end{pmatrix},
+$$
+$f(x)=\pm x$ are asymptotes when $t\to\pm\infty$. 
+
+
+```{python}
+#| eval: false
+t = np.linspace(-2,2,100)
+for C1 in [1.5,2,2.5]:
+    for C2 in [1.5,2,2.5]:
+        plt.plot( -C1*np.exp(-t) + C2*np.exp(t) , \
+                   C1*np.exp(-t) + C2*np.exp(t) )
+```
+
+
+--- 
+
+```{python}
+#| label: fig-phaseplot
+#| fig-cap: "Plot of nine solutions to the system with matrix $A=\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$."
+#| echo: false
+t = np.linspace(-2,2,100)
+for C1 in [1.5,2,2.5]:
+    for C2 in [1.5,2,2.5]:
+        plt.plot( -C1*np.exp(-t) + C2*np.exp(t) , \
+                   C1*np.exp(-t) + C2*np.exp(t) )
+```
+
+---
+
+:::{#prp-spes-komplekse}
+Suppose that $A$ has complex eigenvalues $\lambda$ and $\overline{\lambda}$ (with corresponding eigenvectors $\mathbf{p}$ and $\overline{\mathbf{p}}$). 
+Suppose also that $\mathbf{x}(t_0)$ is known, and real. Then there exists a constant $C$ (which can be complex) so that  
+$$ \mathbf{x}(t) = 2\Re(Ce^{\lambda t}\mathbf{p} ). $$ {#eq-genlosn2}
+:::
+
+The other way it is clear that @eq-genlosn2 is real for all values of $C$. 
+
+
+---
+
+## $2\Re(Ce^{\lambda t}\mathbf{p} )$ is real, even if complex numbers are involved
+
+Let $\mathbf{c}$ and $\mathbf{d}$ be the real and imaginary parts of the complex vector $C\mathbf{p}$, 
+and let $\lambda=a+ib$. Then $C\mathbf{p}=\mathbf{c}+i\mathbf{d}$ and $e^{\lambda t}=e^{at}(\cos(bt)+i\sin(bt))$, and we get
+$$
+\begin{aligned}
+\Re(Ce^{\lambda t}\mathbf{p} ) &= \Re( e^{at} (\mathbf{c}+i\mathbf{d})(\cos(bt)+i\sin(bt)) \\
+&= e^{at}\left( \cos(bt)\mathbf{c} - \sin(bt)\mathbf{d}  \right),
+\end{aligned}
+$$
+so that
+$$ 
+\mathbf{x}(t)=2e^{at}\left( \cos(bt)\mathbf{c} - \sin(bt)\mathbf{d}  \right).
+$$ {#eq-spes:siste}
+From this form it is clear that
+
+1. For $a>0$: $x(t)\to\infty$ when $t\to\infty$ (spiral away from the origin),
+2. For $a<0$: $x(t)\to 0$ when $t\to\infty$ (spiral towards the origin),
+3. For $a=0$: $x(t)$ is periodic.
+
+---
+
+Since $\cos(bt)$ and $\sin(bt)$ are periodic with period $2\pi/b$, a plot over $[0,2\pi/b]$ should show one arm of a spiral in 1. and 2., or one whole period in 3.. 
+
+The following function takes as input
+
+* a real matrix $A$ with complex eigenvalues, 
+* an initial value $x(t_0)=x_0$ 
+
+as parameters, and 
+
+* computes the eigenvalues and eigenvectors of $A$, 
+* solves the system 
+$$
+\begin{pmatrix} \mathbf{p} & \overline{\mathbf{p}}  \end{pmatrix} 
+\begin{pmatrix} 
+Ce^{\lambda t_0} \\ 
+\overline{C}e^{\overline{\lambda} t_0} 
+\end{pmatrix} = \mathbf{x}_0,
+$$
+* finds $C$, 
+* computes $C\mathbf{p}=\mathbf{c}+i\mathbf{d}$, 
+* returns the solution in @eq-spes:siste:
+
+---
+
+```{python}
+def findcomps(A,t_0,x_0):
+    D,P=np.linalg.eig(A)
+    C = np.linalg.solve(P, x_0)
+    C = C[0]/np.exp(D[0]*t_0)
+    c = np.real(C*P[:,[0]])
+    d = np.imag(C*P[:,[0]])
+    a = np.real(D[0])
+    b = np.imag(D[0])
+
+    t=np.linspace(t_0,t_0+4*np.pi/b,100).reshape((1,-1))
+    res = ( c@(np.cos(b*t)*np.exp(a*t)) 
+          - d@(np.sin(b*t)*np.exp(a*t)) )*2   
+    return t, res[[0],:], res[[1],:], a, c[0], d[0]
+```
+
+The interval $[t_0,t_0+4\pi/b]$ includes two arms of the spiral. 
+
+---
+
+## Complex eigenvalues
+
+Consider the three matrices 
+\begin{align*} 
+A_1 &=\begin{pmatrix} 0.1 & 1 \\ -1 & 0.1 \end{pmatrix} & 
+A_2 &=\begin{pmatrix} -0.1 & 1 \\ -1 & -0.1 \end{pmatrix} & 
+A_3 &=\begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} 
+\end{align*}
+
+* These have eigenvalues $0.1\pm i$, $-0.1\pm i$, and $\pm i$, respectively. 
+* We also have that $a>0$, $a<0$, and $a=0$, respectively. 
+* The first solution will in particular show a spiral moving away from the origin, the second a spiral towards the origin. 
+* We have used the initial value $\mathbf{x}(2)=(2,3)$, so that all solutions start in the point $(2,3)$. 
+
+---
+
+```{python}
+t_0 = 2; x_0 = np.array([[2],[3]])
+A_1 = np.array([[0.1,1],[-1,0.1]])
+t, x, y, a, c_1, d_1 = findcomps(A_1,t_0,x_0)
+plt.plot(x.T,y.T)
+```
+
+---
+
+```{python}
+A_2 = np.array([[1,1],[-1,-0.1]])
+t, x, y, a, c_1, d_1 = findcomps(A_2,t_0,x_0)
+plt.plot(x.T,y.T)
+```
+
+---
+
+```{python}
+A_3 = np.array([[0,1],[-1,0]])
+t, x, y, a, c_1, d_1 = findcomps(A_3,t_0,x_0)
+plt.plot(x.T,y.T)
+```
+
+---
+
+
+
+
+## Plotting $t$ against $x_i(t)$
+
+* This visualises all components in the same plot, also when $n>2$.
+* We plot only the first component $x_1(t)$, over the same time interval, and with the same initial condition as above. 
+* Since $c_1\cos(bt)-d_1\sin(bt)$ has amplitude $\sqrt{c_1^2+d_1^2}$ we have upper and lower bounds 
+$$
+-2\sqrt{c_1^2+d_1^2}e^{at}\leq x_1(t)  \leq 2\sqrt{c_1^2+d_1^2}e^{at}
+$$ {#eq-nedreogovre}
+
+```{python}
+#| eval: false
+t, x, y, a, c_1, d_1 = findcomps(A_1,t_0,x_0)
+plt.plot(t.T,x.T)
+plt.plot(t.T,2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
+plt.plot(t.T,-2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
+```
+
+---
+
+```{python}
+#| fig-cap: "Plot of $x_1(t)$ for the system with matrix $A_1$. The upper and lower bounds from @eq-nedreogovre are also shown."
+#| echo: false
+t, x, y, a, c_1, d_1 = findcomps(A_1,t_0,x_0)
+plt.plot(t.T,x.T)
+plt.plot(t.T,2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
+plt.plot(t.T,-2*np.sqrt(c_1**2 + d_1**2)*np.exp(a*t.T))
+```
+
+
+---
+
+## Higher order linear differential equations
+
+A *higher order* linear differential equations with constant coefficients:
+$$
+y^{(n)}(t) + a_1y^{(n-1)}(t) + a_2y^{(n-2)}(t) + \cdots + a_ny(t) = 0
+$$ {#eq-hoyereorden2}
+$y(t)$ is the unknown function. A second order equation: 
+$$y''+py'+qy=0$$
+Set $x_0=y$, $x_1=y'$ to rewrite as a first order linear system:
+$$
+\begin{array}{rrr}
+x_0'=&         &x_1 \\
+x_1'=&-qx_0&-px_1
+\end{array}
+$$
+
+* Coefficient matrix: $A=\begin{pmatrix} 0 & 1 \\ -q & -p \end{pmatrix}$
+* Eigenvalues: $\det(A-\lambda I)=\lambda(\lambda+p)+q=\lambda^2+p\lambda + q$
+
+---
+
+## Distinct eigenvalues
+
+* Distinct eigenvalues is the same as $p^2\neq 4q$. 
+* Then $A$ is diagonalisable, and 
+* $$A-\lambda I_n = \begin{pmatrix} -\lambda & 1 \\ -q & -\lambda -p\end{pmatrix} 
+\sim \begin{pmatrix} -\lambda & 1 \\ 0 & 0 \end{pmatrix},$$
+so that $(1,\lambda_1)$ and $(1,\lambda_2)$ are two particular eigenvectors. 
+* We can therefore set 
+$$P=\begin{pmatrix} 1 & 1 \\ \lambda_1 & \lambda_2 \end{pmatrix}$$
+
+---
+
+## Distinct real eigenvalues
+The general solution is 
+$$
+\begin{pmatrix} y(t) \\ y'(t) \end{pmatrix} 
+= \begin{pmatrix} 1 & 1 \\ \lambda_1 & \lambda_2 \end{pmatrix}\begin{pmatrix} C_1e^{\lambda_1t} \\ C_2e^{\lambda_2t}\end{pmatrix},
+$$ {#eq-spesreellemulti}
+where one can find $C_1$ and $C_2$ with help of initial values $y(t_0)$, $y'(t_0)$.
+
+---
+
+## Distinct real eigenvalues, example
+
+Consider the equation 
+$$y''-5y'+6y=0,$$
+with initial values $y(0)=1$, $y'(0)=0$. 
+
+* Eigenvalues of $A$: $\det(A-\lambda I)=\lambda^2-5\lambda + 6 = 0$, which gives $\lambda_1=2$, $\lambda_2=3$. 
+* Insert $t=0$ in @eq-spesreellemulti we get
+$$
+\begin{pmatrix} 1 \\ 0 \end{pmatrix} = \begin{pmatrix} 1 & 1 \\ 2 & 3 \end{pmatrix}\begin{pmatrix} C_1 \\ C_2 \end{pmatrix},
+$$
+which has the solution $C_1=3$, $C_2=-2$. The solution is thus 
+$$y(t)=C_1e^{\lambda_1t} + C_2e^{\lambda_2t}=3e^{2t}-2e^{3t}.$$
+
+---
+
+## Complex eigenvalues 
+
+::: {#prp-}
+$$
+y(t) = 2e^{at}\left( \cos(bt)c_1 - \sin(bt)d_1  \right),
+$$ {#eq-evalher3}
+where $c_1$ and $d_1$ are arbitrarily chosen real numbers (recall that $\lambda=a+ib$). 
+:::
+
+
+---
+
+## Complex eigenvalues, example
+
+Consider the equation $y''+4y'+5y=0$.
+
+* Characteristic equation: $\lambda^2+4\lambda+5=0$, which has the solution $\frac{-4\pm\sqrt{16-20}}{2}=-2\pm i$. 
+* General solution: 
+$$y(t) = 2e^{-2t}\left( c_1\cos t - d_1\sin t \right).$$
+
+---
+
+## Equal eigenvalues
+
+Assume $\lambda_1=\lambda_2$. Then $\lambda_1=\lambda_2=-p/2$, and $p^2=4q$. We get
+$$
+A-\lambda I 
+= \begin{pmatrix} -\lambda & 1 \\ -q & -\lambda-p \end{pmatrix} 
+= \begin{pmatrix} p/2 & 1 \\ -p^2/4 & -p/2\end{pmatrix}
+\sim\begin{pmatrix} p/2 & 1 \\ 0 & 0\end{pmatrix}.
+$$
+The eigenspace has dimension one, and $A$ is not diagonalisable. Other methods are thus needed. 
+One can show that 
+
+* $y(t)=e^{\lambda t}$ is a solution. 
+* $y(t)=te^{\lambda t}$ is a solution. 
+
+* Thus, all functions on the form $y(t)=Ce^{\lambda t}+Dte^{\lambda t}$ are also solutions.
+* One can show that there is a unique such solution satisfying initial conditions for $y(t_0)$ and $y'(t_0)$. 
+
+## Equal eigenvalues
+
+* Consider the equation $y''+6y'+9y=0$ with initial conditions $y(0)=4$, $y'(0)=-13$. 
+* The characteristic equation: $\lambda^2+6\lambda+9=0$, so that $\lambda_1=\lambda_2=-3$. 
+* General solution: $y(t)=Ce^{-3t}+Dte^{-3t}$
+* We also get $y'(t)=-3Ce^{-3t}+D(1-3t)e^{-3t}$. 
+* The initial conditions give the equations
+\begin{align*}
+C         &= 4 \\
+-3C+D &= -13,
+\end{align*}
+which have the solution $C=4$, $D=-1$. 
+* The solution is thus $y(t)=4e^{-3t}-te^{-3t}$.

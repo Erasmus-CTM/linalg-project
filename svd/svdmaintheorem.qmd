@@ -17,10 +17,8 @@ and $n \times n$, respectively, and where $\Sigma$ is an $m \times n \,$ ''diago
   \end{array}
   \right)
 \end{equation*}
-where $r=\text{rank}(A)$. The diagonal elements $\sigma_{1}, \ldots, \sigma_{r}$ are called the  
+where $r=\text{rank}(A)$. The diagonal elements $\sigma_{1}, \ldots, \sigma_{r}$ are called the 
 *singular values* of $A$. These are strictly positive and ordered in such a way that 
-\begin{displaymath}
-  \sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_r > 0.
-\end{displaymath}
+$$\sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_r > 0.$$
 The factorization $A =   U \Sigma V^T$ is called the *SVD* (Singular Value Decomposition) of $A$. 
 :::

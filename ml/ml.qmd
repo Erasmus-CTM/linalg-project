@@ -1,0 +1,507 @@
+# Project: Backpropagation and the chain rule
+
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+ 
+## Introduction
+This project requires some background in Calculus and analysis in several variables
+In particular you should know about the partial derivatives of a function in several variables, as well as the chain rule in several variables. 
+
+In machine learning one tries to find a function which approximates a given set of measurement data in a best possible way.
+For this to be possible computationally, we require that the candidate functions have a given form. 
+If the measurement data is $\mathbf{x}_i\in\mathbb{R}^n$, $\mathbf{y}_i\in\mathbb{R}^n$, 
+we would like to find an  $\mathbf{F}$ on the given form so that ''the total error''
+$$\sum_{i=1}^m | \mathbf{F}(\mathbf{x}_i)-\mathbf{y}_i |^2$$
+in the measurement data is as small as possible. We assume that the functions on the given form are uniquely described by a set of *parameters* $w_1,w_2,...$, 
+and we then write 
+$$\mathbf{F}_{w_1,w_2,...}: \mathbb{R}^n\to\mathbb{R}^n$$
+for $\mathbf{F}$. 
+Our question becomes: Which choice of parameters gives a function $\mathbf{F}_{w_1,w_2,...}$ with total error 
+$$f(w_1,w_2,...)=\sum_{i=1}^m | \mathbf{F}_{w_1,w_2,...}(\mathbf{x}_i)-\mathbf{y}_i |^2.$$ {#eq-find-min}
+as small as possible? This is a minimisation problem where $w_1,w_2,...$ are the variables (not $\mathbf{x}_i$ and $\mathbf{y}_i$, these are given measurement data!). 
+The total error @eq-find-min is also called the *loss function*.
+
+To find the $w_1,w_2,...$ which gives the minimum of @eq-find-min turns out to be difficult.
+To find good approximations to this minimum can be simpler: 
+From analysis in several variables we know that the *gradient* of a function $f:\mathbb{R}^n\to\mathbb{R}$,
+$$\nabla f = \begin{pmatrix} \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2},...,\frac{\partial f}{\partial x_n}\end{pmatrix},$$
+points in the direction where $f$ increases the most. Therefore, the function will decrease the most if we move in the direction of the negative gradient, 
+and this is exactly what we will do:
+We compute the gradient of $f$ given by @eq-find-min, and follow this a little, to reach a point where $f$ has a smaller value. 
+
+We will require our candidate function to be on the following form. 
+$$
+\mathbf{F}_{\mathbf{w}^{(1)},\mathbf{b}^{(1)},\mathbf{w}^{(2)},\mathbf{b}^{(2)},...} = \mathbf{F}_1(\mathbf{F}_2(\cdots \mathbf{F}_r(\mathbf{x})))
+$$ {#eq-neuralnet}
+where all $\mathbf{w}^{(k)}$, $\mathbf{b}^{(k)}$ are vectors of length $n$, and where
+$$
+\mathbf{F}_k(\mathbf{x}) = \sigma(W^{(k)}\mathbf{x}+\mathbf{b}^{(k)}),
+$$
+with
+$$
+W^{(k)}=
+\begin{pmatrix}
+w_1^{(k)} & w_n^{(k)} & w_{n-1}^{(k)} & \cdots & w_2^{(k)} \\ 
+w_2^{(k)} & w_1^{(k)} & w_n^{(k)} & \cdots & w_3^{(k)} \\
+w_3^{(k)} & w_2^{(k)} & w_1^{(k)} & \cdots & w_4^{(k)} \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+w_n^{(k)} & w_{n-1}^{(k)} & w_{n-2}^{(k)} & \cdots & w_1^{(k)}
+\end{pmatrix}.
+$$
+Some comments are in order:
+
+* $W^{(k)}$ is a special type of matrix which is constant along diagonals. 
+Such matrices are called *circulant Toeplitz matrices*, and have a series of nice properties which can be useful in machine learning. 
+There also exist effective algorithms to multiply with such matrices, something which is exploited in the function \texttt{cconv}, to be defined later. 
+\texttt{cconv} takes two vectors $\mathbf{w}$ and $\mathbf{x}$ as input, and returns $W\mathbf{x}$, where $W$ is the circulant Toeplitz matrix with first column being $\mathbf{w}$. 
+* $\sigma:\mathbb{R}^n\to\mathbb{R}^n$ over is the (component-wise) *activation function*.
+This is first defined from $\mathbb{R}$ to $\mathbb{R}$ by $\sigma(x)=1/(1+e^{-x})$, and extended component-wise to $\mathbb{R}^n$ by
+$$
+\sigma(\mathbf{x})=\sigma\begin{pmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{pmatrix} = \begin{pmatrix} \sigma(x_1) \\ \sigma(x_2) \\ \vdots \\ \sigma(x_n) \end{pmatrix}.
+$$
+* @eq-neuralnet is also called a *Neural Net* (NN), and the $\mathbf{F}_k$'s are called its *layers*. 
+We see that the parameters of the candidate functions are split in groups, as dictated by the vectors $\mathbf{w}^{(i)}$, $\mathbf{b}^{(i)}$. 
+When the $W^{(i)}$ are circulant Toeplitz matrices (as we require), the neural net is called a *Convolutional Neural Net* (CNN). 
+In a general neural net the $W^{(i)}$ can have other forms as well, 
+and it can be the case that some of the $W^{(i)}$ are circulant Toeplitz matrices, while others are not. 
+
+Since @eq-neuralnet is a composition of many functions, we must use the *chain rule* in several variables to find the gradient of @eq-find-min. 
+For this we need to find the *Jacobians* of the ''inner functions" in @eq-neuralnet. 
+The Jacobian of $\mathbf{F}(\mathbf{x}):\mathbb{R}^n\to\mathbb{R}^m$, denoted $\mathbf{F}'(\mathbf{x})$, is defined as the $m\times n$-matrix
+$$
+\begin{pmatrix} 
+\frac{\partial F_1}{\partial x_1} & \frac{\partial F_1}{\partial x_2} & \cdots & \frac{\partial F_1}{\partial x_n} \\
+\frac{\partial F_2}{\partial x_1} & \frac{\partial F_2}{\partial x_2} & \cdots & \frac{\partial F_2}{\partial x_n} \\
+\vdots                                       & \vdots                                       & \vdots & \vdots \\
+\frac{\partial F_m}{\partial x_1} & \frac{\partial F_m}{\partial x_2} & \cdots & \frac{\partial F_m}{\partial x_n} \\                 
+\end{pmatrix}
+$$
+where $F_1,F_2,...,F_m$ are the component functions of $\mathbf{F}$. The chain rule can now be formulated as follows..
+
+::: {#thm-teorem1}
+Let $\mathbf{F}: \mathbb{R}^k\to\mathbb{R}^m$, $\mathbf{G}: \mathbb{R}^n\to\mathbb{R}^k$ be functions with continuous partial derivatives. 
+Then the composite function $\mathbf{H}(\mathbf{x})=\mathbf{F}(\mathbf{G}(\mathbf{x}))$ also has continuous partial derivatives, and
+$$\mathbf{H}'(\mathbf{x})=\mathbf{F}'(\mathbf{G}(\mathbf{x}))\mathbf{G}'(\mathbf{x}).$$
+:::
+
+We thus obtain the Jacobian of a composite function by multiplying the Jacobians of the involved functions
+\footnote{The requirement of continuous partial derivative is actually stricter than what we need}.
+In particular we need the Jacobian of the activation function, so let us start with this. 
+
+::: {#exr-1ml}
+Show that $\sigma'(x)=\sigma(x)(1-\sigma(x))$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have
+$$\sigma'(x)=\frac{e^{-x}}{(1+e^{-x})^2}=\frac{1}{1+e^{-x}}\frac{e^{-x}}{1+e^{-x}}=\sigma(x)\left(1-\frac{1}{1+e^{-x}}\right)=\sigma(x)(1-\sigma(x)).$$
+:::::::
+:::::
+:::
+
+The component-wise extension of the activation function thus has the diagonal matrix with  $\sigma'(x_i)$ on the diagonal as Jacobian.
+
+Given measurement data $\mathbf{x}_i\in\mathbb{R}^n$, $\mathbf{y}_i\in\mathbb{R}^n$, we would like to find vectors $\mathbf{w}^{(i)}$, $\mathbf{b}^{(i)}$ 
+that gives a neural net @eq-neuralnet with minimum total error
+$$
+f\left( \mathbf{w}^{(1)},\mathbf{b}^{(1)},\mathbf{w}^{(2)},\mathbf{b}^{(2)},... \right)
+= \sum_{i=1}^m | \mathbf{F}_{\mathbf{w}^{(1)},\mathbf{b}^{(1)},\mathbf{w}^{(2)},\mathbf{b}^{(2)},...}(\mathbf{x}_i)-\mathbf{y}_i |^2.
+$$
+When we compute the gradient of this we will write $\mathbf{F}_1\circ\mathbf{F}_2$ for the composite function $\mathbf{x}\to \mathbf{F}_1(\mathbf{F}_2(\mathbf{x}))$, 
+and more generally $\mathbf{F}_1\circ\cdots\circ\mathbf{F}_r$ for the composite function $\mathbf{x}\to\mathbf{F}_1(\mathbf{F}_2(\cdots \mathbf{F}_r(\mathbf{x})))$. 
+
+Let us now look at the individual layers. To apply the chain rule correctly we need to set up the points where we evaluate the Jacobians. For this we define
+
+$$\begin{aligned}
+\mathbf{z}^{(2r)}     &=\mathbf{x}    &\\
+\mathbf{z}^{(2k-1)} &=W^{(k)}\mathbf{z}^{(2k)}+\mathbf{b}^{(k)} &1\leq k\leq r \\
+\mathbf{z}^{(2k-2)} &=\sigma(\mathbf{z}^{(2k-1)}) & 1\leq k\leq r.
+\end{aligned}$$ {#eq-yzdef}
+
+The first layer can be written
+$$
+\mathbf{F}_r: 
+\begin{pmatrix} 
+\mathbf{w}^{(1)} \\
+\mathbf{b}^{(1)}  \\
+\vdots \\
+\mathbf{w}^{(r-1)} \\
+\mathbf{b}^{(r-1)} \\
+\mathbf{w}^{(r)} \\
+\mathbf{b}^{(r)}
+\end{pmatrix} 
+\to
+\begin{pmatrix} 
+\mathbf{w}^{(1)} \\
+\mathbf{b}^{(1)}  \\
+\vdots \\
+\mathbf{w}^{(r-1)} \\
+\mathbf{b}^{(r-1)} \\
+\sigma\left(W^{(r)}\mathbf{x} +\mathbf{b}^{(r)}\right)
+\end{pmatrix},
+$$
+We have here re-defined $\mathbf{F}_r$ in the sense that the variables, with the exception of $\mathbf{w}^{(r)},\mathbf{b}^{(r)}$, are forwarded to the next layer. 
+We continue like this, so that we eliminate the $\mathbf{w}$ and $\mathbf{b}$-variables, layer by layer. 
+Let us find the Jacobian $\mathbf{F}_r'$, and let us start with the last $n$ component functions, which have the form 
+$$ \left( \mathbf{w}^{(1)},\mathbf{b}^{(1)},...,\mathbf{w}^{(r)},\mathbf{b}^{(r)}\right) \to \sigma(\mathbf{G}(\mathbf{w}^{(r)},\mathbf{b}^{(r)}))$$
+with $\mathbf{G}(\mathbf{w}^{(r)},\mathbf{b}^{(r)}) = W^{(r)}\mathbf{x} +\mathbf{b}^{(r)}$. 
+
+
+
+::: {#exr-2ml}
+Let $\mathbf{G}(\mathbf{x})=W\mathbf{x} + \mathbf{b}$, where $W$ be an $n\times n$ matrix, and $\mathbf{b},\mathbf{x}\in\mathbb{R}^n$ . Show that $\mathbf{G}'(\mathbf{x})=W$. 
+
+:::
+
+::: {#exr-3ml}
+Let instead $\mathbf{G}: \mathbb{R}^{2n}\to\mathbb{R}^n$ be defined by
+$$
+\mathbf{G}\left( w_1,...,w_n,b_1,...,b_n\right) =
+\begin{pmatrix}
+w_1 & w_n & w_{n-1} & \cdots & w_2 \\ 
+w_2 & w_1 & w_n & \cdots & w_3 \\
+w_3 & w_2 & w_1 & \cdots & w_4 \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+w_n & w_{n-1} & w_{n-2} & \cdots & w_1
+\end{pmatrix}
+\mathbf{x}+\mathbf{b}.
+$$
+In other words, we now consider $w_i$ and $b_i$ as variables, and $\mathbf{x}$ as a constant. 
+Show that
+$$
+\mathbf{G}'(w_1,...,w_n,b_1,...,b_n) = 
+\left(
+\begin{array}{ccccc|ccccc}
+x_1 & x_n & x_{n-1} & \cdots & x_2 & 1 & 0 & 0 & \cdots & 0 \\
+x_2 & x_1 & x_n & \cdots & x_3 & 0 & 1 & 0 & \cdots & 0 \\
+x_3 & x_2 & x_1 & \cdots & x_4 & 0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+x_n & x_{n-1} & x_{n-2} & \cdots & x_1 & 0 & 0 & 0 & \cdots & 1 \\
+\end{array}
+\right)
+$$ {#eq-jacobinew}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Component function $i$ of $\mathbf{G}$ can be written
+$$
+G_i\left( w_1,...,w_n,b_1,...,b_n \right)  = \sum_{j=1}^{n} w_{i-j+1}x_j + b_i = \sum_{j=1}^{n} w_jx_{i-j+1} + b_i ,
+$$
+so that $\frac{\partial G_i }{\partial w_j}=x_{i-j+1}$. This proves the expression for the left part of the matrix @eq-jacobinew. 
+We also have that
+$$\frac{\partial G_i}{\partial b_j}=\begin{cases} 0 & \text{ for } j\neq i \\ 1 & \text{ for } j=i\end{cases},$$
+which explains why the right part of the matrix @eq-jacobinew is the identity matrix.
+:::::::
+:::::
+:::
+
+Since $\sigma\left(W^{(r)}\mathbf{x} +\mathbf{b}^{(r)}\right)$ does not depend on $\mathbf{w}^{(1)}$, $\mathbf{b}^{(1)}$,..., $\mathbf{w}^{(r-1)}$, $\mathbf{b}^{(r-1)}$, 
+the last $n$ component functions in $\mathbf{F}_r$ will therefore have Jacobian $\left(\begin{array}{c|c}O & U^{(r)}\end{array}\right)$, where
+
+$$
+U^{(r)} :=
+\sigma'(\mathbf{z}^{(2r-1)})
+\left(\begin{array}{cccc|cccc}
+x_1 & x_n   & \cdots  & x_2               & 1 & 0 & \cdots & 0 \\
+x_2 & x_1   & \cdots   & x_3                & 0 & 1 & \cdots & 0 \\
+\vdots     & \vdots       & \vdots  & \vdots               & \vdots & \vdots & \vdots & \vdots \\
+x_n     & x_{n-1}        & \cdots & x_1            & 0 & 0 & \cdots & 1 
+\end{array}\right),
+$$ {#eq-urdef}
+
+
+which is an $n\times n$ diagonal matrix multiplied with a $n\times(2n)$ matrix. 
+Since the first component functions are simply the identity mapping, we also get
+$$
+\mathbf{F}_r'=
+\left(\begin{array}{c|c}
+I          & O \\ \hline
+O & U^{(r)}
+\end{array}\right),
+$$ {#eq-firstexpr}
+In the same way we write the other layers $\mathbf{F}_1$,...,$\mathbf{F}_{r-1}$ as
+$$
+\mathbf{F}_k: 
+\begin{pmatrix} 
+\mathbf{w}^{(1)} \\
+\mathbf{b}^{(1)} \\
+\vdots \\
+\mathbf{w}^{(k-1)} \\
+\mathbf{b}^{(k-1)}\\
+\mathbf{w}^{(k)} \\
+\mathbf{b}^{(k)} \\
+\mathbf{x}
+\end{pmatrix} 
+\to
+\begin{pmatrix} 
+\mathbf{w}^{(1)} \\
+\mathbf{b}^{(1)} \\
+\vdots \\
+\mathbf{w}^{(k-1)} \\
+\mathbf{b}^{(k-1)}\\
+\sigma\left(W^{(k)}\mathbf{x} +\mathbf{b}^{(k)}\right)
+\end{pmatrix},$$
+where $1\leq k\leq r-1$. The only difference from the above is that there are $n$ extra variables $x_i$ here (we shall evaluate in $\mathbf{x}=\mathbf{z}^{(2k-1)}$). 
+This means that the only difference for $\mathbf{F}'_k$, when comparing with $\mathbf{F}'_r$ in @eq-firstexpr, is that we get extra columns 
+$\begin{pmatrix} O \\ V^{(k)} \end{pmatrix}$ on the end, where 
+$$
+V^{(k)} := 
+\sigma'(\mathbf{z}^{(2k-1)})
+\left(\begin{array}{cccc}
+w_1^{(k)} & w_n^{(k)}   & \cdots  & w_2^{(k)}           \\
+w_2^{(k)} & w_1^{(k)}   & \cdots   & w_3^{(k)}           \\
+\vdots     & \vdots       & \vdots  & \vdots               \\
+w_n^{(k)}     & w_{n-1}^{(k)}        & \cdots & w_1^{(k)}         
+\end{array}\right)
+$$ {#eq-computevk}
+(this is the Jacobian of $\mathbf{x}\to \sigma\left(W^{(k)}\mathbf{x} + \mathbf{b}\right)$). 
+The other columns are deduced in the same way as @eq-urdef, giving
+$\left(\begin{array}{c|c} I & O \\ \hline O & U^{(k)}\end{array}\right)$, where
+$$
+U^{(k)} :=
+\sigma'(\mathbf{z}^{(2k-1)})
+\left(\begin{array}{cccc|cccc}
+z_1^{(2k)} & z_n^{(2k)}   & \cdots  & z_2^{(2k)}               & 1 & 0 & \cdots & 0 \\
+z_2^{(2k)} & z_1^{(2k)}   & \cdots   & z_3^{(2k)}                & 0 & 1 & \cdots & 0 \\
+\vdots     & \vdots       & \vdots  & \vdots               & \vdots & \vdots & \vdots & \vdots \\
+z_n^{(2k)}     & z_{n-1}^{(2k)}        & \cdots & z_1^{(2k)}            & 0 & 0 & \cdots & 1 
+\end{array}\right)
+$$ {#eq-computeuk}
+($\mathbf{x}$ in @eq-urdef is exchanged with $\mathbf{z}^{(2k)}$). In other words we get
+$$
+\mathbf{F}_k'=
+\left(\begin{array}{c|c|c}
+I         & O & O \\ \hline
+O & U^{(k)} & V^{(k)}
+\end{array}\right).
+$$
+
+Now that we have the Jacobian of each individual layer, we can use the chain rule to find the Jacobian of the entire neural net. 
+If we first apply the chain rule to find the Jacobian of $\mathbf{F}_{r-1}\circ\mathbf{F}_r$ we get
+$$
+\left(\begin{array}{c|c|c}
+I_1     & O       &O           \\ \hline
+O & U^{(r-1)}  & V^{(r-1)} 
+\end{array} \right) 
+\left(\begin{array}{c|c|c} 
+I_1     & O & O \\ \hline 
+O & I_2     & O \\ \hline 
+O  & O & U^{(r)}
+\end{array}\right).
+$$ {#eq-oppg1}
+Here we split the identity matrix $I$ into $\left(\begin{array}{c|c} I_1 & O \\ \hline O & I_2 \end{array}\right)$, 
+for the rows to match the columns in the preceding matrix. 
+
+::: {#exr-4ml}
+Show that qeq-oppg1 equals
+$$
+\left(\begin{array}{c|c|c} 
+I_1     & O & O \\ \hline
+O & U^{(r-1)} & V^{(r-1)}U^{(r)}
+\end{array}\right)
+$$
+
+:::
+
+The Jacobian of  $\mathbf{F}_{r-2}\circ\mathbf{F}_{r-1}\circ\mathbf{F}_r$ now becomes
+$$
+\left(\begin{array}{c|c|c}
+I_1     & O  & O             \\ \hline
+O & U^{(r-2)}  & V^{(r-2)} 
+\end{array} \right)
+\left(\begin{array}{c|c|c|c} 
+I_1     & O & O & O \\ \hline
+O & I_2     & O & O \\ \hline 
+O & O & U^{(r-1)} & V^{(r-1)}U^{(r)}
+\end{array}\right),
+$$ {#eq-oppg2}
+
+::: {#exr-5ml}
+Show that @eq-oppg2 becomes
+$$
+\left(\begin{array}{c|c|c|c} 
+I_1     & O & O & O \\ \hline
+O & U^{(r-2)} & V^{(r-2)} U^{(r-1)} & V^{(r-2)} V^{(r-1)}U^{(r)}
+\end{array}\right)
+$$
+
+:::
+
+If we continue this process to include all layers, we get that the $k$'th part in the end becomes. 
+$$
+V^{(1)}\cdots V^{(k-1)}U^{(k)}.
+$$ {#eq-kthpart}
+What remains now is to also apply the Jacobian (=gradient) of the outer function.
+
+::: {#exr-6ml}
+Let $g(\mathbf{x})=\sum_{i=1}^m |\mathbf{F}(\mathbf{x}_i)-\mathbf{y_i}|^2$, where $\mathbf{F}$ is a differentiable functions. Show that 
+$$\nabla g = \sum_{i=1}^m 2(\mathbf{F}(\mathbf{x}_i)-\mathbf{y}_i)^T\mathbf{F}'(\mathbf{x}_i).$$
+
+:::
+
+If we combine @eq-kthpart with @exr-6ml, the $k$'th part of the gradient for the whole neural net becomes (in the case of one measurement point)
+$$
+2(\mathbf{z}_0-\mathbf{y})^TV^{(1)}\cdots V^{(k-1)}U^{(k)}.
+$$ {#eq-kthpartgrad}
+The first half of this matrix are the partial derivatives for the $w_i^{(k)}$-variables, the second half those of the $b_i^{(k)}$ variables.
+
+## Implementation
+Let us take a look at how all this can be implemented. The algorithm for following the gradient to get closer to a minimum of the loss function is called 
+*backpropagation*. The entire implementation can be found in the file \texttt{testml.py}. 
+The algorithm takes the measurements $\mathbf{x}_i$ and $\mathbf{y}_i$, the number of layers $r$, 
+and the number of iterations \texttt{its}, as input, 
+and returns the updated parameters $\mathbf{w}^{(i)}$ and $\mathbf{b}^{(i)}$, after this number of iterations. 
+As before we assume that all matrices are $n\times n$, 
+all vectors have length $n$, and that there are $m$ measurement points, which we will randomly generate.
+
+We need functions that implement the activation function, as well as multiplication with its Jacobian, and a function that implements circular convolution:
+
+```{pyodide-python}
+#| autorun: true
+def sigma(x):
+    return 1/(1+np.exp(-x))
+
+def sigmader(x):
+    return sigma(x)*(1-sigma(x))
+
+def cconv(x, y):
+    X = np.fft.fft(x)
+    Y = np.fft.fft(y)
+    Z = X*Y
+    return np.fft.ifft(Z).real
+```
+
+We also need code that computes the current value of the lossfunction:
+```{pyodide-python}
+#| autorun: true
+def loss(x, y, w, b):
+    n, m = np.shape(x)
+    n, r = np.shape(w)
+    loss = 0
+    for t in range(m):          # Iterate through the measurements
+        z = np.zeros(n)
+        for k in range(r,0,-1): # iterate through the layers
+            z = cconv(w[:,k-1], z) + b[:,k-1]
+            z = sigma(z)
+        loss += sum(abs(z-y[:,t])**2)
+    return loss
+```
+
+
+We now have all we need to implement the backpropagation function:
+```{pyodide-python}
+#| autorun: true
+def backpropagation(x, y, r, its):
+    valp = 0
+    lrate = 0.01  # Learning rate
+    n, m = np.shape(x)
+    w = np.random.rand(n, r) # Randomly generated initial parameters
+    b = np.random.rand(n, r) # Randomly generated initial parameters
+    for it in range(its):
+        dw = np.zeros_like(w)
+        db = np.zeros_like(b)
+        for t in range(m):
+            z = np.zeros((n,2*r+1))
+            z[:,2*r] = x[:,t]
+            for k in range(r,0,-1):
+                z[:, 2*k-1] = cconv(w[:,k-1], z[:,2*k]) + b[:,k-1]
+                z[:, 2*k-2] = sigma(z[:,2*k-1])
+            
+            temp = 2*(z[:,0]-y[:,t])
+            for k in range(1,r+1):
+                temp = temp*sigmader(z[:,2*k-1])
+                dw[:,k-1] += cconv( np.flip(z[:,2*k]), temp)
+                db[:,k-1] += temp
+                temp = cconv( np.flip(w[:,k-1]), temp)
+        w = w - lrate*dw
+        b = b - lrate*db
+        print(loss(x, y, w, b))
+    return w, b
+```
+This code requires several comments. 
+The implementation has randomly generated initial values for the weights $\mathbf{w}^{(k)}$ and $\mathbf{b}^{(k)}$. 
+These are stored in $n\times r$-matrices, where each column represents a layer. 
+The outer \texttt{for}-loop in the code goes through the iterations. 
+Each iteration follows the gradient a small bit from the current point to reach a new point. 
+In the next iteration the gradient at the new point is computed, and this is followed a little bit from the new point, and so on. 
+The update of the point by following the gradient a small bit is captured by the two last lines in the outermost \texttt{for}-loop. 
+There the *hyperparameter* \texttt{lrate} is seen, which captures the distance to follow the gradient. 
+In machine learning this is also called the *learning rate*, and the algorithm is highly sensitive to this parameter:
+Following the gradient for a little while corresponds to using a first order approximation to the function. 
+But this approximation is good only near the point we evaluate in. We should therefore not follow the gradient too far. We should not follow it too short either - 
+that would render the algorithm ineffective. In practice a compromise is struck. An algorithm can also set the learning rate adaptively, 
+as some points may allow for following the gradient longer than others.
+
+The next \texttt{for}-loop goes through the $m$ data points. For each of them 
+the vectors $\mathbf{z}^{(k)}$ in @eq-yzdef are computed. This is called the *forward pass* of the algorithm,
+and is done by applying the activation function and multiplication with $W^{(k)}$ in alternating order (line 14-15). 
+Once this has been done, the expression @eq-kthpartgrad for the different parts of the gradient is computed. 
+This is also called the *backward pass* of the algorithm since, as we will see, the order of the computations will be reversed when compared to the forward pass. 
+Let us look at why this is the case.
+
+::: {#exr-7ml}
+Assume we would like to compute the expression $\mathbf{x}^TA_1A_2\cdots A_n$ on a computer, 
+where $\mathbf{x}\in\mathbb{R}^n$ and the $A_i$ are $n\times n$-matrices.  
+Explain, in terms of arithmetic complexity, why one should attempt to compute this expression from left to right, rather than from right to left.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+When this is done from left to right you compute a series of vector-matrix multiplications. 
+For the opposite way one computes a series of matrix-matrix multiplications (except for the last one). 
+The point is simply that vector-matrix multiplications are easier to compute than matrix-matrix multiplications.
+:::::::
+:::::
+:::
+
+In terms of complexity it is preferable to compute the quantities from left to right, i.e., in order opposite to the forward pass. 
+When computing @eq-kthpartgrad from left to right, $2(\mathbf{z}_0-\mathbf{y})^TV^{(1)}\cdots V^{(k)}$ can be obtained from 
+$2(\mathbf{z}_0-\mathbf{y})^TV^{(1)}\cdots V^{(k-1)}$ by multiplying with $V^{(k)}$ to the right. 
+Our implementation exploits this by storing the $2(\mathbf{z}_0-\mathbf{y})^TV^{(1)}\cdots V^{(k)}$ in the temporary variable \texttt{temp}.
+According to @eq-computevk, this can be done by
+
+* first multiplying with $\sigma'(\mathbf{z}^{(2k-1)})$ to the right (first line in the innermost \texttt{for}-loop), 
+* then multiplying with $W^{(k)}$ to the right (circular convolution with the reverse of $\mathbf{w}^{(k)}$. Last line in the innermost \texttt{for}-loop). 
+
+To get the partial derivatives w.r.t. the $\mathbf{w}^{(k)}$ and the $\mathbf{b}^{(k)}$ (the $k$'th part of the gradient), 
+we multiply with $U^{(k)}$ to the right. According to @eq-computeuk this can be done by
+first multiplying with $\sigma'(\mathbf{z}^{(2k-1)})$ to the right (first line in the innermost \texttt{for}-loop). After this,
+
+* storing this gives partial derivatives w.r.t. the $\mathbf{b}^{(k)}$ (third line in the innermost \texttt{for}-loop),
+* circular convolution with the reverse of $\mathbf{z}^{(2k)}$ gives partial derivatives w.r.t. the $\mathbf{w}^{(k)}$ (second line in the innermost \texttt{for}-loop), 
+
+After the innermost \texttt{for}-loop the gradient at the current point (captured by the variables \texttt{dw} and \texttt{db}) 
+has been updated with the contribution from one more data point.
+
+
+
+Code for invoking backpropagation can now be as follows.
+```{pyodide-python}
+#| autorun: true
+m = 10   # Number of data points
+n = 10   # dimension of the data
+its = 10 # Number of iterations
+r = 10   # Number of layers
+
+x = np.random.rand(n,m) # Randomly generated measurements
+y = np.random.rand(n,m) # Randomly generated measurements
+
+w, b = backpropagation(x, y, r, its)
+```
+
+
+
+::: {#exr-8ml}
+If you run the code you will see that the loss function usually decreases in the iterations. Is this always the case? 
+If you increase the learning rate to 0.1, will the loss function decrease when you run the code? 
+If the loss function increases in some iterations, can you think of a way to adjust the learning rate so that the loss function always decreases?
+
+:::

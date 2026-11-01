@@ -42,7 +42,7 @@ Secondly, for large matrices we encounter polynomials of very high degree, so th
 
 
 ## Jacobi's method
-We start with the *Jacobi method*, which can be used to find all eigenvectors and eigenvalues of a symmetric matrix numerically. 
+We start with the *Jacobi method*, which can be used to find all eigenvectors and eigenvalues of a symmetric matrix $A$ numerically. 
 It does so by constructing orthogonal matrices $P_1,P_2,...$, and successively applying similarity transformations
 $$
 \begin{aligned}
@@ -53,19 +53,22 @@ $$
   A_{k+1} &= P_k^TA_kP_k
 \end{aligned}
 $$ {#eq-simsetup}
-We first note that all these matrices are symmetric: Set $B=P^TAP$ with $A$ symmetric and $P$ orthogonal. We compute
-$$B^T=(P^TAP)^T=P^TA^T(P^T)^T=P^TAP=B,$$
-so that $B$ also is symmetric. 
+All matrices $A_k$ are symmetric. This follows by induction: 
 
-We also note that all matrices $A_i$ have the same eigenvalues. To see why, 
-if $\textbf{v}$ is an eigenvector for $A_k$ with eigenvalue $\lambda$, then the last equation above gives
-$$A_{k+1}(P_k)^T\textbf{v}=(P_k)^TA_k\textbf{v}=\lambda (P_k)^T\textbf{v},$$
-so that $(P_k)^T\textbf{v}$ is an eigenvector for $A_{k+1}$, also with eigenvalue $\lambda$. Since $A_k$ and $A_{k+1}$ have the 
-same eigenvalues, all of the $A_k$ have the same eigenvalues. 
-If $\textbf{v}$ is an eigenvector of $A_1=A$, then in particular $(P_1)^T\textbf{v}$ will be an eigenvector of $A_2$. 
-By repeating this procedure $(P_2)^T(P_1)^T\textbf{v}$ will be an eigenvector for $A_3$, and more generally 
+* First of all, $A$ is symmetric. 
+* Secondly, with $A_{k+1} = P_k^TA_kP_k$ we obtain
+$$A_{k+1}^T=(P_k^TA_kP_k)^T=P_k^TA_k^TP_k=P_k^TA_kP_k=A_{k+1},$$
+so that $A_{k+1}$ is symmetric when $A_k$ is. 
+
+Since all the matrices $A_i$ are similar, they all have the same eigenvalues. 
+Let us take a look at how the eigenvectors are related. 
+if $\mathbf{v}$ is an eigenvector for $A_k$ with eigenvalue $\lambda$, then the last equation above gives
+$$A_{k+1}(P_k)^T\mathbf{v}=(P_k)^TA_k\mathbf{v}=\lambda (P_k)^T\mathbf{v},$$
+so that $(P_k)^T\mathbf{v}$ is an eigenvector for $A_{k+1}$ with the same eigenvalue. 
+If $\mathbf{v}$ is an eigenvector of $A_1=A$, then in particular $(P_1)^T\mathbf{v}$ will be an eigenvector of $A_2$. 
+By repeating this procedure $(P_2)^T(P_1)^T\mathbf{v}$ will be an eigenvector for $A_3$, and more generally 
 $$
-  (P_k)^T\cdots(P_1)^T\textbf{v} = (P_1\cdots P_k)^T\textbf{v}
+  (P_k)^T\cdots(P_1)^T\mathbf{v} = (P_1\cdots P_k)^T\mathbf{v}
 $$
 will be an eigenvector for $A_{k+1}$. Thus, if $P$ is a matrix consisting of orthonormal eigenvectors for $A$ (so that $A=PDP^T$), $(P_1\cdots P_k)^TP$ is a matrix consisting of orthonormal eigenvectors of $A_{k+1}$. 
 It follows that $A_{k+1}=(P_1\cdots P_k)^TPDP^T(P_1\cdots P_k)$, so that 
@@ -80,7 +83,7 @@ We will not go into similar arguments for the convergence of $P_1\cdots P_k$ to 
 
 After each transformation $A_{k+1} = P_k^TA_kP_k$ we will therefore compute
 $$\text{off}(A) = \sqrt{\sum_{i\neq j}^n a_{ij}^2},$$
-and if this value is less than a given tolerance, $A$ is considered 'diagonal enough', and the algorithm terminates. 
+and if this value is less than a given tolerance, $A$ is considered "diagonal enough", and the algorithm terminates. 
 
 
 
@@ -317,14 +320,14 @@ We will not prove that the QR-method converges towards the eigenvalues/eigenvect
 
 
 ## The power method and the companion matrix
-As we have noted, finding roots in polynomials (i.e., eigenvalues) can be difficult
+As we have noted, finding roots in polynomials (i.e., eigenvalues) can be difficult.
 It turns out that this problem can be turned around: We can use linear algebra to find the roots of the characteristic polynomial. 
 In fact, most software find eigenvalues using this approach, rather than finding them directly as roots in a polynomial!
 
 
 Given the polynomial 
 $$ p(t)=a_0+a_1t+\cdots + a_{n-1}t^{n-1}+t^n,$$
-we define the companion matrix $C(p)$ by
+we define the *companion matrix* $C(p)$ by
 $$
 C(p)
 =
@@ -437,8 +440,7 @@ Let $D$ be the diagonal matrix with $\lambda_1,...,\lambda_n$ on the diagonal. W
 $$C(p)=VDV^{-1},$$
 so that $C(p)$ is diagonalisable, with $V$ diagonalising it.
 
-We can also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
-
+We also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
 The following function takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
 ```{pyodide-python}
 #| autorun: true
@@ -448,28 +450,27 @@ The function `np.poly(A)` is used to find the characteristic polynomial of $A$.
 
 
 $C(A)$ and $A$ have the same eigenvalues, since they by definition have the same characteristic polynomial. 
-Aided by Exercise 3, $C(A)$ can be constructed without actually knowing the eigenvalues. 
-Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix.  
+Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix. 
 This makes it computationally easier to use the power method (and other methods!), which enables us to find the unknown eigenvalues. 
 
 
 
-The function `power_impl` below takes a matrix $A$ and an integer $n$ as input, computes $C(A)$, 
-performs $n$ iterations of the power method, and returns the corresponding estimate for the biggest eigenvalue.
+The function `power_impl` below takes a matrix $A$ and an integer $k$ as input, 
+performs $k$ iterations of the power method, and returns the corresponding estimate for the biggest eigenvalue.
 The function sets the vector having $1$ in all components as initial vector for the power method:
 ```{pyodide-python}
 #| autorun: true
 {{< include power_impl.py >}}
 ```
 
-The following code verifies that the power method actually finds the largest eigenvalue.
+The following code applies the power method to the companion matrix of $A$ to get an estimate for the biggest eigenvalue.
 
 ```{pyodide-python}
 #| autorun: true
 mu, x = power_impl(C(A),10)
 print(mu)
 ```
-
+Finally we verify that this is close to the largest eigenvalue.
 ```{pyodide-python}
 #| autorun: true
 D, P = np.linalg.eig(A)

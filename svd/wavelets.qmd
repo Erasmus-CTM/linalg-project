@@ -1,0 +1,396 @@
+# Project: Image compression based on wavelets
+
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+```{python}
+#| include: false
+#| echo: false
+{{< include ../_imports.py >}}
+{{< include extdim2.py >}}
+{{< include P_from_phi_m.py >}}
+{{< include P_to_phi_m.py >}}
+{{< include proj.py >}}
+{{< include mmasarray.py >}}
+```
+
+
+## Introduction
+*Wavelet-based compression* is an important application of linear algebra to image processing,  
+which is used in some image standards. 
+The purpose of this project is to provide some insight to some of the ideas behind this, without diving into 
+many of the technical details.
+  
+{{< include svdpythoncommon.qmd >}}
+
+We will for simplicity first think of images as one-dimensional objects, and with $2^m$ pixel values for some $m$.
+Now, let $V_m$ be the vector space consisting of piecewise constant function on $[0,1)$ that are constant on all intervals of the form $[i2^{-m},(i+1)2^{-m})$ 
+(i.e., we consider a uniform partition of $[0,1]$ into $2^m$ intervals).
+Rather than thinking of an image as a vector $(y_0,y_1,...,y_{2^m-1})$, we will think of it as the piecewise constant function in $V_m$ which equals $y_i$ on the interval 
+$[i2^{-m},(i+1)2^{-m})$. 
+
+::: {#exr-1wav}
+Explain that $V_0\subseteq V_1 \subseteq V_2\subseteq \cdots$, i.e., the spaces are nested. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Write $[i2^{-m},(i+1)2^{-m})$ as the disjoint union 
+$$[2i2^{-m-1},(2i+1)2^{-m-1}) \cup [(2i+1)2^{-m-1},(2i+2)2^{-m-1}).$$
+This shows that a function which is piecewise constant on intervals of length $2^{-m}$, also is piecewise constant on intervals of length $2^{-(m+1)}$, 
+so that $V_m\subseteq V_{m+1}$.
+:::::::
+:::::
+:::
+
+This presents the following idea: Since, intuitively (and as we will show), $V_{m-1}$ and $V_{m-2}$ are vector spaces of smaller dimension than $V_m$, 
+we can think of the projections of the image in $V_m$ onto $V_{m-1}$ and $V_{m-2}$ as compressions which also can be acceptable replacements for the image. 
+
+When the spaces are piecewise constant functions as here, these projections are perhaps not that good replacements.
+In the theory of wavelets, however, one finds other spaces which are nested in the same way (i.e., $V_0\subseteq V_1 \subseteq V_2\subseteq \cdots$), 
+where one can find much better replacements of the image in (which is assumed to be in $V_m$) in $V_{m-1}$, or $V_{m-2}$. 
+Spaces which are nested in this way are also referred to as a *multiresolution analysis*, and the basis functions we consider in these spaces 
+are called *wavelets*. 
+The wavelet defined from the set of piecewise constant functions is also called the *Haar wavelet*. 
+For an introduction to wavelets compatible with the notation in this project, see @applinalgryanpython.
+
+
+To establish a basis for the set of piecewise constant functions, 
+define first the functions $\phi$ and $\psi$ on $\mathbb{R}$ by
+\begin{align*}
+\phi(t) &= \left\{ \begin{array}{ll} 1 & \text{ for } t\in [0,1) \\ 0 & \text{ for } t\not\in [0,1) \end{array} \right. &
+\psi(t) &= \left\{ \begin{array}{rl} -1 & \text{ for } t\in [0,1/2) \\ 1 & \text{ for } t \in [1/2,1) \\ 0 & \text{ for } t\not\in [0,1) \end{array} \right.
+\end{align*}
+These are easily plotted:
+```{pyodide-python}
+#| autorun: true
+x = np.linspace(-0.1,1.1,240)
+y = np.block( [np.zeros(20),np.ones(200),np.zeros(20)])
+plt.plot(x,y)
+plt.show()
+```
+```{pyodide-python}
+#| autorun: true
+x = np.linspace(-0.1,1.1,240)
+y = np.block( [np.zeros(20),np.ones(100),-np.ones(100),np.zeros(20)])
+plt.plot(x,y)
+plt.show()
+```
+
+
+For all integers $m$ and $n<2^m$ we also define the functions $\phi_{m,n}$ and $\psi_{m,n}$ on $[0,1)$ by 
+\begin{align*}\phi_{m,n}(t)&= \phi(2^mt-n) & \psi_{m,n}(t)&= \psi(2^mt-n).\end{align*}
+
+::: {#exr-2wav}
+Explain that 
+\begin{align*}
+\phi_{m,n}(t)=\begin{cases} 1 & t\in[n2^{-m},(n+1)2^{-m}) \\ 0 & \text{ otherwise.} \end{cases}
+\end{align*}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+$\phi_{m,n}(t)= 1$ if and only if $0\leq 2^mt-n<1$, which is the same as $n2^{-m}\leq t<(n+1)2^{-m}$.
+:::::::
+:::::
+:::
+
+::: {#exr-3wav}
+Explain that
+$$\phi_{m,n} =  \phi_{m+1,2n} + \phi_{m+1,2n+1}$$ {#eq-mainequations0}
+$$\psi_{m,n} = -\phi_{m+1,2n} + \phi_{m+1,2n+1}$$ {#eq-mainequations}
+
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+* $\phi_{m+1,2n}$ is $1$ in $[2n2^{-m-1},(2n+1)2^{-m-1})$, and $0$ elsewhere. \\
+* $\phi_{m+1,2n+1}$ is $1$ in $[(2n+1)2^{-m-1},(2n+2)2^{-m-1})$, and $0$ elsewhere. 
+
+This means that the sum of the two is $1$ on 
+$$[2n2^{-m-1},(2n+2)2^{-m-1})=[n2^{-m},(n+1)2^{-m}),$$
+and $0$ elsewhere. But this means that $\phi_{m,n} =  \phi_{m+1,2n} + \phi_{m+1,2n+1}$. 
+
+Similarly, it follows that $-\phi_{m+1,2n} + \phi_{m+1,2n+1}$ is $0$ outside of $[n2^{-m},(n+1)2^{-m})$, and is $-1$ and $1$ on the two halves of this interval. 
+This means that $\psi_{m,n} = -\phi_{m+1,2n} + \phi_{m+1,2n+1}$.
+:::::::
+:::::
+:::
+
+In the theory of wavelets, the first equation in @eq-mainequations is called the *two scale equation*, 
+the function $\phi$ is called a *scaling function*, and the function $\psi$ is called 
+a *mother wavelet*. 
+We also set 
+\begin{align*}
+\boldsymbol{\phi}_m &= \{ \phi_{m,0}, \phi_{m,1}, \ldots , \phi_{m,2^m-1}\} \\
+\boldsymbol{\psi}_m &= \{ \psi_{m,0}, \psi_{m,1}, \ldots , \psi_{m,2^m-1}\}  \\
+\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m &= \{ \phi_{m,0} ,\ldots, \phi_{m,2^m-1}, \psi_{m,0} \ldots, \psi_{m,2^m-1} \}.
+\end{align*}
+i.e., $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m$ are the functions in $\boldsymbol{\phi}_m$, together with the functions in $\boldsymbol{\psi}_m$.
+We also set $W_m = \text{Span}(\boldsymbol{\psi}_m)$ (note that $W_m\subset V_{m+1}$). 
+From @exr-2wav it follows that $\boldsymbol{\phi}_{m+1}$ is a basis for $V_{m+1}$. 
+From @exr-3wav it follows that $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m\subseteq \boldsymbol{\phi}_{m+1}$.
+
+::: {#exr-4wav}
+Explain that 
+$$[f]_{\boldsymbol{\phi}_m}= (f(0), f(2^{-m}), f(2\cdot 2^{-m}),\ldots, f(1-2^{-m})) \text{ for }f \in V_m.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+If $f=\sum_{n=0}^{2^m-1} c_n\phi_{m,n}$, simply evaluate both sides at $t=i2^{-m}$ for all $i$, and the result follows.
+:::::::
+:::::
+:::
+
+We shall also consider the inner product on $V_m$ defined by 
+\footnote{Even though the function $f(t)g(t)$ is not continuous on $[0,N)$, this integral is well-defined.}
+$$\langle f,g \rangle = \int_0^1 f(t)g(t)dt, \quad f, g \in V_m.$$
+
+
+
+::: {#exr-5wav}
+Show that both $\boldsymbol{\phi}_{m+1}$, and $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m$, are orthogonal bases for $V_{m+1}$ w.r.t. this inner product.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+Since $\phi$ and $\psi$ have the same support, it is clear that the $\psi_{m,n}$, just as the $\phi_{m,n}$, are nonzero only on the interval $[2^{-m}n,2^{-m}(n+1))$.
+Since these intervals are disjoint for different $n$, it follows that 
+\begin{align*} 
+\psi_{m,j}\psi_{m,k}&=0 & \phi_{m,j}, \psi_{m,k} &= 0 & \phi_{m,j}, \phi_{m,k} &= 0,
+\end{align*}
+when $j\neq k$. Although  $\phi_{m,n}\psi_{m,n} \neq 0$, it is straightforward to check that $\int_0^1\phi_{m,n}\psi_{m,n}\,dx = 0$ as well. 
+It follows that $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m$ is orthogonal. $\boldsymbol{\phi}_{m+1}$ is clearly also orthogonal.
+
+Recall that orthogonal vectors are linearly independent. 
+Since there are equally many vectors in $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m$ and $\boldsymbol{\phi}_{m+1}$, 
+and since by @exr-3wav, 
+$$\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m\subseteq \boldsymbol{\phi}_{m+1},$$
+it follows from Theorem 13 in Sec. 4.5 in \cite{lay} that  $\boldsymbol{\phi}_m\oplus\boldsymbol{\psi}_m$ also is a basis for $V_{m+1}$.
+:::::::
+:::::
+:::
+
+
+
+
+
+
+
+
+
+
+
+
+::: {#exr-6wav}
+Show that 
+$$
+P_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 }
+=
+\begin{pmatrix}
+  1 & 0 & -1 &  0 \\
+  1 & 0 &  1 &  0 \\
+  0 & 1 &  0 & -1 \\
+  0 & 1 &  0 &  1
+\end{pmatrix}.
+$$ {#eq-firsttworepeat}
+Is $P_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 }$ an orthogonal matrix? 
+What is $P_{ \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 \leftarrow \boldsymbol{\phi}_2  }$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+From the relations
+$$
+\begin{array}{rcrrrr}
+  \phi_{1,0}  &=& \phi_{2,0} & + \phi_{2,1} \\
+  \phi_{1,1} &=&                     &                    & \phi_{2,2} & + \phi_{2,3} \\
+  \psi_{1,0}  &=& -\phi_{2,0} & +\phi_{2,1} \\
+  \psi_{1,1} &=&                       &                  & -\phi_{2,2} & + \phi_{2,3}
+\end{array}
+$$
+we see that 
+\begin{align*}
+[\phi_{1,0}]_{\boldsymbol{\phi}_2}&=(1,1,0,0) &
+[\phi_{1,1}]_{\boldsymbol{\phi}_2}&=(0,0,1,1) \\
+[\psi_{1,0}]_{\boldsymbol{\phi}_2}&=(-1,1,0,0) &
+[\psi_{1,1}]_{\boldsymbol{\phi}_2}&=(0,0,-1,1)
+\end{align*}
+which gives us the columns of the stated matrix. 
+We also compute that 
+$$
+(P_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 })^TP_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 } = 2I_4.
+$$ {#eq-P2P}
+Strictly speaking then, $P_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 }$ 
+is not an orthogonal matrix, although the columns are orthogonal.
+From @eq-P2P it follows that 
+$$
+P_{ \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 \leftarrow \boldsymbol{\phi}_2  }=\frac{1}{2}( P_{ \boldsymbol{\phi}_2 \leftarrow \boldsymbol{\phi}_1\oplus\boldsymbol{\psi}_1 } )^T.
+$$ {#eq-transposeexpr}
+:::::::
+:::::
+:::
+
+Let us now look at how the changes of coordinates between $\boldsymbol{\phi}_m$ and $\boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}$ can be implemented. 
+These are represented by $2^m\times 2^m$-matrices. 
+
+\subsection*{Implementation of $P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}}$}
+Note that
+
+* @eq-mainequations0 says that the first half of the columns have the vector $(1,1)$ in a repeating pattern, as seen for the first two repetitions in @eq-firsttworepeat. 
+* @eq-mainequations says that the second half of the columns have the vector $(-1,1)$ in a repeating pattern, as also seen for the last two repetitions in @eq-firsttworepeat.
+
+Now, let $\mathbf{y}=P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1} }\mathbf{x}$ 
+(i.e., $\mathbf{x}$/$\mathbf{y}$ are input/output to change of coordinates), 
+and split $\mathbf{x}$ into two, so that $\mathbf{x}=\begin{pmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \end{pmatrix}$. 
+We see that the even entries in the output will be $\mathbf{x}_1 - \mathbf{x}_2$, while the odd entries will be $\mathbf{x}_1 + \mathbf{x}_2$.
+With this in mind, $P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}}$ can be implemented as follows:
+
+```{pyodide-python}
+#| autorun: true
+{{< include P_to_phi_m.py >}}
+```
+
+\subsection*{Implementation of $P_{ \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1} \leftarrow \boldsymbol{\phi}_m  }$}
+Due to @eq-transposeexpr this is $\frac{1}{2}( P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}} )^T$. We thus get that 
+
+* the first half of the rows have the row vector $\begin{pmatrix} 1 & 1 \end{pmatrix}$ in a repeating pattern,
+* the last half of the rows have $\begin{pmatrix} -1 & 1 \end{pmatrix}$ in a repeating pattern. 
+
+This gives the following implementation of $P_{ \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1} \leftarrow \boldsymbol{\phi}_m  }$, 
+which is similar to that of $P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}}$. 
+
+```{pyodide-python}
+#| autorun: true
+{{< include P_from_phi_m.py >}}
+```
+
+Note that the two implementations above avoid writing down the matrix itself. This is extremely important, since images can in general be very large. 
+
+\subsection*{Implementation of the projection of $V_m$ onto $V_k$ }
+Consider now the orthogonal projection of $V_m$ onto $V_k$ (with $k<m$), $\text{proj}_{V_k}$. 
+We know that $\text{proj}_{V_k}(f)$ is the function in $V_k$ which ''best'' approximates $f\in V_m$. 
+
+::: {#exr-7wav}
+Explain that 
+$$
+[\text{proj}_{V_k}]_{\boldsymbol{\phi}_m}
+=
+2^{-(m-k)}
+\begin{pmatrix} 
+E & 0 & 0 &\cdots & 0 & 0 \\ 
+0 & E & 0 & \cdots & 0 & 0 \\ 
+0 & 0 & E & \cdots & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\ 
+0 & 0 & 0 & \cdots & E & 0 \\
+0 & 0 & 0 & \cdots & 0 & E
+\end{pmatrix}
+$$ {#eq-projimpl}
+where $E$ is the matrix of size $2^{m-k}\times 2^{m-k}$ with all entries being one. 
+This essentially means that the projection computes averages of $2^{m-k}$ consecutive entries in the input, and repeat those the same number of times.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$
+\langle \phi_{m,n},\phi_{k,0}\rangle 
+= \begin{cases} 2^{-m} & \text{ for } n=0,...,2^{m-k}-1 \\ 0 & \text{ for other } n\end{cases}.
+$$
+It follows that, for $n=0,...,2^{m-k}$, we have 
+$$\text{proj}_{V_k}(\phi_{m,n})=\frac{2^{-m}}{2^{-k}}\phi_{k,0}=2^{-(m-k)}\phi_{k,0}=\sum_{n=0}^{2^{m-k}-1} 2^{-(m-k)}\phi_{m,n}.$$
+It follows that $[\text{proj}_{V_k}]_{\boldsymbol{\phi}_m}$ 
+starts with $2^{m-k}$ columns where the first $2^{m-k}$ entries are $2^{-(m-k)}$ (and the rest $0$). 
+This is seen in @eq-projimpl as the $E$ in the upper left corner.
+The repeating pattern of $E$ is obtained by considering $\text{proj}_{V_k}(\phi_{m,n}$ for other $n$ as well.
+:::::::
+:::::
+:::
+
+@eq-projimpl has the following implementation.
+
+```{pyodide-python}
+#| autorun: true
+{{< include proj.py >}}
+```
+
+
+
+
+\section*{But images are two-dimensional!}
+Images have at least two spatial dimensions, not one. It turns out that what we have done up to now can be generalised to two dimensions. 
+The starting point is that we associate the pixels again with a piecewise constant function, but now this function has two variables. 
+Think of these as functions that are constant on small squares in the plane, rather than on small intervals on the real line. 
+Basis functions are now identified with two indices - one for each spatial dimension. 
+If $P$ represents either a change of coordinates, or a projection, in one dimension, as defined above, 
+it turns out that the two-dimensional counterpart can be implemented om a matrix/image $A$ as
+$$A\to PAP^T.$$
+Writing $PAP^T=(P(PA)^T)^T$, this can be implemented as follows. 
+
+```{pyodide-python}
+#| autorun: true
+#| echo: false
+{{< include extdim2.py >}}
+```
+
+Let us now experiment with this on an actual image. 
+```{pyodide-python}
+#| autorun: true
+#| echo: false
+{{< include mmasarray.py >}}
+```
+
+You can assume that the Marilyn Monroe image has been stored in the array $A$. We display the image:
+```{pyodide-python}
+#| autorun: true
+plt.imshow(A, cmap='gray')
+plt.show()
+```
+
+
+::: {#exr-8wav}
+Check that $A$ is a $256 \times 256$ matrix. 
+Also, apply `extdim2` with $P$ being `P_from_phi_m`, or `proj` (projection from $V_m$ to $V_{m-1}$/$V_{m-2}$). 
+View the corresponding images.
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used.
+
+```{pyodide-python}
+#| autorun: true
+print(np.shape(A))
+```
+
+```{python}
+#| label: fig-plot71
+#| fig-cap: "Change of coordinates"
+# pyodide: autorun
+C = extdim2(A,P_from_phi_m)
+plt.imshow(C,cmap='gray'); plt.axis('off')
+plt.show()
+```
+
+```{python}
+#| label: fig-plot72
+#| fig-cap: "Projection from $V_m$ to $V_{m-1}$."
+# pyodide: autorun
+D = extdim2(A, lambda A : proj(A,1))
+plt.imshow(D,cmap='gray'); plt.axis('off')
+plt.show()
+```
+```{python}
+#| label: fig-plot70
+#| fig-cap: "Projection from $V_m$ to $V_{m-2}$."
+# pyodide: autorun
+D = extdim2(A, lambda A : proj(A,2))
+plt.imshow(D,cmap='gray'); plt.axis('off')
+plt.show()
+```
+
+The resulting three images can be seen in @fig-plot71, @fig-plot72, @fig-plot70. 
+Note that the image resulting from the change of coordinates consists of four parts, 
+where the upper left part represents a compressed version of the image. 
+The other three parts may have values outside the range $[0,255]$. 
+It is up to the program how such out of range-values are plotted.
+:::::::
+:::::
+:::

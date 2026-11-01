@@ -36,7 +36,7 @@ C(p)
 $$
 
 ::: {#exr-1}
-(a) Show that the characteristic polynomial of $C(p)$ is given by $\det(C(p)-\lambda I)=(-1)^n p(\lambda)$, 
+a. Show that the characteristic polynomial of $C(p)$ is given by $\det(C(p)-\lambda I)=(-1)^n p(\lambda)$, 
 so that the eigenvalues of $C(p)$ correspond to the roots of $p$. 
 
 ::::: {.callout-tip title='Hint' collapse="true"}
@@ -71,7 +71,7 @@ $$
 :::::::
 :::::
 
-(b) Show that $C(p)$ is invertible if and only if $a_0\neq 0$, and that 
+b. Show that $C(p)$ is invertible if and only if $a_0\neq 0$, and that 
 $$
   C(p)^{-1} 
   = 
@@ -109,7 +109,7 @@ component by component.
 :::
 
 ::: {#exr-2}
-Suppose that $\lambda$ is a root in $p(t)$, in other words an eigenvalue for $C(p)$ according to Exercise 1. 
+Suppose that $\lambda$ is a root in $p(t)$, in other words an eigenvalue for $C(p)$. 
 Show that $(1,\lambda,\lambda^2,...,\lambda^{n-1})$ is a corresponding eigenvector for $C(p)$.
 
 ::::: {.content-visible when-profile="instructor"}
@@ -147,9 +147,9 @@ so that $C(p)$ is diagionalisable, with $V$ diagonalising it.
 
 We can also define the companion matrix $C(A)$ of a matrix $A$ to be the companion matrix of $(-1)^n$ times the characteristic polynomial of $A$. 
 
-::: {#exr-3}
-Write a function \texttt{C(A)} which takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
-You can use the command \texttt{poly(A)} in \texttt{numpy} to find the characteristic polynomial of $A$. 
+::: {#exr-3companion}
+Write a function `C(A)` which takes a square matrix $A$ as input, and returns the companion matrix $C(A)$. 
+You can use the function `poly(A)` in `numpy` to find the characteristic polynomial of $A$. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -163,8 +163,8 @@ The code can look as follows.
 :::
 
 $C(A)$ and $A$ have the same eigenvalues, since they by definition have the same characteristic polynomial. 
-Aided by Exercise 3, $C(A)$ can be constructed without actually knowing the eigenvalues. 
-Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix.  
+Aided by @exr-3companion, $C(A)$ can be constructed without actually knowing the eigenvalues. 
+Since $C(A)$ has a simpler form (most elements in the matrix are $0$), it is easier computationally to compute powers of this matrix. 
 This makes it computationally easier to use the power method (and other methods!), which enables us to find the unknown eigenvalues. 
 
 ::: {#exr-4} 
@@ -204,7 +204,7 @@ print(D)
 With the power method we only found approximations to the biggest eigenvalue above. 
 The *QR-method* is a method for finding eigenvalues which is very similar to Jacobi's method. In particular it can be used to find approximations to 
 all eigenvalues. 
-Again we start with a symmetric matrix $A$, and apply similarity transformations (so that all matrices have the same eigenvalues), 
+Again we start with a symmetric matrix $A$, and apply similarity transformations (so that all matrices have the same eigenvalues). 
 In Jacobi's method the similarity transformations were plane rotations. In the QR-method they are given by the QR-factorisation: 
 
 ::: {#exr-45}
@@ -247,7 +247,7 @@ The following code can be used
 :::::
 :::
 
-(a) Write a function `eig_qr` which follows the recipe above to find the matrices $A_1$, $A_2$, and so on. $A$ should be input to the function. 
+a. Write a function `eig_qr` which follows the recipe above to find the matrices $A_1$, $A_2$, and so on. $A$ should be input to the function. 
 The method should stop when `off(A)` (the off-diagonal part of the matrix) gets smaller than the tolerance $10^{-4}$. 
 Use the built-in function `np.linalg.qr()` to find the $QR$ factorisation of a matrix. 
 
@@ -261,7 +261,7 @@ Use the built-in function `np.linalg.qr()` to find the $QR$ factorisation of a m
 :::::
 
 
-(b) We now define the matrix 
+b. We now define the matrix 
 ```{pyodide-python}
 #| autorun: true
 A=np.array([[1,2,3,4],[2,1,2,3],[3,2,1,2],[4,3,2,1]])
@@ -284,7 +284,7 @@ This procedure has to be repeated for te other zeros as well.
 :::::::
 :::::
 
-(c) Consider the matrices printed out when running 
+c. Consider the matrices printed out when running 
 ```{pyodide-python}
 #| autorun: true
 print(eig_qr(A))
