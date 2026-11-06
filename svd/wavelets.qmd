@@ -20,7 +20,7 @@
 
 
 ## Introduction
-*Wavelet-based compression* is an important application of linear algebra to image processing,  
+*Wavelet-based compression* is an important application of linear algebra to image processing, 
 which is used in some image standards. 
 The purpose of this project is to provide some insight to some of the ideas behind this, without diving into 
 many of the technical details.
@@ -118,7 +118,7 @@ This means that $\psi_{m,n} = -\phi_{m+1,2n} + \phi_{m+1,2n+1}$.
 :::::
 :::
 
-In the theory of wavelets, the first equation in @eq-mainequations is called the *two scale equation*, 
+In the theory of wavelets, @eq-mainequations0 is called the *two scale equation*, 
 the function $\phi$ is called a *scaling function*, and the function $\psi$ is called 
 a *mother wavelet*. 
 We also set 
@@ -250,7 +250,7 @@ With this in mind, $P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\o
 {{< include P_to_phi_m.py >}}
 ```
 
-\subsection*{Implementation of $P_{ \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1} \leftarrow \boldsymbol{\phi}_m  }$}
+## Implementation of $P_{ \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1} \leftarrow \boldsymbol{\phi}_m  }$
 Due to @eq-transposeexpr this is $\frac{1}{2}( P_{ \boldsymbol{\phi}_m \leftarrow \boldsymbol{\phi}_{m-1}\oplus\boldsymbol{\psi}_{m-1}} )^T$. We thus get that 
 
 * the first half of the rows have the row vector $\begin{pmatrix} 1 & 1 \end{pmatrix}$ in a repeating pattern,

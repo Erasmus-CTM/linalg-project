@@ -1,0 +1,237 @@
+# Project: Matrices and condition numbers
+
+```{pyodide-python}
+#| pdf-fallback: true
+#| autorun: true
+#| include: false
+{{< include ../_imports.py >}}
+```
+
+```{python}
+#| include: false
+{{< include ../_imports.py >}}
+```
+  
+# Matrices and condition numbers
+ 
+## Introduction
+When solving the system  $A\mathbf{x}=\mathbf{b}$ on a computer, the matrix $A$ and the right hand side $\mathbf{b}$ will typically be subject to measurement- or roundoff-errors.
+The computer will therefore really solve a problem on the form. 
+$$(A+E)\mathbf{y}=\mathbf{b}+\mathbf{e},$$
+where $E$/$\mathbf{e}$ is a matrix/vector with smalle elements, and which represent an error from the actual coefficient matrix/right hand side.
+In what follows we will assume for simplicity that there are no errors in the coefficient matrix, so that $E=0$.
+
+We will be concerned with how the error $\mathbf{e}$ in the right hand side propagates to the solution of the system. 
+Are there cases where even a small error $\mathbf{e}$ propagates to a large error between the solutions $\mathbf{x}$ and $\mathbf{y}$? 
+Such behaviour is clearly not desirable, since it makes us vulnerable w.r.t. small errors. 
+To illustrate that such behaviour is possible, set
+$$A=\frac{1}{2}\begin{pmatrix}1+\epsilon & 1-\epsilon \\ 1-\epsilon & 1+\epsilon\end{pmatrix},$$ 
+where $\epsilon$ is a real number we will vary.
+
+::: {#exr-1cond}
+Show that the solution of the system 
+$A\mathbf{x}=\mathbf{b}$, where $\mathbf{b}=\begin{pmatrix}1 \\ 1\end{pmatrix}$, is
+$\mathbf{x}= \begin{pmatrix}1 \\ 1 \end{pmatrix}$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that 
+$$
+A\mathbf{x}= \frac{1}{2}\begin{pmatrix}1+\epsilon & 1-\epsilon \\ 1-\epsilon & 1+\epsilon\end{pmatrix} \begin{pmatrix}1 \\ 1 \end{pmatrix}
+= \frac{1}{2}\begin{pmatrix} 1+\epsilon+1-\epsilon \\ 1-\epsilon+1+\epsilon\end{pmatrix} = \begin{pmatrix} 1 \\ 1 \end{pmatrix} = \mathbf{b}.
+$$
+:::::::
+:::::
+:::
+
+::: {#exr-2cond}
+Find the eigenvalues of $A$, and the corresponding eigenvectors. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We need to solve
+$$\det(\lambda I -A) = (\lambda-(1+\epsilon)/2)^2 - (1-\epsilon)^2/4 = \lambda^2 - (1+\epsilon)\lambda + \epsilon.$$
+This has roots
+$$\frac{1+\epsilon \pm\sqrt{(1+\epsilon)^2   -4\epsilon}}{2}= \frac{1+\epsilon \pm(1-\epsilon)}{2}.$$
+The biggest eigenvalue is $\lambda_1=1$, the smallest is $\lambda_2=\epsilon$. 
+Let us find the eigenvectors.
+
+* An eigenvector for $\lambda_1=1$.
+$$
+I-A = \begin{pmatrix} 1-(1+\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & 1-(1+\epsilon)/2 \end{pmatrix} 
+= \begin{pmatrix} (1-\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & (1-\epsilon)/2\end{pmatrix}
+\sim \begin{pmatrix} 1 & -1 \\ 0 & 0 \end{pmatrix},
+$$
+so that we can set $\mathbf{v}_1=(1,1)$.
+* An eigenvector for $\lambda_2=\epsilon$:
+$$
+\epsilon I-A = \begin{pmatrix} \epsilon-(1+\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & \epsilon-(1+\epsilon)/2 \end{pmatrix} 
+= \begin{pmatrix} -(1-\epsilon)/2 & -(1-\epsilon)/2 \\ -(1-\epsilon)/2 & -(1-\epsilon)/2 \end{pmatrix} 
+\sim \begin{pmatrix} 1 & 1 \\ 0 & 0 \end{pmatrix},
+$$
+so that we can set $\mathbf{v}_2=(1,-1)$.
+
+:::::::
+:::::
+:::
+
+
+
+If we have a small error $\mathbf{e}$, we would expect that the solution of $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ is close to $(1,1)$, regardless of what $\epsilon$ may be.
+
+::: {#exr-3cond}
+Set $\mathbf{e}=10^{-3}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$. Show that the solution of $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ is 
+$$\mathbf{y}=\begin{pmatrix} 1 \\ 1 \end{pmatrix} + 10^{-3}\epsilon^{-1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}.$$
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that $\mathbf{y}=\mathbf{v}_1 + 10^{-3}\epsilon^{-1}\mathbf{v}_2$, so that 
+$$
+A\mathbf{y} = A\mathbf{v}_1 + 10^{-3}\epsilon^{-1}A\mathbf{v}_2 = \mathbf{v}_1 + 10^{-3}\mathbf{v}_2 = \mathbf{b} + \mathbf{e}.
+$$
+:::::::
+:::::
+:::
+
+Here something unexpected happened: When $\epsilon$ is big the solution $\mathbf{y}$ is near the exact solution $\mathbf{x}$, 
+but when $\epsilon$ is small, this is not the case. 
+What goes wrong here? The explanation we will give is that $A$ has a high *condition number* when $\epsilon$ is small. 
+Put  differently, when $\epsilon\to 0$ the matrix $A$ gets close to the singular matrix $\frac{1}{2}\begin{pmatrix}1 & 1 \\ 1 & 1\end{pmatrix}$, 
+and this is problematic since a system with a singular matrix does not give unique solutions.
+
+
+Since the discussion above has to do with errors , we need to be precise about this.
+When talking about the error between two quantities it is natural to use the concept of relative error:
+
+
+::: {#def-condnumber}
+If $a$ and $b$ are numbers, their relative error is defined as $\left|\frac{b-a}{a}\right|$.
+If $\mathbf{a}$ and $\mathbf{b}$ are vectors, their relative error is defined as $\frac{|\mathbf{b}-\mathbf{a}|}{|\mathbf{a}|}$.
+:::
+
+Relative error says more about the relationship between $a$ and $b$ than what the *absolute error* \index{Feil!absolutt} $|b-a|$ does, 
+since it, contrary to the absolute error, doesn't change if we scale the numbers ($\left|\frac{cb-ca}{ca}\right|=\left|\frac{b-a}{a}\right|$ for any $c\neq0$).
+The relative error also says something about how many decimals $a$ and $b$ have in common: If the relative error is approximately $10^{-k}$, 
+you can expect that about the first $k$ decimal digits in $a$ and $b$ agree.
+For the systems $A\mathbf{x}=\mathbf{b}$ and $A\mathbf{y}=\mathbf{b}+\mathbf{e}$ above there are two different relative errors:
+
+1. The relative error in the right hand side: $| (\mathbf{b}+\mathbf{e}) - \mathbf{b}|/|\mathbf{b}| = |\mathbf{e}|/|\mathbf{b}|$.
+2. The relative error between the solutions $\mathbf{x}$ og $\mathbf{y}$: $|\mathbf{y}-\mathbf{x}|/|\mathbf{x}|$.
+
+The ratio 
+$$ \frac{  |\mathbf{y}-\mathbf{x}|/|\mathbf{x}| }{ |\mathbf{e}|/|\mathbf{b}| }$$ {#eq-forholdrelerr}
+says how much the relative error in the right hand side propagates to the solutions. 
+If this factor is about $10^{-n}$, it means that about $n$ decimal digits may be lost when solving the perturbed system. 
+
+
+::: {#exr-4cond}
+Compute the relative errors $|\mathbf{y}-\mathbf{x}|/|\mathbf{x}|$ and $|\mathbf{e}|/|\mathbf{b}|$. What is the ratio @eq-forholdrelerr?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+We have that
+$$\mathbf{y}-\mathbf{x}=\begin{pmatrix} 1 + 10^{-3}\epsilon^{-1} \\ 1 - 10^{-3}\epsilon^{-1} \end{pmatrix}-\begin{pmatrix} 1 \\ 1 \end{pmatrix}=10^{-3}\epsilon^{-1} \begin{pmatrix} 1\\-1 \end{pmatrix}$$
+It follows that $|\mathbf{y}-\mathbf{x}|/|\mathbf{x}|=10^{-3}\epsilon^{-1}$.
+We also have $|\mathbf{e}|/|\mathbf{b}|=10^{-3}$, 
+so that the ratio @eq-forholdrelerr is $\epsilon^{-1}$.
+:::::::
+:::::
+:::
+
+The previous exercise shows that the propagation factor @eq-forholdrelerr for relative error may be large. 
+The following result, which we will not prove, states how big it may be.
+
+::: {#prp-kondisjon-symmetrisk}
+Suppose that $A$ is symmetric and invertible, and let
+$$|\lambda_1|\geq|\lambda_2|\geq\cdots\geq|\lambda_n|>0$$
+be the eigenvalues of $A$ listed with decreasing absolute value. Then we have that
+$$
+\left|\frac{\lambda_n}{\lambda_1}\right| \frac{|\mathbf{e}|}{|\mathbf{b}|} \leq \frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}  \leq \left|\frac{\lambda_1}{\lambda_n}\right|  \frac{|\mathbf{e}|}{|\mathbf{b}|}
+$$ {#condnumberineq}
+:::
+
+The *condition number* of $A$ is defined as $K(A)=|\lambda_1/\lambda_n|$. With this notation \eqref{condnumberineq} can be written as
+$$
+\frac{1}{K(A)} \frac{|\mathbf{e}|}{|\mathbf{b}|} \leq \frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}  \leq K(A) \frac{|\mathbf{e}|}{|\mathbf{b}|}.
+$$ {#condnumberineq2}
+Note that 
+
+* the right inequality says that the relative error in the right hand side propagates at most by a factor of $K(A)$ to the solution of the system,
+* the left inequality can be rewritten as $\frac{|\mathbf{e}|}{|\mathbf{b}|} \leq K(A)\frac{|\mathbf{y}-\mathbf{x}|}{|\mathbf{x}|}$. In this form it states that the relative error in $\mathbf{x}$ 
+propagates at most by a factor of $K(A)$ when performing the matrix multiplication $\mathbf{b}=A\mathbf{x}$.
+
+::: {#exr-5cond}
+What is the condition number of the matrix $A$?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The eigenvalues were $\epsilon<1$ and $1$, so that the condition number is $\epsilon^{-1}$. 
+:::::::
+:::::
+:::
+
+::: {#exr-6cond}
+Let us change the right hand side to $\mathbf{b}=\begin{pmatrix} 1 \\-1 \end{pmatrix}$, and the error to $\mathbf{e}=10^{-3}\begin{pmatrix} 1 \\ 1 \end{pmatrix}$. 
+Compute the same quantities as in @exr-4cond. You can use that the new solutions are 
+\begin{align*}
+\mathbf{x} &=  \epsilon^{-1}\begin{pmatrix} 1\\-1\end{pmatrix} &
+\mathbf{y}&=\epsilon^{-1}\begin{pmatrix} 1\\-1\end{pmatrix} + 10^{-3}\begin{pmatrix} 1\\1 \end{pmatrix}.
+\end{align*}
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+That the stated $\mathbf{x}$ and $\mathbf{y}$ are correct can be verified as follows: 
+\begin{align*}
+A\mathbf{x}&= \epsilon^{-1}A\mathbf{v}_2 = \mathbf{v}_2=\mathbf{b} \\
+A\mathbf{y}&= \epsilon^{-1}A\mathbf{v}_2 + 10^{-3}A\mathbf{v}_1 = \mathbf{v}_2 + 10^{-3}\mathbf{v}_1 = \mathbf{b} + \mathbf{e}.
+\end{align*}
+We now get 
+\begin{align*}
+|\mathbf{y} - \mathbf{x}|/|\mathbf{x}|&=10^{-3}\sqrt{2}/(\epsilon^{-1}\sqrt{2})=10^{-3}\epsilon \\
+|\mathbf{e}|/|\mathbf{b}|&=10^{-3}\sqrt{2}/\sqrt{2}=10^{-3}. 
+\end{align*}
+The ratio @eq-forholdrelerr is thus $\epsilon$. 
+:::::::
+:::::
+:::
+
+We have thus shown that the $\mathbf{b}$ and $\mathbf{e}$ from @exr-4cond give maximal propagation of relative error ($\epsilon^{-1}$) when solving the system $A\mathbf{x}=\mathbf{b}$, 
+while the $\mathbf{x}$ and $\mathbf{y}$ from @exr-6cond give maximal propagation of relative error when computing the matrix multiplication $\mathbf{b}=A\mathbf{x}$. 
+
+
+
+
+The example above may seem rather obvious, since it is close to a singular matrix. 
+There exist other matrices with high condition numbers, where this is less obvious. 
+An example is the Hilbert matrix, which has elements $h_{kn}=1/(k+n-1)$. 
+A $4\times 4$ Hilbert matrix can be created as follows.
+
+```{pyodide-python}
+#| autorun: true
+x = np.arange(1,5).reshape((4,1))
+print(1/(x + x.T - 1))
+```
+By writing `cond(A)` we get the condition number of $A$. 
+
+::: {#exr-7cond}
+Plot the condition number of the Hilbert matrix as a function of $n$, where $n$ goes from $14$ to $20$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+You can also get an $n\times n$ Hilbert matrix with the command `hilbert(n)` in the package `scipy`.
+The following code uses this.
+```{pyodide-python}
+#| autorun: true
+n = np.arange(20)
+ch = np.zeros(20)
+for k in n:
+    ch[k] = np.linalg.cond(hilbert(k+1))
+plt.semilogy(n+1,ch)
+plt.show()
+```
+This plot is logarithmic.
+Along the $x$-axis we have $n$, along the $y$-axis we have the number of correct digits we lose.
+We see that the Hilbert matrix loose $2$ digits precision when we increment $n$.
+:::::::
+:::::
+:::

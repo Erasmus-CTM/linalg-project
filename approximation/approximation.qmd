@@ -625,7 +625,7 @@ freq_s = 44100
 freq = 440
 T= 1/freq
 samples_per_period = int(freq_s/freq)
-t = np.linspace(0,T,samples_per_period).reshape((-1,1))
+tp = np.linspace(0,T,samples_per_period).reshape((-1,1))
 ```
 The interpolating function $p$ will agree with the function (denoted as before by $f$) at a subset of the plot points. 
 We pick $M=2N+1$ function values uniformly on $[0,T]$, so that $t_k=kT/M$, $0\leq k<M$. 
@@ -654,7 +654,7 @@ We obtain the samples of the square wave at the interpolation points and the plo
 ```{pyodide-python}
 #| autorun: true
 fsp = square_wave(tsp, T) # samples from one period
-f = square_wave(t, T) # plot points
+fp = square_wave(tp, T) # plot points
 ```
 
 Let us now use the $M=2N+1$ trigonometric functions 
@@ -698,29 +698,20 @@ c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
 ```{pyodide-python}
 #| autorun: true
 n = np.arange(-N,N+1).reshape((1,-1))
-p = np.real( np.exp(2*np.pi*1j*n*t/T) @ c )
+p = np.real( np.exp(2*np.pi*1j*n*tp/T) @ c )
 ```
 We can plot this together with the square wave itself as follows.
 ```{pyodide-python}
 #| autorun: true
-plt.plot( t, p)
-plt.plot( t, f)
+plt.plot( tp, p)
+plt.plot( tp, fp)
 plt.legend([f"f(t), M={M}",'f(t)'])
 plt.show()
 ```
 In order to listen to a set of samples as a sound we need the following function
 ```{pyodide-python}
 #| autorun: true
-def audiowrite(filename, f, freq_s):
-    ofile = wave.open(filename, 'w')
-    ofile.setsampwidth(2)
-    ofile.setframerate(freq_s)
-    ofile.setnchannels(1)
-    max_amplitude = 2**15-1
-    f=max_amplitude*f
-    f=f.astype(np.uint16)
-    ofile.writeframesraw(f.astype(np.uint16).tobytes())
-    ofile.close()
+{{< include ../audiowrite.py >}}
 ```    
 We now generate sounds corresponding to a sine, a square wave and its interpolant (we set the sounds to last three seconds).
 ```{pyodide-python}
@@ -730,8 +721,8 @@ numsec=3
 t = np.linspace(0,numsec,samples_per_period*numsec*freq)
 sine = np.sin(2*np.pi*freq*t)
 
-f = f.reshape(-1)
-f = np.tile(f, numsec*freq)
+fr = fp.reshape(-1)
+fr = np.tile(fr, numsec*freq)
 
 p = p.reshape(-1)
 p = np.tile(p, numsec*freq)
@@ -745,7 +736,7 @@ Finally we write sound data to file:
 ```{pyodide-python}
 #| eval: false
 audiowrite('sine.wav', sine, freq_s)
-audiowrite('square.wav', f, freq_s)
+audiowrite('square.wav', fr, freq_s)
 audiowrite('interpolant.wav', p, freq_s)
 ```
 You can now listen to the three generated files in your favourite audio player. 
@@ -864,7 +855,7 @@ There exist many polynomials of degree $\leq n$ which interpolate a given functi
 ## Exercises {.unnumbered}
 
 ::: {#exr-numopssyst}
-In this exercise we will look at code which computes the matrix we need to find the canonical form of the interpolating polynomial. 
+In this exercise we will look at code which computes the matrix we need when finding the canonical form of the interpolating polynomial. 
 @lst-plotint computed the Vandermonde matrix with the code
 
 ```{pyodide-python}
@@ -1035,13 +1026,13 @@ We interpolate the function $f(x) = x^2$ with a polynomial $p_3$ of degree $\leq
 
 ::: {#exr-lagrange name="Lagrange form"}
 We have the data
-\begin{center}
-\begin{tabular}{c|c|c|c|c}
-$x$    & 0 & 1 & 3 & 4\\
+$$
+\begin{array}{c|c|c|c|c}
+x    & 0 & 1 & 3 & 4\\
 \hline
-$f(x)$ & 1 & 0 & 2 & 1\\
-\end{tabular}
-\end{center}
+f(x) & 1 & 0 & 2 & 1\\
+\end{array}
+$$
 
 (a) Write the cubic polynomial which interpolates in these points as
 \begin{align*}
@@ -1091,13 +1082,13 @@ $$p_3(x)=1-x+\frac{2}{3}x(x-1)-\frac{1}{3}x(x-1)(x-3).$$
 ::: {#exr-polrep name='Interpolation with a set of data'}
 
 (a) We have the data
-\begin{center}
-\begin{tabular}{c|c|c|c|c}
-$x$ & 0 & 1 & 2 \\
+$$
+\begin{array}{c|c|c|c|c}
+x & 0 & 1 & 2 \\
 \hline
-$f(x)$ & 2& 1& 0\\
-\end{tabular}
-\end{center}
+f(x) & 2& 1& 0\\
+\end{array}
+$$
 These are points on the line $y=2-x$. Find the Newton form of the quadratic interpolating polynomial and compare. 
 What is the difference?
 
@@ -1347,9 +1338,8 @@ and
 
 ::: {#exr-progtriwave}
 Fill out the code below so that it generalises the code developed in @sec-trigpol. 
-```{python}
+```{pyodide-python}
 #| eval: false
-# pyodide:
 def plot_trig_approx(f, Nvals):
     ...
     
@@ -1370,17 +1360,14 @@ Run the code for the listed code for the *triangle wave*\index{Triangle wave}, a
 The code can be as follows
 ```{pyodide-python}
 #| autorun: true
-import numpy as np
-import matplotlib.pyplot as plt
-
 def plot_trig_approx(func, Nvals):
     freq_s = 44100
     freq = 440
     T= 1/freq
     samples_per_period = int(freq_s/freq)
-    t = np.linspace(0,T,samples_per_period).reshape((-1,1))
-    f = func(t, T) # plot points
-    plt.plot( t, f, '-k', label = 'f(t)')
+    tp = np.linspace(0,T,samples_per_period).reshape((-1,1))
+    fp = func(tp, T) # plot points
+    plt.plot( tp, fp, '-k', label = 'f(t)')
     
     for N in Nvals:
         M=2*N+1
@@ -1390,8 +1377,8 @@ def plot_trig_approx(func, Nvals):
         c = np.fft.fft(fsp,axis=0)/M
         c = np.block([ [c[(N+1):,:]] , [c[:(N+1),:]] ])
         n = np.arange(-N,N+1).reshape((1,-1))
-        p = np.real(np.exp(2*np.pi*1j*n*t/T)@c)
-        plt.plot(t, p, label=f"p(t), M={M}.")
+        p = np.real(np.exp(2*np.pi*1j*n*tp/T)@c)
+        plt.plot(tp, p, label=f"p(t), M={M}.")
     
 def triangle_wave(t, T):
     return np.abs(t - T/2)*4/T - 1

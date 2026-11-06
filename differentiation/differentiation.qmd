@@ -157,7 +157,7 @@ fd = np.cos
 a = 0.5
 h = 10**(-np.arange(0,6,0.1).reshape(-1,1))
 efh = fd(a) - (f(a+h)-f(a))/h
-plt.loglog(h, np.abs(efh), 'k.', h, h/2, 'r')
+plt.plot(np.log(h), np.log(np.abs(efh)), 'k.', np.log(h), np.log(h/2), 'r')
 plt.legend(['Error','Bound on error'])
 plt.show()
 ```
@@ -453,10 +453,10 @@ The truncation error bounds are plotted against each other as follows.
 # pyodide: autorun
 a = 0.5
 h = 10**(-np.arange(0,6,0.1))
-plt.loglog(h, np.abs(np.sin(a)*h/2),
-               h, np.abs(np.cos(a)*h**2/6),
-               h, np.abs(18*np.cos(a)*h**4),
-               h, np.abs(np.sin(a)*h**2/12))
+plt.plot(np.log(h), np.log(np.abs(np.sin(a)*h/2)),
+               np.log(h), np.log(np.abs(np.cos(a)*h**2/6)),
+               np.log(h), np.log(np.abs(18*np.cos(a)*h**4)),
+               np.log(h), np.log(np.abs(np.sin(a)*h**2/12)))
 plt.legend(['Newton','Symmetric Newton',
             'Four points','second derivative'])
 plt.show()
