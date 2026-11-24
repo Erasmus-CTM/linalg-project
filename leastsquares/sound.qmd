@@ -5,117 +5,140 @@
 #| autorun: true
 #| include: false
 {{< include ../_imports.py >}}
+{{< include ../approximation/square_wave.py >}}
 ```
 
 ```{python}
 #| include: false
 {{< include ../_imports.py >}}
+{{< include ../approximation/square_wave.py >}}
 ```
 
 ## Introduction
-In this project we shall first establish an experimental platform for listening to and working with sound on a computer, 
-in which trigonometric functions will be our building blocks.  
-Following this we will consider two ways of approximating sound: Interpolation and Fourier series. 
+In this project we shall establish an experimental platform for listening to and working with sound on a computer, 
+in which trigonometric functions will be the building blocks.  
+We will consider two ways of approximating sound: Interpolation and Fourier series. 
 
-Trigonometric functions can be thought of as the building blocks of sound. 
-Think of a sound as a mathematical function which returns its amplitude at a given instance in time. 
-A sine wave on the form $\sin(2\pi t/T)$ ($T$ is the period of the sine wave) in particular makes a distinct sound it may be possible to match with a key on a piano. 
+Think of a sound as a mathematical function which returns the amplitude at a given instance in time. 
+A sine wave on the form $\sin(2\pi t/T)$ ($T$ is the period of the sine wave) in particular makes a distinct sound, 
+similar to that obtained when pressing a key on a piano. 
 And adding many sine waves with different periods together, it turns out that more complex sounds can be obtained. 
 
 Sound on a computer is represented as numbers between $-1$ and $1$, called *sound samples*. 
-In many applications sound is represented by 44100 samples for each second, also called the *sampling frequency*, denoted `freq_s`. 
+Often sound is represented by 44100 samples for each second, also called the *sampling frequency*, denoted `freq_s`. 
 
-The sounds we consider will be periodic. If a sound repeats 440 times per second we say that its *frequency* is $f=440$Hz. 
-The period is then `T=1/freq`, and the number of samples per period is `freq_s/freq` (which may not be an integer). 
-In the following we will plot the sound samples against time. First we will plot sounds over one period.
-
-```{pyodide-python}
-#| autorun: true
-freq_s = 44100
-freq = 440
-T= 1/freq
-samples_per_period = int(freq_s/freq)
-tp = np.linspace(0,T,samples_per_period).reshape((-1,1))
-```
-When using interpolation, the interpolating function $p$ will agree with the function $f$ 
-at a subset of the plot points. 
-We pick $M=2N+1$ function values uniformly on $[0,T]$, so that $t_k=kT/M$, $0\leq k<M$. 
-We set
-$$\mathbf{f}=(f(0\cdot T/M),f(1\cdot T/M),...,f((M-1)T/M)).$$ 
+The sounds we consider will be periodic. If a sound repeats 440 times per second we say that its *frequency* is `freq`$=440$Hz. 
+The period is then `T=1/freq`, and the number of samples per period is `freq_s/freq` (this may not be an integer). 
+We first define the variables listed above
 
 ```{pyodide-python}
 #| autorun: true
-N=20
-M=2*N+1
-tsp = np.linspace(0,T-T/M,M).reshape((-1,1))
+{{< include ../approximation/setup_fs_f_T_spp.py >}}
 ```
+We will plot the sound samples against time. For this we will use the variable `tp` defined above, which 
+holds the number of samples for one period with the given sampling frequency. 
+
 We will consider the square wave defined by 
 $$
 f_s(t)=\begin{cases} 1 & \text{ for } 0\leq t<T/2 \\ -1 & \text{ for } T/2\leq t<T.\end{cases}
 $$
-The following function returns samples of the square wave at concrete instances in time in 
-one period.
 
+::: {#exr-05}
+Write a function `square_wave(t)` which returns the values of the square wave at the instances in time
+provided in the input vector `t`. You can assume that all time instances are between $0$ and $T$. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code does the job.
 ```{pyodide-python}
 #| autorun: true
-def square_wave(t, T):
-    return 2*(t < T/2).astype(int) -1
+{{< include ../approximation/square_wave.py >}}
 ```
-We obtain the samples of the square wave at the interpolation points and the plot points as follows.
-```{pyodide-python}
-#| autorun: true
-fsp = square_wave(tsp, T) # samples from one period
-fp = square_wave(tp, T) # plot points
-```
-Let us now use the $M=2N+1$ trigonometric functions
+:::::::
+:::::
+:::
+
+
+When using interpolation, the interpolating function $p$ will agree with the function $f$ 
+at a subset of the plot points. 
+We will pick $M=2N+1$ function values uniformly on $[0,T]$, so that $t_k=kT/M$, $0\leq k<M$. We set
+$$\mathbf{f}=(f(0\cdot T/M),f(1\cdot T/M),...,f((M-1)T/M)).$$
+We will use the $M=2N+1$ trigonometric functions
 $$\{e^{2\pi int/T} \}_{n=-N}^N$$ {#eq-basisfunctions}
 as a basis for interpolation.
 Let us find the unique function $p(t)=\sum_{n=-N}^N c_n e^{2\pi int/T}$ interpolating $f$ at the points 
-$\{kT/M\}_{k=0}^{M-1}$ using this basis. 
+$\{kT/M\}_{k=0}^{M-1}$. 
 If $t$ is one of the interpolation points we must have that
 $$
 \sum_{n=-N}^N c_ne^{2\pi int/T} = f(t),
 $$
 which can be written as 
 $$
-\begin{pmatrix} e^{-2\pi iNt_i/T} & \cdots & e^{-2\pi it_i/T} & 1 & e^{2\pi it_i/T} & \cdots & e^{2\pi iNt_i/T} \end{pmatrix}
-\begin{pmatrix} c_{-N} \\ \vdots \\ c_{-1} \\ c_0 \\ c_1 \\ \vdots & c_{-N} \end{pmatrix}
+\begin{pmatrix} e^{-2\pi iNt/T} & \cdots & e^{-2\pi it/T} & 1 & e^{2\pi it/T} & \cdots & e^{2\pi iNt/T} \end{pmatrix}
+\begin{pmatrix} c_{-N} \\ \vdots \\ c_{-1} \\ c_0 \\ c_1 \\ \vdots & \\ c_{-N} \end{pmatrix}
 = f(t).
 $$
 Since there are $2N+1$ unknowns $c_n$, let us also take $2N+1$ interpolation points. 
 We will choose these as $Tk/(2N+1)$ for $0\leq k\leq 2N$, i.e., uniformly distributed over one period. 
 With $M=2N+1$, since  the samples of the square wave is 
-$$x_s(Tk/M)=\begin{cases} 1 & \text{ for } k=0,...,N\\ -1 & \text{ for } k =N+1,...,2N\end{cases}$$
-and since $2\pi (Tk/M)/T=2\pi k/M$, this gives the following equations.
+$$f(Tk/M)=\begin{cases} 1 & \text{ for } k=0,...,N\\ -1 & \text{ for } k =N+1,...,2N\end{cases}$$
+and since $2\pi (Tk/M)/T=2\pi k/M$, this gives the system.
 $$
-\left(\begin{array} {ccc|ccc}
+\begin{pmatrix}
 e^{2\pi i0(-N)/M} & \cdots & e^{2\pi i0(-1)/M} & e^{2\pi i00/M} & \cdots & e^{2\pi i0N/M}\\
 e^{2\pi i1(-N)/M} & \cdots & e^{2\pi i1(-1)/M} & e^{2\pi i10/M} & \cdots & e^{2\pi i1N/M}\\
 \vdots & \ddots & \vdots & \vdots &\ddots & \vdots \\
 e^{\frac{2\pi i(M-1)(-N)}{M}} & \cdots & e^{\frac{2\pi i(M-1)(-1)}{M}} & e^{\frac{2\pi i(M-1)0}{M}} & \cdots & e^{\frac{2\pi i (M-1)N}{M}}
-\end{array}\right)
-\left(\begin{array}{c} c_{-N} \\ \vdots \\ c_{-1} \\ \hline c_0 \\ \vdots \\ c_N \end{array}\right)
+\end{pmatrix}
+\begin{pmatrix} c_{-N} \\ \vdots \\ c_{-1} \\ c_0 \\ c_1 \\ \vdots \\ c_N \end{pmatrix}
 =\mathbf{f}.
 $$
 
-We find the $c_n$: 
+The function `c_sampling` below takes as input the number `N` and the function `func` we sample,
+and then computes and returns the vector $\mathbf{c}$ as described above. 
+
 ```{pyodide-python}
 #| autorun: true
-n = np.arange(-N,N+1).reshape((1,-1))
-A = np.exp(2*np.pi*1j*n*tsp/T)
-c = np.linalg.solve(A,fsp)
-p = np.real( np.exp(2*np.pi*1j*n*tp/T) @ c )
+{{< include ../approximation/c_sampling.py >}}
 ```
-$p(t)$ is a real function.
-We can plot this together with the square wave itself as follows.
+
+One can show that $p(t)$ is a real function when $f$ is a real function. 
+
+::: {#exr-07}
+Write a function `points_p` which takes the following two inputs
+
+* A function `find_c` which can be used to compute the vector $\mathbf{c}$.
+* The number $N$ as described above. 
+
+`points_p` should return the values of $p$ at the time instances in the vector `tp`. 
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+The following code can be used. 
 ```{pyodide-python}
 #| autorun: true
-plt.plot( tp, p)
-plt.plot( tp, fp)
-plt.legend([f"f(t), M={M}",'f(t)'])
-plt.show()
+{{< include ../approximation/points_p.py >}}
 ```
-In order to listen to a set of samples as a sound we need the following function
+:::::::
+:::::
+:::
+
+Now we can plot the interpolating polynomial together with the square wave itself as follows.
+
+```{pyodide-python}
+#| autorun: true
+{{< include ../approximation/plot_trig_approx.py >}}
+```
+
+```{pyodide-python}
+#| autorun: true
+plot_trig_approx( lambda N: c_sampling(N, square_wave),square_wave, [5,10,20])
+```
+
+
+
+
+In order to listen to a set of samples as a sound we need the following functions
 ```{pyodide-python}
 #| autorun: true
 {{< include ../audiowrite.py >}}
@@ -125,18 +148,44 @@ We now generate sounds corresponding to a sine, a sum of two sines, a square wav
 #| autorun: true
 numsec=3
 
-t = np.linspace(0,numsec,samples_per_period*numsec*freq).reshape((-1,1))
-f = square_wave(t, T)
+t = np.linspace(0,numsec,samples_per_period*numsec*freq)
 sine = np.sin(2*np.pi*freq*t)
 
 freq_1=440
 freq_2=880
 x_2 = 0.5*np.sin(2*np.pi*freq_1*t) + 0.5*np.sin(2*np.pi*freq_2*t)
 
+fp = square_wave(tp)
+fr = fp.reshape(-1)
+fr = np.tile(fr, numsec*freq)
+
+p = points_p(lambda N: c_sampling(N, square_wave), 20)
 p = p.reshape(-1)
 p = np.tile(p, numsec*freq)
 p = p/np.abs(p).max()
 ```
+
+::: {#exr-6}
+What is the purpose of the line 
+```{pyodide-python}
+#| autorun: true
+p = p/np.abs(p).max()
+```
+in the code above?
+
+::::: {.content-visible when-profile="instructor"}
+::::::: {.callout-important title='Solution' collapse="true"}
+From the plot we see that some values of the interpolating polynomial lie outside the range $[-1,1]$. 
+For such values it is not defined what the computer should do. 
+Dividing by the maximum ensures that the values lie within the right interval, at the cost of a down-scaling of the sound 
+itself.
+:::::::
+:::::
+:::
+
+
+
+
 
 
 
@@ -148,7 +197,8 @@ Compute the samples of the square wave for three seconds, and listen to it.
 The following code can be used to generate the sound.
 ```{pyodide-python}
 #| autorun: true
-fr = f.reshape(-1)
+fp = square_wave(tp)
+fr = fp.reshape(-1)
 fr = np.tile(fr, numsec*freq)
 ```
 Press the buttons below to listen to it. 
@@ -163,21 +213,24 @@ By multiplying each sinusoid with $0.5$ we ensure that the sound samples never e
 
 ```{pyodide-python}
 #| eval: false
-audiowrite('leastsquares/sumofsines.wav', x_2, freq_s)
+audiowrite('sine.wav', sine, freq_s)
+audiowrite('sumofsines.wav', x_2, freq_s)
+audiowrite('square.wav', fr, freq_s)
+audiowrite('interpolant.wav', p, freq_s)
 ```
 
 ```{=html}
 <audio controls title="The sine wave">
-    <source src="../approximation/sine.wav" type="audio/mpeg">
+    <source src="sine.wav" type="audio/mpeg">
 </audio>
 <audio controls title="Sum of two sines">
     <source src="sumofsines.wav" type="audio/mpeg">
 </audio>
 <audio controls title="The square wave">
-    <source src="../approximation/square.wav" type="audio/mpeg">
+    <source src="square.wav" type="audio/mpeg">
 </audio>
 <audio controls title="Interpolant">
-    <source src="../approximation/interpolant.wav" type="audio/mpeg">
+    <source src="interpolant.wav" type="audio/mpeg">
 </audio>
  ```
 
@@ -207,7 +260,7 @@ since the trigonometric functions have period $2\pi$. The functions are thus ort
 :::::
 :::
 
-It follows that 
+It follows that the best approximation to a function $f$ from $V_{N,T}=\text{Span}\left(\{e^{2\pi int/T}\}_{n=-N}^N\right)$ is
 \begin{align*}
 \text{proj}_{V_{N,T}}(f) &= \sum_{n=-N}^N \frac{ \langle f,e^{2\pi int/T} \rangle }{ \langle e^{2\pi int/T} , e^{2\pi int/T}\rangle} e^{2\pi int/T} \\
 &= \frac{1}{T} \sum_{n=-N}^N \int_0^T f(t)e^{-2\pi int/T}\,dt e^{2\pi int/T}
@@ -219,7 +272,7 @@ This is also called the *Fourier series* of $f$. The coefficients of the $e^{2\p
 
 
 ::: {#exr-3}
-Find the best approximation of $x_s(T)$ from $V_{N,T}$.
+Find the best approximation of $f_s(T)$ from $V_{N,T}$.
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
@@ -238,50 +291,28 @@ $$\sum_{-N\leq n\leq N, n\neq 0} \frac{1-(-1)^n}{\pi in} e^{2\pi int/T}.$$
 :::::
 :::
 
-Once $N$ has been set, the vector $(c_{-N},...,c_{-1},c_0,c_1,...,c_N)$ can be found with the following code.
-```{pyodide-python}
-#| autorun: true
-{{< include find_fourier_coeffs.py >}}
-```
-
-
-Let us now see how we can plot a general Fourier series
-$$
-\sum_{n=-N}^N c_n e^{2\pi int/T},
-$$
-With $\mathbf{t}=(t_1,t_2,...,t_s)$ a vector of time samples, this can be written as
-$$
-\begin{pmatrix} e^{-2\pi iNt_i/T} & \cdots & e^{-2\pi it_i/T} & 1 & e^{2\pi it_i/T} & \cdots & e^{2\pi iNt_i/T} \end{pmatrix}
-\begin{pmatrix} c_{-N} \\ \vdots \\ c_{-1} \\ c_0 \\ c_1 \\ \vdots \\ c_{-N} \end{pmatrix}
-$$
-This means that the samples of the Fourier series can be found with the following function.
-```{pyodide-python}
-#| autorun: true
-{{< include compute_fourier.py >}}
-```
-
-
-::: {#exr-4}
-Plot the Fourier series of the square wave for $N=3,7,11$, together with the square wave itself. Plot over $[0,T]$. 
+::: {#exr-25}
+Write a function `c_square` which takes $N$ as input, and returns the Fourier coefficients
+$(c_{-N},...,c_{-1},c_0,c_1,...,c_N)$ of the square wave. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-The following code can be used.
+The following code can be used. 
 ```{pyodide-python}
 #| autorun: true
-Nvals = [3,7,11]
-plt.plot( tp, square_wave(tp,T), '-k', label = 'f(t)')
-
-for N in Nvals:
-    c, n = find_fourier_coeffs(N)
-    p = np.real( np.exp(2*np.pi*1j*n*tp/T) @ c )
-    plt.plot(tp, p, label=f"p(t), M={2*N+1}.")
-plt.legend()
-plt.show()
+{{< include c_square.py >}}
 ```
 :::::::
 :::::
 :::
+
+We can now use the function `plot_trig_approx` to plot a general Fourier series by replacing `c_sampling` with 
+`c_square`. We use the values $3$ , $7$, and $11$ for $N$.
+
+```{pyodide-python}
+#| autorun: true
+plot_trig_approx( c_square, square_wave, [3,7,11])
+```
 
 ::: {#exr-5}
 Listen to Fourier series of the square wave for $N=7$. 
@@ -291,20 +322,25 @@ Listen to Fourier series of the square wave for $N=7$.
 The following code can be used to generate the sound.
 ```{pyodide-python}
 #| autorun: true
-N = 7
-c = np.zeros((2*N+1))
-c[(N+1)::2] = 4/(np.arange(1, N+1, 2)*np.pi)
-x_4 = np.real(compute_fourier(t, c))
+p2 = points_p(c_square, 7)
+p2 = p2.reshape(-1)
+p2 = np.tile(p2, numsec*freq)
+p2 = p2/np.abs(p2).max()
 ```
+
+
+
+```{pyodide-python}
+#| eval: false
+audiowrite('fourierseries.wav', p2, freq_s)
+```
+
+```{=html}
+<audio controls title="The Fourier series">
+    <source src="fourierseries.wav" type="audio/mpeg">
+</audio>
+ ```
+
 :::::::
 :::::
-:::
-
-::: {#exr-6}
-The sound in the previous exercise did not resemble the square wave. Change the signal as follows:
-```{pyodide-python}
-#| autorun: true
-x_5=x_4/max(abs(x_4))
-```
-Why does the signal now sound much more like the square wave?
 :::

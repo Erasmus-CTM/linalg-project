@@ -101,12 +101,11 @@ Any continuous function is integrable.
 :::
 
 ::: {.proof}
-Let $\Pi_n=\{x_0,\dots,x_n\}$ be partitions of $[a,b]$ so that the size of the partitions go to 0, the size of a partition being 
-the largest distance between neighbouring points $x_{i-1}$ and $x_i$. We have that 
+Let $\Pi_n=\{x_0,\dots,x_n\}$ be partitions of $[a,b]$ so that $|\Pi_n|\to 0$. We have that 
 $$\underline{I}(\Pi_n)\leq  \int_a^b f(x)\,dx \leq \overline{I}(\Pi_n).$$ {#eq-help2prove}
 Assume that $\epsilon$ is given. 
 Since $f$ is continuous on $[a,b]$, it is also uniformly continuous on $[a,b]$. 
-Due to this, and since the size of the partitions goes to 0, 
+Due to this, and since $|\Pi_n|\to 0$, 
 there exists an $N$ so that, for $n\geq N$, $|f(x)-f(y)|\leq\epsilon/(b-a)$ for $x,y$ in the same sub-interval of $\Pi_n$. 
 In particular this means that $M_i-m_i\leq \epsilon/(b-a)$, and we get
 $$\overline{I}(\Pi_n)-\underline{I}(\Pi_n)=\sum_{i=1}^n (M_i-m_i)(x_i-x_{i-1})\leq \frac{\epsilon}{b-a}(x_i-x_{i-1})=\frac{\epsilon}{b-a}(b-a)=\epsilon.$$ 
@@ -120,7 +119,7 @@ Let $f\colon [a,b]\to\mathbb{R}$ be continuous, let $\Pi_n=\{x_0,\dots,x_n\}$ be
 $$
 \sum_{i=1}^n f(t_i)(x_i-x_{i-1})
 $$ {#eq-fundnumint}
-will converge to $\int_a^b f(x)\,dx$ as the "size" of the $\Pi_n$ goes to 0.
+will converge to $\int_a^b f(x)\,dx$ as $|\Pi_n|\to 0$.
 :::
 
 Thus, in general we can derive methods for numerical integration by splitting $[a,b]$ in small sub-intervals, 
@@ -556,7 +555,7 @@ we must evaluate the function we integrate twice in every point.
 
 Simpson's method requires us to use an odd number of points.
 
-> For an interval three partition points are needed. For every interval we add two more partition points, so that the total number of point always is odd.
+> For one interval three partition points are needed. For every interval we add two more partition points, so that the total number of point always is odd.
 
 1. [x] True
 2. [ ] False
@@ -590,7 +589,7 @@ What is the result?
 4. [ ] 3/5
 
 
-## Accuracy of the methods {.quiz-multiple}
+## Accuracy of the methods
 
 Which of the trapezoidal rule, the midpoint method, and Simpson's method, are most accurate for linear polynomials? 
 

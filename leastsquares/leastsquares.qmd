@@ -5,6 +5,12 @@
 #| autorun: true
 #| include: false
 {{< include ../_imports.py >}}
+{{< include ../approximation/setup_fs_f_T_spp.py >}}
+{{< include ../approximation/square_wave.py >}}
+{{< include ../approximation/triangle_wave.py >}}
+{{< include ../approximation/c_sampling.py >}}
+{{< include ../approximation/points_p.py >}}
+{{< include ../approximation/plot_trig_approx.py >}}
 ```
 
 ```{python}
@@ -15,6 +21,12 @@
 {{< include run3.py >}}
 {{< include plot_regression.py >}}
 {{< include run4.py >}}
+{{< include ../approximation/setup_fs_f_T_spp.py >}}
+{{< include ../approximation/square_wave.py >}}
+{{< include ../approximation/triangle_wave.py >}}
+{{< include ../approximation/c_sampling.py >}}
+{{< include ../approximation/points_p.py >}}
+{{< include ../approximation/plot_trig_approx.py >}}
 ```
 
 
@@ -619,42 +631,43 @@ $$
 The following code returns the Fourier coefficients, as well as the corresponding range of $n$-values in the sum.\index{python!np.delete}
 ```{pyodide-python}
 #| autorun: true
-def find_fourier_coeffs(N):
-    n = np.arange(-N,N+1).reshape((1,-1)).astype(float)
-    n = np.delete(n, N, axis=1)
-    c = ((1-(-1)**n)/(np.pi*1j*n)).T
-    return c, n
-```    
-Note that the code discards the value $n=0$, to avoid division by zero. 
-We can now plot the Fourier series as follows. 
+{{< include c_square.py >}}
+```
+The code discards the value $n=0$, to avoid division by zero. 
+We can now plot the Fourier series using the function `plot_trig_approx` from @sec-trigpol: 
 ```{pyodide-python}
 #| autorun: true
-def square_wave(t, T):
-    return 2*(t < T/2).astype(int) -1
-    
-Nvals = [3,7,11]
-freq_s = 44100
-freq = 440
-T= 1/freq
-samples_per_period = int(freq_s/freq)
-tp = np.linspace(0,T,samples_per_period).reshape((-1,1))
-plt.plot( tp, square_wave(tp,T), '-k', label = 'f(t)')
-
-for N in Nvals:
-    c, n = find_fourier_coeffs(N)
-    p = np.real( np.exp(2*np.pi*1j*n*tp/T)@c )
-    plt.plot(tp, p, label=f"p(t), M={2*N+1}.")
-plt.legend()
-plt.show()
+plot_trig_approx( c_square, square_wave, [5,10,20])
 ```
 
-::: {.content-visible when-format="html"}
-## Quiz {.unnumbered}
 
-```quizdown
 
+
+
+Let us listen to the Fourier series of the square wave for $N=7$. 
+We first generate the sound.
+```{pyodide-python}
+#| autorun: true
+numsec = 3
+p2 = points_p(c_square, 7)
+p2 = p2.reshape(-1)
+p2 = np.tile(p2, numsec*freq)
+p2 = p2/np.abs(p2).max()
 ```
-:::
+Then we write the time samples to file, and listen to the result. 
+```{pyodide-python}
+#| eval: false
+audiowrite('fourierseries.wav', p2, freq_s)
+```
+
+```{=html}
+<audio controls title="The Fourier series">
+    <source src="fourierseries.wav" type="audio/mpeg">
+</audio>
+ ```
+
+
+
 
 
 
@@ -713,50 +726,25 @@ We also get
 :::::::
 :::::
 
-(b) Write a function `find_fourier_triangle(n)` which returns the Fourier coefficients for the triangle wave for the  values of $n$ 
-listed in the vector `n`. 
+(b) Write a function `c_triangle(N)` which returns the Fourier coefficients $(c_{-N},...,c_N)$ for the triangle wave. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
-`find_fourier_triangle(n)` can be implemented as follows. 
+`c_triangle(N)` can be implemented as follows. 
 ```{pyodide-python}
 #| autorun: true
-def find_fourier_triangle(n):
-    I_00 = (T/(2*np.pi*1j*n))*(1-(-1)**n)
-    I_01 = -I_00
-    I_10 = -(T**2/(4*np.pi*1j*n))*(-1)**n \
-           +(T/(2*np.pi*1j*n))*I_00
-    I_11 = (-1)**n * ( (T/2)*I_00 + I_10  )
-    I_0 = I_00 - (4/T)*I_10 
-    I_1 = (4/T)*I_11 - 3*I_01
-    return (I_0+I_1).T/T
+{{< include c_triangle.py >}}
 ```
 :::::::
 :::::
- 
+
 (c) Repeat the setup from @exr-progtriwave in order to plot different Fourier series for the triangle wave. 
 
 ::::: {.content-visible when-profile="instructor"}
 ::::::: {.callout-important title='Solution' collapse="true"}
 ```{pyodide-python}
 #| autorun: true
-def plot_trig_approx_2(Nvals):
-    freq_s = 44100
-    freq = 440
-    T= 1/freq
-    samples_per_period = int(freq_s/freq)
-    tp = np.linspace(0,T,samples_per_period).reshape((-1,1))
-
-    for N in Nvals:
-        n = np.arange(-N,N+1).reshape((1,-1)).astype(float)
-        n = np.delete(n, N, axis=1)
-        c = find_fourier_triangle(n)
-        p = np.real( np.exp(2*np.pi*1j*n*tp/T)@c )
-        plt.plot(tp, p, label=f"p(t), M={2*N+1}.")
-    plt.legend()
-    plt.show()
-    
-plot_trig_approx_2([3,7,11])
+plot_trig_approx(c_triangle, triangle_wave, [5,10,20])
 ```
 :::::::
 :::::

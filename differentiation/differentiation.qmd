@@ -142,7 +142,8 @@ In other words, if we plot the logarithm of the error against the logarithm of $
 * the slope of the curve gives us the exponent $k$, and
 * the intersection with the $y$-axis is in $\log K$, so that we can find $K$ from this intersection.
 
-We write `plt.loglog(h,e)`\index{python!plt.loglog} to plot $\log h$ against $\log e$. `plt.loglog` has a syntax similar to that of the `plt.plot`-command.
+We write `plt.loglog(h,e)`\index{python!plt.loglog} to plot $\log h$ against $\log e$ (or simply write `plt.plot( plt.log(h), plt.log(e) )`). 
+`plt.loglog` has a syntax similar to that of the `plt.plot`-command.
 
 @fig-plotnewtonwithoutg shows a loglog plot of $h$ against the truncation error, together with the upper bound $M_2h/2$ for the error. 
 Here we set $M_2=1$, so that we again produce an overestimate. 
@@ -511,7 +512,7 @@ The error $\left| f^{\prime\prime} (0) - D_2f(0) \right|$ is limited by
 1. [ ] $\frac{h^2}{12}\max_{x\in[-h,h]}\left| f^{\prime\prime}(x)\right|$
 2. [ ] $\frac{h^2}{48}\max_{x\in[-h,h]}\left| f^{(4)}(x)\right|$
 3. [ ] $\frac{h}{4}\max_{x\in[-h,h]}\left| f^{\prime\prime}(x)\right|$
-4. [ ] $\frac{h^2}{12}\max_{x\in[-h,h]}\left| f^{(4)}(x)\right|$
+4. [x] $\frac{h^2}{12}\max_{x\in[-h,h]}\left| f^{(4)}(x)\right|$
 
 
 ## The symmetric Newton quotient
